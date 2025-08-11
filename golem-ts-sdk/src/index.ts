@@ -116,8 +116,14 @@ class Agent {
   }
 }
 
+// FIXME: agentType is already part of agentId, so we should not need to pass it separately
 async function getAgent(agentType: string, agentId: string): Promise<Agent> {
   const typedAgentId = AgentId.fromString(agentId);
+
+  if (typedAgentId.agentName.toString() !== agentType) {
+    // FIXME
+    throw new Error(`Agent ID ${agentId} does not match the expected type ${agentType}`);
+  }
 
   const agent = agents.get(typedAgentId);
 
