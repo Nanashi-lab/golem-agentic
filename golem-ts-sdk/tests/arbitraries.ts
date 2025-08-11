@@ -11,6 +11,7 @@ import {
   UnionComplexType,
   UnionType,
 } from './test-data';
+import { Either } from 'effect';
 
 export const mapArb: fc.Arbitrary<MapType> = fc
   .dictionary(fc.string(), fc.integer())
@@ -71,6 +72,10 @@ export const objectComplexArb: fc.Arbitrary<ObjectComplexType> = fc.record({
   i: tupleComplexArb,
   j: mapArb,
   k: fc.record({ n: fc.integer() }),
+  l: fc.oneof(
+    fc.record({ tag: fc.constant('ok'), val: fc.integer() }),
+    fc.record({ tag: fc.constant('err'), val: fc.string() }),
+  ),
 });
 
 export const unionComplexArb: fc.Arbitrary<UnionComplexType> = fc.oneof(

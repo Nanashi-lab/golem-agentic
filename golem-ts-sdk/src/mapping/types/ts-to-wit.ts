@@ -23,6 +23,7 @@ import {WitTypeBuilder} from "./wit-type-builder";
 import {numberToOrdinalKebab} from "./type-index-ordinal";
 import * as Either from "effect/Either";
 import {WitType} from "golem:agent/common";
+import {isInBuiltResult} from "./inbuilt";
 
 export function constructWitTypeFromTsType(type: Type): Either.Either<WitType, string> {
     return Either.flatMap(constructAnalysedTypeFromTsType(type), (analysedType) => {
@@ -94,7 +95,7 @@ export function constructAnalysedTypeFromTsType(type: TsType): Either.Either<Ana
                 const typeArg = type.getTypeArguments?.()[0];
 
                 if (!typeArg) {
-                    return Either.left("Array must have a type argument");
+                    return Either.left(`Unable to handle the type of ${type.name}. Array must have a type argument`);
                 }
 
                 return Either.map(constructAnalysedTypeFromTsType(typeArg), (result) =>
@@ -112,7 +113,7 @@ export function constructAnalysedTypeFromTsType(type: TsType): Either.Either<Ana
                 if (genericTypeDefinition.name === 'Map') {
                     const typeArgs = type.getTypeArguments?.();
                     if (!typeArgs || typeArgs.length !== 2) {
-                       return Either.left("Map must have a type argument");
+                       return Either.left(`Unable to handle the type ${type.name}. Map must have a type argument`);
                     }
                     const keyType = constructAnalysedTypeFromTsType(typeArgs[0]);
                     const valueType = constructAnalysedTypeFromTsType(typeArgs[1]);
@@ -120,14 +121,29 @@ export function constructAnalysedTypeFromTsType(type: TsType): Either.Either<Ana
                     return Either.zipWith(keyType, valueType, (keyType, valueType) =>
                         analysedType.list(analysedType.tuple([keyType, valueType])))
 
+                } else if (isInBuiltResult(type)) {
+                    const okType = type.getTypeArguments?.()[0];
+                    const errType = type.getTypeArguments?.()[1];
+
+                    if (!okType || !errType) {
+                        return Either.left(`Unable to handle the type ${type.name}. Result type must have concrete type arguments`);
+                    }
+
+                    const okAnalysed = constructAnalysedTypeFromTsType(okType);
+                    const errAnalysed = constructAnalysedTypeFromTsType(errType);
+
+                    return Either.zipWith(okAnalysed, errAnalysed, (okType, errType) => {
+                        return analysedType.result(okType, errType);
+                    })
+
                 } else {
-                    return Either.left("Type must have a type argument");
+                    return Either.left(`Unable to handle the type of ${type.name}. The type id is ${genericType.id}.`);
                 }
             } else {
                 const typeArg = type.getTypeArguments?.()[0];
 
                 if (!typeArg) {
-                    return Either.left("Array must have a type argument");
+                    return Either.left(`Unable to handle the type of ${type.name}. The type id is ${type.id}.`);
                 }
 
                 return constructAnalysedTypeFromTsType(typeArg);

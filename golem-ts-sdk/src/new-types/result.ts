@@ -1,0 +1,85 @@
+// A few new types that can be used instead of data types such as Effect.Either
+
+/**
+ * A simple Result type that can be used to represent success or failure.
+ * It is similar to Effect.Either. This is exposed as data types such as Effect.Either
+ * are not supported by golem-ts-sdk.
+ *
+ * SDK developer note: `namespace` cannot be used in the SDK, as it is not supported by RTTIST.
+ * Hence, functionalities such as `map`, `mapBoth` are not under the namespace `Result` as in Effect.Either.
+ */
+export type Result<T, E> = { tag: 'ok'; val: T } | { tag: 'err'; val: E };
+
+/**
+ * Creates a Result with a successful value.
+ * @param val
+ */
+function ok<T, E = never>(val: T): Result<T, E> {
+  return { tag: 'ok', val };
+}
+
+/**
+ * Creates a Result with an error value.
+ * @param val
+ */
+function err<T = never, E = unknown>(val: E): Result<T, E> {
+  return { tag: 'err', val };
+}
+
+/**
+ * Maps a Result's value using the provided function if it is an 'ok' Result.
+ * If the Result is an 'err', it returns the Result unchanged.
+ * @param r The Result to map.
+ * @param f The function to apply to the value if it is 'ok'.
+ */
+function map<T, E, U>(r: Result<T, E>, f: (t: T) => U): Result<U, E> {
+  return r.tag === 'ok' ? ok(f(r.val)) : r;
+}
+
+/**
+ * Maps both the 'ok' and 'err' values of a Result using the provided functions.
+ * If the Result is 'ok', it applies onOk to the value; if 'err', it applies onErr to the error.
+ * @param r The Result to map.
+ * @param onOk The function to apply to the value if it is 'ok'.
+ * @param onErr The function to apply to the error if it is 'err'.
+ */
+function mapBoth<T, E, U, F>(
+  r: Result<T, E>,
+  onOk: (t: T) => U,
+  onErr: (e: E) => F,
+): Result<U, F> {
+  return r.tag === 'ok' ? ok(onOk(r.val)) : err(onErr(r.val));
+}
+
+/**
+ * Combines two Results into one Result containing a tuple of their values.
+ * If either Result is 'err', it returns that error.
+ * @param ra The first Result.
+ * @param rb The second Result.
+ */
+function zipBoth<A, B, E>(
+  ra: Result<A, E>,
+  rb: Result<B, E>,
+): Result<[A, B], E> {
+  if (ra.tag === 'err') {
+    return { tag: 'err', val: ra.val } as Result<[A, B], E>;
+  }
+  if (rb.tag === 'err') {
+    return { tag: 'err', val: rb.val } as Result<[A, B], E>;
+  }
+  return ok([ra.val, rb.val]);
+}
+
+/**
+ * Combines an array of Results into a single Result containing an array of values.
+ * If any Result is 'err', it returns that error.
+ * @param results An array of Results to combine.
+ */
+function allResults<T, E>(results: Result<T, E>[]): Result<T[], E> {
+  const vals: T[] = [];
+  for (const r of results) {
+    if (r.tag === 'err') return r;
+    vals.push(r.val);
+  }
+  return ok(vals);
+}
