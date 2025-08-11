@@ -88,6 +88,6 @@ jobs:
       - name: Publish to npm
         working-directory: ./golem-ts-sdk
         run: |
-          npm publish --access public --tag test
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
