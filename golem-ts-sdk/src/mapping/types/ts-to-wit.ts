@@ -137,13 +137,13 @@ export function constructAnalysedTypeFromTsType(type: TsType): Either.Either<Ana
                     })
 
                 } else {
-                    return Either.left(`Unable to handle the type of ${type.name}`);
+                    return Either.left(`Unable to handle the type of ${type.name}. The type id is ${genericType.id}.`);
                 }
             } else {
                 const typeArg = type.getTypeArguments?.()[0];
 
                 if (!typeArg) {
-                    return Either.left(`Unable to handle the type of ${type.name}`);
+                    return Either.left(`Unable to handle the type of ${type.name}. The type id is ${type.id}.`);
                 }
 
                 return constructAnalysedTypeFromTsType(typeArg);
