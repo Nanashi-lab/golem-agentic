@@ -17,8 +17,9 @@ import { ResolvedAgent } from './resolved-agent';
 import { AgentId } from './agent-id';
 import { getRegisteredAgents } from './agent-registry';
 import { agentInitiators } from './agent-Initiator';
-import { Result, WitValue } from 'golem:rpc/types@0.2.2';
+import { Result } from 'golem:rpc/types@0.2.2';
 import { AgentError, DataValue } from 'golem:agent/common';
+import { constructWitValueFromValue } from './mapping/values/value';
 
 export { BaseAgent } from './base-agent';
 export { AgentId } from './agent-id';
@@ -27,6 +28,23 @@ export { Metadata } from './type_metadata';
 
 /// Registry
 export const agents = new Map<AgentId, Agent>();
+
+const UninitializedAgentError: AgentError = {
+  tag: 'custom-error',
+  val: {
+    tag: 'tuple',
+    val: [
+      {
+        tag: 'component-model',
+        val: constructWitValueFromValue({
+          kind: 'string',
+          value:
+            'Agent is not initialized. Please create an agent first using static function called create',
+        }),
+      },
+    ],
+  },
+};
 
 // Component export
 class Agent {
@@ -40,10 +58,23 @@ class Agent {
     methodName: string,
     input: DataValue,
   ): Promise<Result<DataValue, AgentError>> {
+    if (!this.resolvedAgent) {
+      return {
+        tag: 'err',
+        val: UninitializedAgentError,
+      };
+    }
+
     return this.resolvedAgent.invoke(methodName, input);
   }
 
   async getDefinition(): Promise<any> {
+    if (!this.resolvedAgent) {
+      return {
+        tag: 'err',
+        val: UninitializedAgentError,
+      };
+    }
     this.resolvedAgent.getDefinition();
   }
 
@@ -56,9 +87,12 @@ class Agent {
     if (!initiator) {
       const entries = Array.from(agentInitiators.keys());
 
-      throw new Error(
-        `No implementation found for agent: ${agentType}. Valid entries are ${entries.join(', ')}`,
-      );
+      return {
+        tag: 'err',
+        val: agentError(
+          `No implementation found for agent: ${agentType}. Valid entries are ${entries.join(', ')}`,
+        ),
+      };
     }
 
     const initiateResult = initiator.initiate(agentType, input);
@@ -101,6 +135,24 @@ async function discoverAgents(): Promise<Agent[]> {
 
 async function discoverAgentTypes(): Promise<bindings.guest.AgentType[]> {
   return getRegisteredAgents();
+}
+
+function agentError(error: string): AgentError {
+  return {
+    tag: 'custom-error',
+    val: {
+      tag: 'tuple',
+      val: [
+        {
+          tag: 'component-model',
+          val: constructWitValueFromValue({
+            kind: 'string',
+            value: error,
+          }),
+        },
+      ],
+    },
+  };
 }
 
 export const guest: typeof bindings.guest = {
