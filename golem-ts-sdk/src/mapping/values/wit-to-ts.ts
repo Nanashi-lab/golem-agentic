@@ -25,6 +25,7 @@ import {
 } from 'rttist';
 import { WitValue } from 'golem:rpc/types@0.2.2';
 import { constructValueFromWitValue, Value } from './value';
+import { isInBuiltResult } from '../types/inbuilt';
 
 // Note that we take `expectedType: Type` instead of `expectedType: AnalysedType`(because at this point `AnalysedType` of the `witValue`
 // is also available) as `Type` holds more information, and help us have fine-grained control over the type conversion.
@@ -434,6 +435,37 @@ function constructTsValueFromValue(value: Value, expectedType: Type): any {
             return new Map(entries);
           } else {
             throw new Error(`Expected Map, obtained value ${value}`);
+          }
+        } else if (isInBuiltResult(expectedType)) {
+          if (value.kind === 'result') {
+            const resultValue = value.value;
+
+            const typeArgs = expectedType.getTypeArguments?.();
+            if (!typeArgs || typeArgs.length !== 2) {
+              throw new Error('Result type must have two type arguments');
+            }
+
+            if (resultValue.ok !== undefined) {
+              const okType = typeArgs[0];
+              const resulValue = resultValue.ok;
+              const tsValue = constructTsValueFromValue(resulValue, okType);
+              return {
+                tag: 'ok',
+                val: tsValue,
+              };
+            } else if (resultValue.err !== undefined) {
+              const errType = typeArgs[1];
+              const resulValue = resultValue.err;
+              const tsValue = constructTsValueFromValue(resulValue, errType);
+              return {
+                tag: 'err',
+                val: tsValue,
+              };
+            } else {
+              throw new Error(
+                `Expected result with ok or err, obtained value ${value}`,
+              );
+            }
           }
         } else {
           throw new Error('Type must have a type argument');

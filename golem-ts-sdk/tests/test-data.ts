@@ -11,6 +11,7 @@
 // functions in type-utils.ts in tests module.
 
 // ─────────────────────────────────────────────────────────────────────────────
+import { Result } from '../src/new-types';
 
 interface SimpleInterfaceType {
   n: number;
@@ -47,6 +48,7 @@ export type UnionComplexType =
   | TupleComplexType
   | SimpleInterfaceType;
 // FIXME: RTTIST don't support these types to be part of union yet - fails at type-gen
+//| Result<String, string>
 // | MapType
 // | ListType
 // | ListComplexType
@@ -63,6 +65,7 @@ export type ObjectComplexType = {
   i: TupleComplexType;
   j: MapType;
   k: SimpleInterfaceType;
+  l: Result<number, string>;
 };
 
 export interface TestInterfaceType {

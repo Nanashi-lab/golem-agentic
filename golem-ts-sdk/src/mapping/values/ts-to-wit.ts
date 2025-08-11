@@ -25,6 +25,7 @@ import { WitValue } from 'golem:rpc/types@0.2.2';
 import { constructWitValueFromValue, Value } from './value';
 import * as Either from 'effect/Either';
 import * as Option from 'effect/Option';
+import { isInBuiltResult } from '../types/inbuilt';
 
 export function constructWitValueFromTsValue(
   tsValue: any,
@@ -234,7 +235,7 @@ function constructValueFromTsValue(
         return Either.left(invalidTypeError(tsValue, 'string literal'));
       }
     default:
-      return Either.left(unexpectedTypeError(tsValue, Option.none()));
+      return Either.left(unexpectedTypeError(tsValue, type, Option.none()));
   }
 }
 
@@ -257,6 +258,7 @@ function handleGeneralType(
   return Either.left(
     unexpectedTypeError(
       tsValue,
+      type,
       Option.some(`Unsupported TypeKind.Type: ${type.displayName}`),
     ),
   );
@@ -271,6 +273,7 @@ function handleArrayType(
     return Either.left(
       unexpectedTypeError(
         tsValue,
+        type,
         Option.some('unable to infer the type of Array'),
       ),
     );
@@ -309,13 +312,74 @@ function handleMapType(tsValue: any, type: Type): Either.Either<Value, string> {
   const name = genericType.genericTypeDefinition.name;
 
   if (name === 'Map') return handleKeyValuePairs(tsValue, type);
+  if (isInBuiltResult(type)) {
+    const okType = genericType.getTypeArguments?.()[0];
+    const errorType = genericType.getTypeArguments?.()[1];
+
+    if (!okType || !errorType) {
+      return Either.left(
+        unexpectedTypeError(
+          tsValue,
+          type,
+          Option.some('Result must have two type arguments'),
+        ),
+      );
+    }
+    return handleResultType(tsValue, okType, errorType);
+  }
 
   return Either.left(
     unexpectedTypeError(
       tsValue,
+      type,
       Option.some(`Unsupported generic type: ${name}`),
     ),
   );
+}
+
+function handleResultType(
+  tsValue: any,
+  okType: Type,
+  errorType: Type,
+): Either.Either<Value, string> {
+  if (
+    typeof tsValue === 'object' &&
+    tsValue !== null &&
+    'tag' in tsValue &&
+    'val' in tsValue
+  ) {
+    if (tsValue.tag === 'ok') {
+      const okTsVal = tsValue.val;
+
+      const okValue = constructValueFromTsValue(okTsVal, okType);
+
+      return Either.map(okValue, (okValue) => {
+        return {
+          kind: 'result',
+          value: {
+            ok: okValue,
+          },
+        };
+      });
+    } else if (tsValue.tag === 'err') {
+      const errTsVal = tsValue.val;
+
+      const errValue = constructValueFromTsValue(errTsVal, errorType);
+
+      return Either.map(errValue, (errValue) => {
+        return {
+          kind: 'result',
+          value: {
+            err: errValue,
+          },
+        };
+      });
+    } else {
+      return Either.left(invalidTypeError(tsValue, 'result'));
+    }
+  } else {
+    return Either.left(invalidTypeError(tsValue, 'result'));
+  }
 }
 
 function handleKeyValuePairs(
@@ -327,6 +391,7 @@ function handleKeyValuePairs(
     return Either.left(
       unexpectedTypeError(
         tsValue,
+        type,
         Option.some('Map must have two type arguments'),
       ),
     );
@@ -340,6 +405,7 @@ function handleKeyValuePairs(
     return Either.left(
       unexpectedTypeError(
         tsValue,
+        type,
         Option.some('unable to infer key or value type'),
       ),
     );
@@ -507,6 +573,26 @@ function matchesComplexType(value: any, type: Type): boolean {
       );
     }
 
+    if (isInBuiltResult(type)) {
+      const okType = genericType.getTypeArguments?.()[0];
+      const errorType = genericType.getTypeArguments?.()[1];
+
+      if (!okType || !errorType) {
+        return false;
+      }
+
+      if (typeof value !== 'object' || value === null) return false;
+
+      if ('tag' in value && 'val' in value) {
+        if (value.tag === 'ok') {
+          return matchesType(value.val, okType);
+        } else if (value.tag === 'err') {
+          return matchesType(value.val, errorType);
+        }
+      }
+      return false;
+    }
+
     return false;
   }
 
@@ -569,8 +655,9 @@ function unionTypeMatchError(unionTypes: Type[], tsValue: any): string {
 
 function unexpectedTypeError(
   tsValue: any,
+  expectedType: Type,
   message: Option.Option<string>,
 ): string {
-  const error = `${tsValue} has a type that is currently not supported as agent argument or result type. `;
+  const error = `Value ${JSON.stringify(tsValue)} cannot be handled. Type of this value is inferred to be ${expectedType.name}`;
   return error + (Option.isSome(message) ? ` Reason: ${message.value}` : '');
 }

@@ -122,7 +122,9 @@ async function getAgent(agentType: string, agentId: string): Promise<Agent> {
 
   if (typedAgentId.agentName.toString() !== agentType) {
     // FIXME
-    throw new Error(`Agent ID ${agentId} does not match the expected type ${agentType}`);
+    throw new Error(
+      `Agent ID ${agentId} does not match the expected type ${agentType}`,
+    );
   }
 
   const agent = agents.get(typedAgentId);
