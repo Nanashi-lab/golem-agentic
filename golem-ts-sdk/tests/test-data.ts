@@ -11,7 +11,7 @@
 // functions in type-utils.ts in tests module.
 
 // ─────────────────────────────────────────────────────────────────────────────
-import { Result } from '../src/new-types';
+import { Result } from '../src/new-types/result';
 
 interface SimpleInterfaceType {
   n: number;

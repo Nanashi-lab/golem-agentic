@@ -25,6 +25,7 @@ export { BaseAgent } from './base-agent';
 export { AgentId } from './agent-id';
 export { Prompt, Description, Agent } from './decorators';
 export { Metadata } from './type_metadata';
+export { Result } from './new-types/result';
 
 /// Registry
 export const agents = new Map<AgentId, Agent>();
