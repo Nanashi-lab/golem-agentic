@@ -66,6 +66,7 @@ export type ObjectComplexType = {
   j: MapType;
   k: SimpleInterfaceType;
   l: Result<number, string>;
+  //m: Either.Either<number, string> // FIXME: Effect.Either is inferred as Invalid by RTTIST
 };
 
 export interface TestInterfaceType {

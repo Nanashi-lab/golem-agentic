@@ -6,3 +6,4 @@ export function isInBuiltResult(type: Type): boolean {
 
     return typeDef.name === 'Result' && typeDef.id == '@@golemcloud/golem-ts-sdk/src/new-types:Result'
 }
+

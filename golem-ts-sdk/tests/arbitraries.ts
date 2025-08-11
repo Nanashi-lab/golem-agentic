@@ -11,6 +11,7 @@ import {
   UnionComplexType,
   UnionType,
 } from './test-data';
+import { Either } from 'effect';
 
 export const mapArb: fc.Arbitrary<MapType> = fc
   .dictionary(fc.string(), fc.integer())
