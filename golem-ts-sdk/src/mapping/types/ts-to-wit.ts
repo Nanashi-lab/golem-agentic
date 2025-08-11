@@ -132,7 +132,7 @@ export function constructAnalysedTypeFromTsType(type: TsType): Either.Either<Ana
                     const okAnalysed = constructAnalysedTypeFromTsType(okType);
                     const errAnalysed = constructAnalysedTypeFromTsType(errType);
 
-                    Either.zipWith(okAnalysed, errAnalysed, (okType, errType) => {
+                    return Either.zipWith(okAnalysed, errAnalysed, (okType, errType) => {
                         return analysedType.result(okType, errType);
                     })
 

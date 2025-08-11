@@ -419,6 +419,17 @@ function checkUnionComplexFields(fields: NameTypePair[]) {
                   },
                 },
               },
+              {
+                name: 'l',
+                typ: {
+                  kind: 'result',
+                  value: {
+                    ok: { kind: 's32' },
+                    err: { kind: 'string' },
+                    name: undefined,
+                  },
+                },
+              },
             ],
             name: undefined,
           },
@@ -716,6 +727,17 @@ function checkObjectComplexFields(fields: any[]) {
         kind: 'record',
         value: {
           fields: [{ name: 'n', typ: { kind: 's32' } }],
+          name: undefined,
+        },
+      },
+    },
+    {
+      name: 'l',
+      typ: {
+        kind: 'result',
+        value: {
+          ok: { kind: 's32' },
+          err: { kind: 'string' },
           name: undefined,
         },
       },
