@@ -7,7 +7,7 @@ export default [
         ignores: ['.metadata/**', 'tests/**', 'dist/**', 'types/**'],
     },
     {
-        files: ['src/**/*.{ts,tsx}'], // Lint only actual source
+        files: ['src/**/*.{ts,tsx}'],
         languageOptions: {
             parser: parserTs,
             parserOptions: {
