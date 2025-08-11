@@ -63,7 +63,7 @@ class Agent {
 
     const initiateResult = initiator.initiate(agentType, input);
 
-    if (initiateResult.tag == 'ok') {
+    if (initiateResult.tag === 'ok') {
       const agent = new Agent();
       agent.resolvedAgent = initiateResult.val;
 

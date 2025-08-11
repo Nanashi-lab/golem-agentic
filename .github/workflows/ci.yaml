@@ -28,6 +28,14 @@ jobs:
         run: |
           npm install
 
+      - name: Check code quality
+        working-directory: ./golem-ts-sdk
+        run: |
+          npm run lint || (
+            echo "Linting issues found. Please fix them before proceeding. `npm run lint:fix` may help"
+            exit 1
+          )     
+
       - name: Check code formatting
         working-directory: ./golem-ts-sdk
         run: |

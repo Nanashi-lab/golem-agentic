@@ -39,12 +39,12 @@ export function constructTsValueFromWitValue(
 }
 
 function constructTsValueFromValue(value: Value, expectedType: Type): any {
-  if (value == undefined) {
+  if (value === undefined) {
     return null;
   }
 
   // There is no option type in type-script, so take analysed type along with expected type.
-  if (value.kind == 'option') {
+  if (value.kind === 'option') {
     if (!value.value) {
       return null;
     } else {
@@ -91,7 +91,7 @@ function constructTsValueFromValue(value: Value, expectedType: Type): any {
         throw new Error(`Expected number, obtained value ${value}`);
       }
     case TypeKind.BigInt:
-      if (value.kind == 'u64') {
+      if (value.kind === 'u64') {
         return value.value;
       } else {
         throw new Error(`Expected bigint, obtained value ${value}`);
@@ -103,7 +103,7 @@ function constructTsValueFromValue(value: Value, expectedType: Type): any {
         throw new Error(`Expected string, obtained value ${value}`);
       }
     case TypeKind.NonPrimitiveObject:
-      if (value.kind == 'record') {
+      if (value.kind === 'record') {
         const fieldValues = value.value;
         const expectedTypeFields: ReadonlyArray<PropertyInfo> = (
           expectedType as ObjectType
@@ -153,7 +153,7 @@ function constructTsValueFromValue(value: Value, expectedType: Type): any {
     case TypeKind.Error:
       if (value.kind === 'result') {
         if (value.value.err !== undefined) {
-          if (value.value.err.kind == 'string') {
+          if (value.value.err.kind === 'string') {
             return new Error(value.value.err.value);
           } else {
             throw new Error(
@@ -388,7 +388,7 @@ function constructTsValueFromValue(value: Value, expectedType: Type): any {
       return constructTsValueFromValue(value, innerType);
     case TypeKind.Type:
       if (expectedType.isArray()) {
-        if (value.kind == 'list') {
+        if (value.kind === 'list') {
           return value.value.map((item: Value) =>
             constructTsValueFromValue(
               item,
@@ -400,7 +400,7 @@ function constructTsValueFromValue(value: Value, expectedType: Type): any {
         }
       } else if (expectedType.isTuple()) {
         const typeArg = expectedType.getTypeArguments?.();
-        if (value.kind == 'tuple') {
+        if (value.kind === 'tuple') {
           return value.value.map((item: Value, idx: number) =>
             constructTsValueFromValue(item, typeArg[idx]),
           );
@@ -411,14 +411,14 @@ function constructTsValueFromValue(value: Value, expectedType: Type): any {
         const genericType: GenericType<typeof expectedType> =
           expectedType as GenericType<typeof expectedType>;
         const genericTypeDefinition = genericType.genericTypeDefinition;
-        if (genericTypeDefinition.name == 'Map') {
+        if (genericTypeDefinition.name === 'Map') {
           const typeArgs = expectedType.getTypeArguments?.();
 
           if (!typeArgs || typeArgs.length !== 2) {
             throw new Error('Map must have two type arguments');
           }
 
-          if (value.kind == 'list') {
+          if (value.kind === 'list') {
             const entries: [any, any][] = value.value.map((item: Value) => {
               if (item.kind !== 'tuple' || item.value.length !== 2) {
                 throw new Error(

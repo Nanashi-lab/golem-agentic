@@ -115,7 +115,7 @@ export function Agent() {
     if (agentRegistry.has(className)) return ctor;
 
     let classType = Metadata.getTypes().filter(
-      (type) => type.isClass() && type.name == className,
+      (type) => type.isClass() && type.name === className,
     )[0];
 
     let filteredType = classType as ClassType;

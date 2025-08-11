@@ -109,7 +109,7 @@ export function constructAnalysedTypeFromTsType(type: TsType): Either.Either<Ana
             } else if (type.isGenericType()) {
                 const genericType: GenericType<typeof type> = (type as GenericType<typeof type>);
                 const genericTypeDefinition = genericType.genericTypeDefinition;
-                if (genericTypeDefinition.name == 'Map') {
+                if (genericTypeDefinition.name === 'Map') {
                     const typeArgs = type.getTypeArguments?.();
                     if (!typeArgs || typeArgs.length !== 2) {
                        return Either.left("Map must have a type argument");
