@@ -4,7 +4,7 @@ import parserTs from '@typescript-eslint/parser';
 
 export default [
     {
-        ignores: ['.metadata/**', 'tests/**', 'dist/**', 'types/**'], // 🚀 Ignore generated + test code
+        ignores: ['.metadata/**', 'tests/**', 'dist/**', 'types/**'],
     },
     {
         files: ['src/**/*.{ts,tsx}'], // Lint only actual source
