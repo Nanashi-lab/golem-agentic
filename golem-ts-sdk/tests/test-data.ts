@@ -11,7 +11,7 @@
 // functions in type-utils.ts in tests module.
 
 // ─────────────────────────────────────────────────────────────────────────────
-import { Result } from '../src/new-types/result';
+import { Either } from '../src/new-types/either';
 
 interface SimpleInterfaceType {
   n: number;
@@ -67,7 +67,7 @@ export type ObjectComplexType = {
   i: TupleComplexType;
   j: MapType;
   k: SimpleInterfaceType;
-  l: Result<number, string>;
+  l: Either<number, string>;
   //m: Either.Either<number, string> // FIXME: Effect.Either is inferred as Invalid by RTTIST
 };
 
