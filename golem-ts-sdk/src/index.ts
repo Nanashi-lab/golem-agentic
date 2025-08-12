@@ -20,10 +20,11 @@ import { agentInitiators } from './agent-Initiator';
 import { Result } from 'golem:rpc/types@0.2.2';
 import { AgentError, DataValue } from 'golem:agent/common';
 import { constructWitValueFromValue } from './mapping/values/value';
+import { createCustomError } from './agent-error';
 
 export { BaseAgent } from './base-agent';
 export { AgentId } from './agent-id';
-export { Prompt, Description, Agent } from './decorators';
+export { prompt, description, agent } from './decorators';
 export { Metadata } from './type_metadata';
 export { Result } from './new-types/result';
 
@@ -90,7 +91,7 @@ class Agent {
 
       return {
         tag: 'err',
-        val: agentError(
+        val: createCustomError(
           `No implementation found for agent: ${agentType}. Valid entries are ${entries.join(', ')}`,
         ),
       };
@@ -144,24 +145,6 @@ async function discoverAgents(): Promise<Agent[]> {
 
 async function discoverAgentTypes(): Promise<bindings.guest.AgentType[]> {
   return getRegisteredAgents();
-}
-
-function agentError(error: string): AgentError {
-  return {
-    tag: 'custom-error',
-    val: {
-      tag: 'tuple',
-      val: [
-        {
-          tag: 'component-model',
-          val: constructWitValueFromValue({
-            kind: 'string',
-            value: error,
-          }),
-        },
-      ],
-    },
-  };
 }
 
 export const guest: typeof bindings.guest = {
