@@ -1,7 +1,7 @@
 // A few new types that can be used instead of data types such as Effect.Either
 
 /**
- * A simple Result type that can be used to represent success or failure.
+ * A simple Either type that can be used to represent success or failure.
  * It is similar to Effect.Either. This is exposed as data types such as Effect.Either
  * are not supported by golem-ts-sdk.
  *
