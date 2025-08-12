@@ -253,7 +253,7 @@ function handleGeneralType(
 ): Either.Either<Value, string> {
   if (type.isArray()) return handleArrayType(tsValue, type);
   if (type.isTuple()) return handleTupleType(tsValue, type);
-  if (type.isGenericType()) return handleMapType(tsValue, type);
+  if (type.isGenericType()) return handleOtherComplexTypes(tsValue, type);
 
   return Either.left(
     unexpectedTypeError(
@@ -307,26 +307,18 @@ function handleTupleType(
   );
 }
 
-function handleMapType(tsValue: any, type: Type): Either.Either<Value, string> {
+function handleOtherComplexTypes(
+  tsValue: any,
+  type: Type,
+): Either.Either<Value, string> {
   const genericType = type as GenericType<typeof type>;
   const name = genericType.genericTypeDefinition.name;
 
   if (name === 'Map') return handleKeyValuePairs(tsValue, type);
-  if (isInBuiltResult(type)) {
-    const okType = genericType.getTypeArguments?.()[0];
-    const errorType = genericType.getTypeArguments?.()[1];
 
-    if (!okType || !errorType) {
-      return Either.left(
-        unexpectedTypeError(
-          tsValue,
-          type,
-          Option.some('Result must have two type arguments'),
-        ),
-      );
-    }
-    return handleResultType(tsValue, okType, errorType);
-  }
+  if (isInBuiltResult(type)) return handleInBuiltResult(tsValue, type);
+
+  if (name === 'Promise') return handlePromiseType(tsValue, type);
 
   return Either.left(
     unexpectedTypeError(
@@ -335,6 +327,26 @@ function handleMapType(tsValue: any, type: Type): Either.Either<Value, string> {
       Option.some(`Unsupported generic type: ${name}`),
     ),
   );
+}
+
+function handlePromiseType(
+  tsValue: any,
+  type: Type,
+): Either.Either<Value, string> {
+  const typeArgs = type.getTypeArguments?.();
+
+  if (!typeArgs || typeArgs.length !== 1) {
+    return Either.left(
+      unexpectedTypeError(
+        tsValue,
+        type,
+        Option.some(`${type.name} must have one type argument`),
+      ),
+    );
+  }
+
+  const innerType = typeArgs[0];
+  return constructValueFromTsValue(tsValue, innerType);
 }
 
 function handleResultType(
@@ -380,6 +392,25 @@ function handleResultType(
   } else {
     return Either.left(invalidTypeError(tsValue, 'result'));
   }
+}
+
+function handleInBuiltResult(
+  tsValue: any,
+  genericType: Type,
+): Either.Either<Value, string> {
+  const okType = genericType.getTypeArguments?.()[0];
+  const errorType = genericType.getTypeArguments?.()[1];
+
+  if (!okType || !errorType) {
+    return Either.left(
+      unexpectedTypeError(
+        tsValue,
+        genericType,
+        Option.some('Result must have two type arguments'),
+      ),
+    );
+  }
+  return handleResultType(tsValue, okType, errorType);
 }
 
 function handleKeyValuePairs(

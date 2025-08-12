@@ -9,6 +9,7 @@ import {
   getTupleType,
   getUnionType,
   getUnionComplexType,
+  getPromiseType,
 } from './utils';
 import { TestInterfaceType } from './test-data';
 import {
@@ -37,6 +38,26 @@ describe('typescript value to wit value round-trip conversions', () => {
     fc.assert(
       fc.property(interfaceArb, (arbData) => {
         const type = getTestInterfaceType();
+        runRoundTripTest(arbData, type);
+      }),
+    );
+  });
+
+  // Note that in the case of promise, it can only be part of the return type of agent function
+  // Also a value of promise as such will not be handled by the mapping layer,
+  // Hence we generate normal values, and see if it works with the promise type.
+  // Such a test ensures the following type of code works correctly:
+  // This test replicates the following idea
+  // ```ts
+  // async function testFn(): Promise<string> {
+  //   return 'test';
+  // }
+  // ```
+  // In this case, `test` is a string pointing to the value of the promise.
+  it('should correctly perform round-trip conversion for arbitrary values of promise type', () => {
+    fc.assert(
+      fc.property(fc.string(), (arbData) => {
+        const type = getPromiseType();
         runRoundTripTest(arbData, type);
       }),
     );

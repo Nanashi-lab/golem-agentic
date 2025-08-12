@@ -7,6 +7,7 @@ import {
   getBooleanType,
   getNumberType,
   getStringType,
+  getPromiseType,
 } from './utils';
 import {
   analysedType,
@@ -88,6 +89,22 @@ describe('TypeScript primitives to AnalysedType', () => {
     const numberType = getNumberType();
     const result = constructAnalysedTypeFromTsType(numberType);
     expect(Either.getRight(result)).toEqual(Option.some(analysedType.s32()));
+  });
+});
+
+// A promise<inner> type will be considered as AnalysedType<inner>,
+// as TypeScript allows returning the value that the promise resolves to
+describe('TypeScript Promise type to type', () => {
+  it('Promise type is converted to AnalysedType', () => {
+    const promiseType = getPromiseType();
+    const result = Either.getOrElse(
+      constructAnalysedTypeFromTsType(promiseType),
+      (error) => {
+        throw new Error(`Failed to construct analysed type: ${error}`);
+      },
+    );
+
+    expect(result).toEqual(analysedType.str());
   });
 });
 

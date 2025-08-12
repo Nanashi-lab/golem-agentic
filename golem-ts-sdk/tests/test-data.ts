@@ -17,6 +17,8 @@ interface SimpleInterfaceType {
   n: number;
 }
 
+export type PromiseType = Promise<string>;
+
 export type ObjectType = { a: string; b: number; c: boolean };
 
 export type UnionType = number | string | boolean | ObjectType;

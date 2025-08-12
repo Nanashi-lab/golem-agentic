@@ -60,6 +60,10 @@ export function getNumberType(): Type {
   return fetchType('NumberType');
 }
 
+export function getPromiseType(): Type {
+  return fetchType('PromiseType');
+}
+
 export function getRecordFieldsFromAnalysedType(
   analysedType: AnalysedType,
 ): NameTypePair[] | undefined {

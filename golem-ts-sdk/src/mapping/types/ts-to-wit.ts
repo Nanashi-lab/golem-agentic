@@ -90,64 +90,68 @@ export function constructAnalysedTypeFromTsType(type: TsType): Either.Either<Ana
                 return Either.map(constructAnalysedTypeFromTsType(iterableIteratorType), (result) => analysedType.list(result));
             }
 
-        case TypeKind.Type:
+        case TypeKind.Type: {
+            const typeArgs = type.getTypeArguments?.() ?? [];
+
+            const requireArgs = (n: number, msg: string) => {
+                if (typeArgs.length !== n) {
+                    return Either.left(`Unable to handle the type ${type.name}. ${msg}`);
+                }
+                return null;
+            };
+
+            const handleSingleArg = (msg: string) => {
+                const err = requireArgs(1, msg);
+                if (err) return err;
+                return constructAnalysedTypeFromTsType(typeArgs[0]);
+            };
+
             if (type.isArray()) {
-                const typeArg = type.getTypeArguments?.()[0];
-
-                if (!typeArg) {
-                    return Either.left(`Unable to handle the type of ${type.name}. Array must have a type argument`);
-                }
-
-                return Either.map(constructAnalysedTypeFromTsType(typeArg), (result) =>
-                    analysedType.list(result));
-
-            }  else if (type.isTuple()) {
-                const tupleTypes =
-                    Either.all(type.getTypeArguments?.().map(constructAnalysedTypeFromTsType)) || Either.all([]);
-
-                return Either.map(tupleTypes, (analysedTypes) => analysedType.tuple(analysedTypes))
-
-            } else if (type.isGenericType()) {
-                const genericType: GenericType<typeof type> = (type as GenericType<typeof type>);
-                const genericTypeDefinition = genericType.genericTypeDefinition;
-                if (genericTypeDefinition.name === 'Map') {
-                    const typeArgs = type.getTypeArguments?.();
-                    if (!typeArgs || typeArgs.length !== 2) {
-                       return Either.left(`Unable to handle the type ${type.name}. Map must have a type argument`);
-                    }
-                    const keyType = constructAnalysedTypeFromTsType(typeArgs[0]);
-                    const valueType = constructAnalysedTypeFromTsType(typeArgs[1]);
-
-                    return Either.zipWith(keyType, valueType, (keyType, valueType) =>
-                        analysedType.list(analysedType.tuple([keyType, valueType])))
-
-                } else if (isInBuiltResult(type)) {
-                    const okType = type.getTypeArguments?.()[0];
-                    const errType = type.getTypeArguments?.()[1];
-
-                    if (!okType || !errType) {
-                        return Either.left(`Unable to handle the type ${type.name}. Result type must have concrete type arguments`);
-                    }
-
-                    const okAnalysed = constructAnalysedTypeFromTsType(okType);
-                    const errAnalysed = constructAnalysedTypeFromTsType(errType);
-
-                    return Either.zipWith(okAnalysed, errAnalysed, (okType, errType) => {
-                        return analysedType.result(okType, errType);
-                    })
-
-                } else {
-                    return Either.left(`Unable to handle the type of ${type.name}. The type id is ${genericType.id}.`);
-                }
-            } else {
-                const typeArg = type.getTypeArguments?.()[0];
-
-                if (!typeArg) {
-                    return Either.left(`Unable to handle the type of ${type.name}. The type id is ${type.id}.`);
-                }
-
-                return constructAnalysedTypeFromTsType(typeArg);
+                const err = requireArgs(1, "Array must have a type argument");
+                if (err) return err;
+                return Either.map(
+                    constructAnalysedTypeFromTsType(typeArgs[0]),
+                    analysedType.list
+                );
             }
+
+            if (type.isTuple()) {
+                return Either.map(
+                    Either.all(typeArgs.map(constructAnalysedTypeFromTsType)),
+                    analysedType.tuple
+                );
+            }
+
+            if (type.isGenericType()) {
+                const genericType = type as GenericType<typeof type>;
+                const defName = genericType.genericTypeDefinition.name;
+
+                if (defName === "Map") {
+                    const err = requireArgs(2, "Map must have two type arguments");
+                    if (err) return err;
+                    return Either.zipWith(
+                        constructAnalysedTypeFromTsType(typeArgs[0]),
+                        constructAnalysedTypeFromTsType(typeArgs[1]),
+                        (keyType, valueType) =>
+                            analysedType.list(analysedType.tuple([keyType, valueType]))
+                    );
+                }
+
+                if (isInBuiltResult(type)) {
+                    const err = requireArgs(2, "Result type must have concrete type arguments");
+                    if (err) return err;
+                    return Either.zipWith(
+                        constructAnalysedTypeFromTsType(typeArgs[0]),
+                        constructAnalysedTypeFromTsType(typeArgs[1]),
+                        analysedType.result
+                    );
+                }
+
+                return handleSingleArg(`The type id is ${genericType.id}.`);
+            }
+
+            return handleSingleArg(`The type id is ${type.id}.`);
+        }
 
         case TypeKind.Object:
             const object = type as ObjectType;

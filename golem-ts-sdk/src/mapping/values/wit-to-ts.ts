@@ -467,8 +467,17 @@ function constructTsValueFromValue(value: Value, expectedType: Type): any {
               );
             }
           }
+        } else if (genericTypeDefinition.name === 'Promise') {
+          const typeArgs = expectedType.getTypeArguments?.();
+          if (!typeArgs || typeArgs.length !== 1) {
+            throw new Error('Promise type must have one type argument');
+          }
+
+          return constructTsValueFromValue(value, typeArgs[0]);
         } else {
-          throw new Error('Type must have a type argument');
+          throw new Error(
+            `Generic type ${genericTypeDefinition.name} not supported`,
+          );
         }
       } else {
         const arg = expectedType.getTypeArguments?.()[0];
