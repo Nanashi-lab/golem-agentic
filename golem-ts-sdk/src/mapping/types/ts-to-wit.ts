@@ -188,61 +188,31 @@ export function constructAnalysedTypeFromTsType(type: TsType): Either.Either<Ana
         case TypeKind.Union:
             let fieldIdx = 1;
             const unionType = type as UnionType;
-            // To get over a bug in RTTIST where boolean fields within a union type is considered separately as true and false
 
             let foundBool = false;
-            let possibleTypes: NameOptionTypePair[] = []
+            const possibleTypes: NameOptionTypePair[] = [];
 
             for (const t of unionType.types) {
-                switch(t.kind) {
-                    case TypeKind.Boolean:
-                        if (!foundBool) {
-                            Either.map(constructAnalysedTypeFromTsType(t), (result) => {
-                                possibleTypes.push({
-                                    name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
-                                    typ: result
-                                });
-                            })
-                        }
+                // To work around RTTIST bug where boolean fields in a union are split into true/false
+                const isBoolLike =
+                    t.kind === TypeKind.Boolean ||
+                    t.kind === TypeKind.True ||
+                    t.kind === TypeKind.False;
 
-                        foundBool = true;
-                        continue;
-                    case TypeKind.True:
-                        if (!foundBool) {
-                            Either.map(constructAnalysedTypeFromTsType(t), (result) => {
-                                possibleTypes.push({
-                                    name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
-                                    typ: result
-                                });
-                            })
-                        }
-
-                        foundBool = true;
-                        continue;
-                    case TypeKind.False:
-                        if (!foundBool) {
-                            Either.map(constructAnalysedTypeFromTsType(t), (result) => {
-                                possibleTypes.push({
-                                    name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
-                                    typ: result
-                                });
-                            })
-                        }
-
-                        foundBool = true;
-                        continue;
-                    default:
-                        Either.map(constructAnalysedTypeFromTsType(t), (result) => {
-                            possibleTypes.push({
-                                name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
-                                typ: result
-                            });
-                        })
+                if (isBoolLike) {
+                    if (foundBool) continue;
+                    foundBool = true;
                 }
 
+                Either.map(constructAnalysedTypeFromTsType(t), (result) => {
+                    possibleTypes.push({
+                        name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
+                        typ: result,
+                    });
+                });
             }
 
-            return Either.right(analysedType.variant(possibleTypes))
+            return Either.right(analysedType.variant(possibleTypes));
 
         case TypeKind.Alias:
             const typeAlias = type as TypeAliasType;
