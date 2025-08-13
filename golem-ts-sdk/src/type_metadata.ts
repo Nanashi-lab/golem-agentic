@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { BaseMetadataLibrary, GlobalMetadata } from 'rttist';
+import { BaseMetadataLibrary, GlobalMetadata, Type } from 'rttist';
+import { AgentClassName } from './agent-name';
+import * as Option from 'effect/Option';
 
 export const PackageName = '@golemcloud/golem-ts-sdk';
 
@@ -24,7 +26,21 @@ export const Metadata = new BaseMetadataLibrary(
   GlobalMetadata,
 );
 
-export function updateMetadata(metadata: Array<any>) {
-  Metadata.clearMetadata(PackageName);
-  metadata.forEach((mod) => mod.add(Metadata, false));
-}
+export const TypeMetadata = {
+  update(metadata: Array<any>): void {
+    Metadata.clearMetadata(PackageName);
+    metadata.forEach((mod) => mod.add(Metadata, false));
+  },
+
+  lookupClassMetadata(className: AgentClassName): Option.Option<Type> {
+    const types = Metadata.getTypes().filter(
+      (type) => type.isClass() && type.name === className.toString(),
+    );
+
+    if (types.length === 0) {
+      return Option.none();
+    }
+
+    return Option.some(types[0]);
+  },
+};

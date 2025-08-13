@@ -13,22 +13,24 @@
 // limitations under the License.
 
 import { AgentError, AgentType, DataValue } from 'golem:agent/common';
-import { Result, WitValue } from 'golem:rpc/types@0.2.2';
+import { Result } from 'golem:rpc/types@0.2.2';
 import { AgentInternal } from './agent-internal';
 import { AgentId } from './agent-id';
-import { agentRegistry } from './agent-registry';
+import { AgentRegistry } from './agent-registry';
+import { AgentClassName } from './agent-name';
+import * as Option from 'effect/Option';
 
 export class ResolvedAgent {
   readonly classInstance: any;
   private agentInternal: AgentInternal;
-  private readonly name: string;
+  private readonly agentClassName: AgentClassName;
 
   constructor(
-    name: string,
+    agentClassName: AgentClassName,
     tsAgentInternal: AgentInternal,
     originalInstance: any,
   ) {
-    this.name = name;
+    this.agentClassName = agentClassName;
     this.agentInternal = tsAgentInternal;
     this.classInstance = originalInstance;
   }
@@ -45,6 +47,9 @@ export class ResolvedAgent {
   }
 
   getDefinition(): AgentType {
-    return agentRegistry.get(this.name)!;
+    return Option.getOrThrowWith(
+      AgentRegistry.lookup(this.agentClassName),
+      () => new Error(`Agent class ${this.agentClassName} is not registered.`),
+    );
   }
 }

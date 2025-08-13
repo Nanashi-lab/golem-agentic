@@ -23,22 +23,31 @@ import {
 import { WitValue } from 'golem:rpc/types@0.2.2';
 import { AgentInternal } from './agent-internal';
 import { ResolvedAgent } from './resolved-agent';
-import { Metadata } from './type_metadata';
+import { TypeMetadata } from './type_metadata';
 import { ClassType, ParameterInfo, Type } from 'rttist';
 import { getLocalClient, getRemoteClient } from './client-generation';
 import { BaseAgent } from './base-agent';
-import { agentInitiators } from './agent-Initiator';
+import { AgentInitiatorRegistry } from './agent-Initiator';
 import { createUniqueAgentId } from './agent-instance-counter';
-import { createAgentName } from './agent-name';
-import { agentRegistry } from './agent-registry';
-import { constructWitTypeFromTsType } from './mapping/types/ts-to-wit';
+import {
+  AgentClassName,
+  AgentClassNameUtil,
+  AgentName,
+  AgentNameUtil,
+} from './agent-name';
+import { AgentRegistry } from './agent-registry';
 import { constructTsValueFromWitValue } from './mapping/values/wit-to-ts';
 import { constructWitValueFromTsValue } from './mapping/values/ts-to-wit';
 import * as Either from 'effect/Either';
-import { createCustomError } from './agent-error';
+import {
+  buildInputSchema,
+  buildOutputSchema,
+  getConstructorDataSchema,
+} from './schema';
+import * as Option from 'effect/Option';
 
 const methodMetadata = new Map<
-  string,
+  AgentClassName,
   Map<string, { prompt?: string; description?: string }>
 >();
 
@@ -126,63 +135,30 @@ const methodMetadata = new Map<
  */
 export function agent() {
   return function <T extends new (...args: any[]) => any>(ctor: T) {
-    const className = ctor.name;
+    const agentClassName = AgentClassNameUtil.fromString(ctor.name);
 
-    if (agentRegistry.has(className)) return ctor;
+    if (AgentRegistry.exists(agentClassName)) {
+      return ctor;
+    }
 
-    let classType = Metadata.getTypes().filter(
-      (type) => type.isClass() && type.name === className,
-    )[0];
+    let classType = Option.getOrElse(
+      TypeMetadata.lookupClassMetadata(agentClassName),
+      () => {
+        throw new Error(
+          `Agent class ${agentClassName} is not registered in TypeMetadata. Please ensure the class is decorated with @agent()`,
+        );
+      },
+    );
+
+    const constructorDataSchema = Either.getOrElse(
+      getConstructorDataSchema(classType),
+      (err) => {
+        throw new Error('Invalid constructor parameters for the agent: ' + err);
+      },
+    );
 
     let filteredType = classType as ClassType;
     let methodNames = filteredType.getMethods();
-
-    const constructorInfos = (classType as ClassType).getConstructors();
-
-    if (constructorInfos.length > 1) {
-      throw new Error(
-        `Agent type ${className} has multiple constructors. Please specify the constructor parameters explicitly.`,
-      );
-    }
-
-    const constructorSignatureInfo = constructorInfos[0];
-
-    const constructorParamInfos: readonly ParameterInfo[] =
-      constructorSignatureInfo.getParameters();
-
-    const constructorParamTypes = Either.all(
-      constructorParamInfos.map((paramInfo) =>
-        constructWitTypeFromTsType(paramInfo.type),
-      ),
-    );
-
-    const constructDataSchemaResult = Either.map(
-      constructorParamTypes,
-      (paramType) => {
-        return paramType.map((paramType, idx) => {
-          const paramName = constructorParamInfos[idx].name;
-          return [
-            paramName,
-            {
-              tag: 'component-model',
-              val: paramType,
-            },
-          ] as [string, ElementSchema];
-        });
-      },
-    );
-
-    const constructorElementSchemas = Either.getOrElse(
-      constructDataSchemaResult,
-      (err) => {
-        throw new Error(`Failed to construct DataSchema: ${err}`);
-      },
-    );
-
-    const constructorDataSchema: DataSchema = {
-      tag: 'tuple',
-      val: constructorElementSchemas,
-    };
 
     const methods: AgentMethod[] = methodNames.map((methodInfo) => {
       const signature = methodInfo.getSignatures()[0];
@@ -193,7 +169,8 @@ export function agent() {
 
       const methodName = methodInfo.name.toString();
 
-      const baseMeta = methodMetadata.get(className)?.get(methodName) ?? {};
+      const baseMeta =
+        methodMetadata.get(agentClassName)?.get(methodName) ?? {};
 
       const inputSchemaEither = buildInputSchema(parameters);
 
@@ -220,12 +197,14 @@ export function agent() {
       };
     });
 
+    const agentName = AgentNameUtil.fromAgentClassName(agentClassName);
+
     const agentType: AgentType = {
-      typeName: className,
-      description: className,
+      typeName: agentName,
+      description: agentClassName,
       constructor: {
-        name: className,
-        description: `Constructs ${className}`,
+        name: agentClassName,
+        description: `Constructs ${agentClassName}`,
         promptHint: 'Enter something...',
         inputSchema: constructorDataSchema,
       },
@@ -233,121 +212,146 @@ export function agent() {
       dependencies: [],
     };
 
-    agentRegistry.set(className, agentType);
+    AgentRegistry.register(agentClassName, agentType);
 
     (ctor as any).createRemote = getRemoteClient(ctor);
     (ctor as any).createLocal = getLocalClient(ctor);
 
-    agentInitiators.set(className, {
-      initiate: (agentName: string, constructorParams: DataValue) => {
-        const constructorInfo = (classType as ClassType).getConstructors()[0];
+    AgentInitiatorRegistry.register(
+      AgentNameUtil.fromAgentClassName(agentClassName),
+      {
+        initiate: (_agentName: string, constructorParams: DataValue) => {
+          const constructorInfo = (classType as ClassType).getConstructors()[0];
 
-        const constructorParamTypes: readonly ParameterInfo[] =
-          constructorInfo.getParameters();
+          const constructorParamTypes: readonly ParameterInfo[] =
+            constructorInfo.getParameters();
 
-        const constructorParamWitValues =
-          getWitValueFromDataValue(constructorParams);
+          const constructorParamWitValues =
+            getWitValueFromDataValue(constructorParams);
 
-        const convertedConstructorArgs = constructorParamWitValues.map(
-          (witVal, idx) => {
-            return constructTsValueFromWitValue(
-              witVal,
-              constructorParamTypes[idx].type,
-            );
-          },
-        );
+          const convertedConstructorArgs = constructorParamWitValues.map(
+            (witVal, idx) => {
+              return constructTsValueFromWitValue(
+                witVal,
+                constructorParamTypes[idx].type,
+              );
+            },
+          );
 
-        const instance = new ctor(...convertedConstructorArgs);
+          const instance = new ctor(...convertedConstructorArgs);
 
-        const uniqueAgentId = createUniqueAgentId(createAgentName(className));
-        (instance as BaseAgent).getId = () => uniqueAgentId;
+          const uniqueAgentId = createUniqueAgentId(agentName);
+          (instance as BaseAgent).getId = () => uniqueAgentId;
 
-        const agentInternal: AgentInternal = {
-          getId: () => {
-            return uniqueAgentId;
-          },
-          getAgentType: () => {
-            const def = agentRegistry.get(className);
-            if (!def) throw new Error(`AgentType not found for ${className}`);
-            return def;
-          },
-          invoke: async (method, args) => {
-            const fn = instance[method];
-            if (!fn)
-              throw new Error(
-                `Method ${method} not found on agent ${className}`,
+          const agentInternal: AgentInternal = {
+            getId: () => {
+              return uniqueAgentId;
+            },
+            getAgentType: () => {
+              return Option.getOrThrowWith(
+                AgentRegistry.lookup(agentClassName),
+                () =>
+                  new Error(`Failed to find agent type for ${agentClassName}`),
+              );
+            },
+            invoke: async (method, args) => {
+              const fn = instance[method];
+              if (!fn)
+                throw new Error(
+                  `Method ${method} not found on agent ${agentClassName}`,
+                );
+
+              const agentTypeOpt = AgentRegistry.lookup(agentClassName);
+
+              if (Option.isNone(agentTypeOpt)) {
+                const error: AgentError = {
+                  tag: 'invalid-method',
+                  val: `Agent type ${agentClassName} not found in registry.`,
+                };
+                return {
+                  tag: 'err',
+                  val: error,
+                };
+              }
+
+              const agentType = agentTypeOpt.value;
+
+              const methodInfo = (classType as ClassType).getMethod(method)!;
+
+              const methodSignature = methodInfo.getSignatures()[0];
+
+              const paramTypes: readonly ParameterInfo[] =
+                methodSignature.getParameters();
+
+              const argsWitValues = getWitValueFromDataValue(args);
+
+              const returnType: Type = methodSignature.returnType;
+
+              const convertedArgs = argsWitValues.map((witVal, idx) => {
+                return constructTsValueFromWitValue(
+                  witVal,
+                  paramTypes[idx].type,
+                );
+              });
+
+              const result = await fn.apply(instance, convertedArgs);
+
+              const methodDef = agentType.methods.find(
+                (m) => m.name === method,
               );
 
-            const def = agentRegistry.get(className);
+              if (!methodDef) {
+                const entriesAsStrings = Array.from(
+                  AgentRegistry.entries(),
+                ).map(
+                  ([key, value]) =>
+                    `Key: ${key}, Value: ${JSON.stringify(value, null, 2)}`,
+                );
 
-            const methodInfo = (classType as ClassType).getMethod(method)!;
+                const error: AgentError = {
+                  tag: 'invalid-method',
+                  val: `Method ${method} not found in agent type ${agentClassName}. Available methods: ${entriesAsStrings.join(
+                    ', ',
+                  )}`,
+                };
 
-            const methodSignature = methodInfo.getSignatures()[0];
+                return {
+                  tag: 'err',
+                  val: error,
+                };
+              }
 
-            const paramTypes: readonly ParameterInfo[] =
-              methodSignature.getParameters();
-
-            const argsWitValues = getWitValueFromDataValue(args);
-
-            const returnType: Type = methodSignature.returnType;
-
-            const convertedArgs = argsWitValues.map((witVal, idx) => {
-              return constructTsValueFromWitValue(witVal, paramTypes[idx].type);
-            });
-
-            const result = await fn.apply(instance, convertedArgs);
-
-            const methodDef = def?.methods.find((m) => m.name === method);
-
-            if (!methodDef) {
-              const entriesAsStrings = Array.from(agentRegistry.entries()).map(
-                ([key, value]) =>
-                  `Key: ${key}, Value: ${JSON.stringify(value, null, 2)}`,
+              const returnValue = constructWitValueFromTsValue(
+                result,
+                returnType,
               );
 
-              const error: AgentError = {
-                tag: 'invalid-method',
-                val: `Method ${method} not found in agent type ${className}. Available methods: ${entriesAsStrings.join(
-                  ', ',
-                )}`,
-              };
+              if (Either.isLeft(returnValue)) {
+                const agentError: AgentError = {
+                  tag: 'invalid-method',
+                  val: `Invalid return value from ${method}: ${Either.getLeft(returnValue)}`,
+                };
+
+                return {
+                  tag: 'err',
+                  val: agentError,
+                };
+              }
 
               return {
-                tag: 'err',
-                val: error,
+                tag: 'ok',
+                val: getDataValueFromWitValueReturned(returnValue.right),
               };
-            }
+            },
+          };
 
-            const returnValue = constructWitValueFromTsValue(
-              result,
-              returnType,
-            );
-
-            if (Either.isLeft(returnValue)) {
-              const agentError: AgentError = {
-                tag: 'invalid-method',
-                val: `Invalid return value from ${method}: ${Either.getLeft(returnValue)}`,
-              };
-
-              return {
-                tag: 'err',
-                val: agentError,
-              };
-            }
-
-            return {
-              tag: 'ok',
-              val: getDataValueFromWitValueReturned(returnValue.right),
-            };
-          },
-        };
-
-        return {
-          tag: 'ok',
-          val: new ResolvedAgent(className, agentInternal, instance),
-        };
+          return {
+            tag: 'ok',
+            val: new ResolvedAgent(agentClassName, agentInternal, instance),
+          };
+        },
       },
-    });
+    );
   };
 }
 
@@ -375,47 +379,6 @@ export function description(desc: string) {
     const meta = ensureMeta(target, propertyKey);
     meta.description = desc;
   };
-}
-
-function buildInputSchema(
-  paramTypes: readonly ParameterInfo[],
-): Either.Either<DataSchema, string> {
-  const result = Either.all(
-    paramTypes.map((parameterInfo) =>
-      Either.map(convertToElementSchema(parameterInfo.type), (result) => {
-        return [parameterInfo.name, result] as [string, ElementSchema];
-      }),
-    ),
-  );
-
-  return Either.map(result, (res) => {
-    return {
-      tag: 'tuple',
-      val: res,
-    };
-  });
-}
-
-function buildOutputSchema(
-  returnType: Type,
-): Either.Either<DataSchema, string> {
-  return Either.map(convertToElementSchema(returnType), (result) => {
-    return {
-      tag: 'tuple',
-      val: [['return-value', result]],
-    };
-  });
-}
-
-function convertToElementSchema(
-  type: Type,
-): Either.Either<ElementSchema, string> {
-  return Either.map(constructWitTypeFromTsType(type), (witType) => {
-    return {
-      tag: 'component-model',
-      val: witType,
-    };
-  });
 }
 
 // FIXME: in the next verison, handle all dataValues

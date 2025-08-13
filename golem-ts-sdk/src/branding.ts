@@ -12,4 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export type Branded<T, B> = T & { __brand: B };
+export type Branded<T, B> = T & { readonly __brand: B };

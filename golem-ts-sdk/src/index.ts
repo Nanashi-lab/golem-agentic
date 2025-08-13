@@ -15,18 +15,21 @@
 import type * as bindings from 'agent-guest';
 import { ResolvedAgent } from './resolved-agent';
 import { AgentId } from './agent-id';
-import { getRegisteredAgents } from './agent-registry';
-import { agentInitiators } from './agent-Initiator';
 import { Result } from 'golem:rpc/types@0.2.2';
 import { AgentError, DataValue } from 'golem:agent/common';
 import { constructWitValueFromValue } from './mapping/values/value';
 import { createCustomError } from './agent-error';
+import { AgentInitiatorRegistry } from './agent-Initiator';
+import { AgentName, AgentNameUtil } from './agent-name';
+import { AgentRegistry } from './agent-registry';
+import * as Option from 'effect/Option';
 
 export { BaseAgent } from './base-agent';
 export { AgentId } from './agent-id';
 export { prompt, description, agent } from './decorators';
 export { Metadata } from './type_metadata';
 export { Either } from './new-types/either';
+export { UnstructuredText } from './new-types/text-input';
 
 /// Registry
 export const agents = new Map<AgentId, Agent>();
@@ -84,10 +87,12 @@ class Agent {
     agentType: string,
     input: DataValue,
   ): Promise<Result<Agent, AgentError>> {
-    const initiator = agentInitiators.get(agentType);
+    const initiator = AgentInitiatorRegistry.lookup(
+      AgentNameUtil.fromString(agentType),
+    );
 
-    if (!initiator) {
-      const entries = Array.from(agentInitiators.keys());
+    if (Option.isNone(initiator)) {
+      const entries = Array.from(AgentInitiatorRegistry.entries());
 
       return {
         tag: 'err',
@@ -97,7 +102,7 @@ class Agent {
       };
     }
 
-    const initiateResult = initiator.initiate(agentType, input);
+    const initiateResult = initiator.value.initiate(agentType, input);
 
     if (initiateResult.tag === 'ok') {
       const agent = new Agent();
@@ -144,7 +149,7 @@ async function discoverAgents(): Promise<Agent[]> {
 }
 
 async function discoverAgentTypes(): Promise<bindings.guest.AgentType[]> {
-  return getRegisteredAgents();
+  return AgentRegistry.getRegisteredAgents();
 }
 
 export const guest: typeof bindings.guest = {
