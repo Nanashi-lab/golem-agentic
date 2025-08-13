@@ -15,6 +15,8 @@
 import { ResolvedAgent } from './resolved-agent';
 import { Result } from 'golem:rpc/types@0.2.2';
 import { AgentError, DataValue } from 'golem:agent/common';
+import { AgentName } from './agent-name';
+import * as Option from 'effect/Option';
 
 /**
  * AgentInitiator is the canonical interface for instantiating agents.
@@ -41,4 +43,22 @@ export type AgentInitiator = {
   ): Result<ResolvedAgent, AgentError>;
 };
 
-export const agentInitiators = new Map<string, AgentInitiator>();
+const agentInitiators = new Map<AgentName, AgentInitiator>();
+
+export const AgentInitiatorRegistry = {
+  register(agentName: AgentName, agentInitiator: AgentInitiator): void {
+    agentInitiators.set(agentName, agentInitiator);
+  },
+
+  lookup(agentName: AgentName): Option.Option<AgentInitiator> {
+    return Option.fromNullable(agentInitiators.get(agentName));
+  },
+
+  has(agentName: AgentName): boolean {
+    return agentInitiators.has(agentName);
+  },
+
+  entries(): IterableIterator<[AgentName, AgentInitiator]> {
+    return agentInitiators.entries();
+  },
+};

@@ -13,9 +13,29 @@
 // limitations under the License.
 
 import { AgentType } from 'golem:agent/common';
+import { AgentClassName } from './agent-name';
+import * as Option from 'effect/Option';
 
-export const agentRegistry = new Map<string, AgentType>();
+const agentRegistry = new Map<AgentClassName, AgentType>();
 
-export function getRegisteredAgents(): AgentType[] {
-  return Array.from(agentRegistry.values());
-}
+export const AgentRegistry = {
+  register(agentClassName: AgentClassName, agentType: AgentType): void {
+    agentRegistry.set(agentClassName, agentType);
+  },
+
+  entries(): IterableIterator<[AgentClassName, AgentType]> {
+    return agentRegistry.entries();
+  },
+
+  getRegisteredAgents(): AgentType[] {
+    return Array.from(agentRegistry.values());
+  },
+
+  lookup(agentClassName: AgentClassName): Option.Option<AgentType> {
+    return Option.fromNullable(agentRegistry.get(agentClassName));
+  },
+
+  exists(agentClassName: AgentClassName): boolean {
+    return agentRegistry.has(agentClassName);
+  },
+};
