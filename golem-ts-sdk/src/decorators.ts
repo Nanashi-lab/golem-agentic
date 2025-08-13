@@ -139,14 +139,19 @@ export function agent() {
 
     let filteredType = classType as ClassType;
 
-    const methods = Either.getOrThrowWith(
-      getAgentMethodSchema(filteredType, agentClassName),
-      (err) => {
-        new Error(
-          `Failed to get agent method schema for ${agentClassName}: ${err}`,
-        );
-      },
+    const methodSchemaEither = getAgentMethodSchema(
+      filteredType,
+      agentClassName,
     );
+
+    // Note: Either.getOrThrowWith doesn't seem to work within the decorator context
+    if (Either.isLeft(methodSchemaEither)) {
+      throw new Error(
+        `Failed to get agent method schema for ${agentClassName}: ${methodSchemaEither.left}`,
+      );
+    }
+
+    const methods = methodSchemaEither.right;
 
     const agentName = AgentNameConstructor.fromAgentClassName(agentClassName);
 
