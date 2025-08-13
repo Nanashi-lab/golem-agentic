@@ -43,7 +43,7 @@ export type AgentInitiator = {
   ): Result<ResolvedAgent, AgentError>;
 };
 
-const agentInitiators = new Map<string, AgentInitiator>();
+const agentInitiators = new Map<AgentName, AgentInitiator>();
 
 export const AgentInitiatorRegistry = {
   register(agentName: AgentName, agentInitiator: AgentInitiator): void {
@@ -58,7 +58,7 @@ export const AgentInitiatorRegistry = {
     return agentInitiators.has(agentName);
   },
 
-  entries(): IterableIterator<[string, AgentInitiator]> {
+  entries(): IterableIterator<[AgentName, AgentInitiator]> {
     return agentInitiators.entries();
   },
 };
