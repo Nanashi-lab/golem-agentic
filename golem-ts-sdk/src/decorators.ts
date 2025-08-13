@@ -27,12 +27,9 @@ import { AgentRegistry } from './agent-registry';
 import { constructTsValueFromWitValue } from './mapping/values/wit-to-ts';
 import { constructWitValueFromTsValue } from './mapping/values/ts-to-wit';
 import * as Either from 'effect/Either';
-import {
-  ensureMeta,
-  getAgentMethodSchema,
-  getConstructorDataSchema,
-} from './schema';
+import { getAgentMethodSchema, getConstructorDataSchema } from './schema';
 import * as Option from 'effect/Option';
+import { MethodMetadata } from './method-metadata';
 
 /**
  * Marks a class as an Agent and registers it in the global agent registry.
@@ -311,15 +308,19 @@ export function agent() {
 
 export function prompt(prompt: string) {
   return function (target: Object, propertyKey: string) {
-    const meta = ensureMeta(target, propertyKey);
-    meta.prompt = prompt;
+    const agentClassName = AgentClassNameConstructor.fromString(
+      target.constructor.name,
+    );
+    MethodMetadata.setPromptName(agentClassName, propertyKey, prompt);
   };
 }
 
 export function description(desc: string) {
   return function (target: Object, propertyKey: string) {
-    const meta = ensureMeta(target, propertyKey);
-    meta.description = desc;
+    const agentClassName = AgentClassNameConstructor.fromString(
+      target.constructor.name,
+    );
+    MethodMetadata.setDescription(agentClassName, propertyKey, desc);
   };
 }
 

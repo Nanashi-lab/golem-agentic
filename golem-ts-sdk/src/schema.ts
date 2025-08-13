@@ -4,6 +4,7 @@ import { AgentMethod, DataSchema, ElementSchema } from 'golem:agent/common';
 import { constructWitTypeFromTsType } from './mapping/types/ts-to-wit';
 import { Metadata } from './type_metadata';
 import { AgentClassName } from './agent-name';
+import { MethodMetadata } from './method-metadata';
 
 export function getConstructorDataSchema(
   classType: Type,
@@ -51,23 +52,6 @@ export function getConstructorDataSchema(
   });
 }
 
-const methodMetadata = new Map<
-  AgentClassName,
-  Map<string, { prompt?: string; description?: string }>
->();
-
-export function ensureMeta(target: any, method: string) {
-  const className = target.constructor.name;
-  if (!methodMetadata.has(className)) {
-    methodMetadata.set(className, new Map());
-  }
-  const classMeta = methodMetadata.get(className)!;
-  if (!classMeta.has(method)) {
-    classMeta.set(method, {});
-  }
-  return classMeta.get(method)!;
-}
-
 export function getAgentMethodSchema(
   classType: Type,
   agentClassName: AgentClassName,
@@ -86,7 +70,7 @@ export function getAgentMethodSchema(
       const methodName = methodInfo.name.toString();
 
       const baseMeta =
-        methodMetadata.get(agentClassName)?.get(methodName) ?? {};
+        MethodMetadata.lookup(agentClassName)?.get(methodName) ?? {};
 
       const inputSchemaEither = buildInputSchema(parameters);
 
