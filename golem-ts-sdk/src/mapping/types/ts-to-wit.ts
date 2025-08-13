@@ -95,7 +95,7 @@ export function constructAnalysedTypeFromTsType(type: TsType): Either.Either<Ana
 
             const requireArgs = (n: number, msg: string) => {
                 if (typeArgs.length !== n) {
-                    return Either.left(`Unable to handle the type ${type.name}. ${msg}`);
+                    return Either.left(`Unable to handle the type ${type.id} ${type.name}. ${msg}`);
                 }
                 return null;
             };

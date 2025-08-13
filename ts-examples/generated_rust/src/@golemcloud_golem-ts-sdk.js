@@ -64,14 +64,14 @@ class AgentId {
 function constructValueFromWitValue(wit) {
     if (!wit.nodes.length)
         throw new Error('Empty nodes in WitValue');
-    return buildTree(getNode(wit.nodes, wit.nodes.length - 1), wit.nodes);
+    return buildTree(wit.nodes[wit.nodes.length - 1], wit.nodes);
 }
 function buildTree(node, nodes) {
     switch (node.tag) {
         case 'record-value':
             return {
                 kind: 'record',
-                value: node.val.map((idx) => buildTree(getNode(nodes, idx), nodes)),
+                value: node.val.map((idx) => buildTree(nodes[idx], nodes)),
             };
         case 'variant-value': {
             const [caseIdx, maybeIndex] = node.val;
@@ -79,7 +79,7 @@ function buildTree(node, nodes) {
                 return {
                     kind: 'variant',
                     caseIdx,
-                    caseValue: buildTree(getNode(nodes, maybeIndex), nodes),
+                    caseValue: buildTree(nodes[maybeIndex], nodes),
                 };
             }
             else {
@@ -97,12 +97,12 @@ function buildTree(node, nodes) {
         case 'tuple-value':
             return {
                 kind: 'tuple',
-                value: node.val.map((idx) => buildTree(getNode(nodes, idx), nodes)),
+                value: node.val.map((idx) => buildTree(nodes[idx], nodes)),
             };
         case 'list-value':
             return {
                 kind: 'list',
-                value: node.val.map((idx) => buildTree(getNode(nodes, idx), nodes)),
+                value: node.val.map((idx) => buildTree(nodes[idx], nodes)),
             };
         case 'option-value':
             if (node.val === undefined) {
@@ -110,7 +110,7 @@ function buildTree(node, nodes) {
             }
             return {
                 kind: 'option',
-                value: buildTree(getNode(nodes, node.val), nodes),
+                value: buildTree(nodes[node.val], nodes),
             };
         case 'result-value': {
             const res = node.val;
@@ -119,7 +119,7 @@ function buildTree(node, nodes) {
                     kind: 'result',
                     value: {
                         ok: res.val !== undefined
-                            ? buildTree(getNode(nodes, res.val), nodes)
+                            ? buildTree(nodes[res.val], nodes)
                             : undefined,
                     },
                 };
@@ -129,7 +129,7 @@ function buildTree(node, nodes) {
                     kind: 'result',
                     value: {
                         err: res.val !== undefined
-                            ? buildTree(getNode(nodes, res.val), nodes)
+                            ? buildTree(nodes[res.val], nodes)
                             : undefined,
                     },
                 };
@@ -170,14 +170,8 @@ function buildTree(node, nodes) {
             };
         }
         default:
-            throw new Error(`Unhandled WitNode tag: ${node.tag}, node=${JSON.stringify(node)}`);
+            throw new Error(`Unhandled tag: ${node.tag}`);
     }
-}
-function getNode(nodes, idx) {
-    if (idx === undefined || nodes[idx] === undefined) {
-        throw new Error(`Invalid node reference: idx=${idx}, nodes length=${nodes.length}`);
-    }
-    return nodes[idx];
 }
 function constructWitValueFromValue(value) {
     const nodes = [];
@@ -1865,9 +1859,8 @@ const all = input => {
 };
 
 function isInBuiltResult(type) {
-    const genericType = type;
-    const typeDef = genericType.genericTypeDefinition;
-    return typeDef.name === 'Either' && typeDef.id.startsWith("@@golemcloud/golem-ts-sdk");
+    return type.name.startsWith("@golemcloud/golem-ts-sdk") &&
+        type.name.endsWith('Either<\'2>');
 }
 
 // Copyright 2024-2025 Golem Cloud
@@ -3320,7 +3313,7 @@ function constructAnalysedTypeFromTsType(type) {
             const typeArgs = type.getTypeArguments?.() ?? [];
             const requireArgs = (n, msg) => {
                 if (typeArgs.length !== n) {
-                    return left(`Unable to handle the type ${type.name}. ${msg}`);
+                    return left(`Unable to handle the type ${type.id} ${type.name}. ${msg}`);
                 }
                 return null;
             };
@@ -3706,7 +3699,7 @@ function agent() {
         const methodSchemaEither = getAgentMethodSchema(filteredType, agentClassName);
         // Note: Either.getOrThrowWith doesn't seem to work within the decorator context
         if (isLeft(methodSchemaEither)) {
-            throw new Error(`Failed to get agent method schema for ${agentClassName}: ${getLeft(methodSchemaEither)}`);
+            throw new Error(`Failed to get agent method schema for ${agentClassName}: ${methodSchemaEither.left}`);
         }
         const methods = methodSchemaEither.right;
         const agentName = AgentNameConstructor.fromAgentClassName(agentClassName);
