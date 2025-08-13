@@ -1,17 +1,18 @@
 import {
     BaseAgent,
-    Agent,
-    Prompt,
-    Description,
+    agent,
+    prompt,
+    description,
+    Either
 } from '@golemcloud/golem-ts-sdk';
 
 type AliasedType = {a: string, b: number};
 
-@Agent()
+@agent()
 class AssistantAgent extends BaseAgent {
-    @Prompt("Ask your question")
-    @Description("This method allows the agent to answer your question")
-    async ask(name: string, b: AliasedType): Promise<string> {
+    @prompt("Ask your question")
+    @description("This method allows the agent to answer your question")
+    async ask(name: string, b: Either<string, number>): Promise<string> {
         const customData = { data: "Sample data", value: 42 };
 
         // Can be used after solving https://github.com/golemcloud/wasm-rquickjs/issues/2
@@ -29,7 +30,7 @@ class AssistantAgent extends BaseAgent {
     }
 }
 
-@Agent()
+@agent()
 class WeatherAgent extends BaseAgent {
     private readonly userName: string;
 
@@ -38,8 +39,8 @@ class WeatherAgent extends BaseAgent {
         this.userName = username;
     }
 
-    @Prompt("Get weather")
-    @Description("Weather forecast weather for you")
+    @prompt("Get weather")
+    @description("Weather forecast weather for you")
     async getWeather(name: string, param2: CustomData): Promise<string> {
         return Promise.resolve(
             `Hi ${this.userName} Weather in ${name} is sunny. Params passed: ${name} ${JSON.stringify(param2)}. ` +
