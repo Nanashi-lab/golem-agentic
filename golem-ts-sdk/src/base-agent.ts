@@ -15,7 +15,7 @@
 import { AgentType } from 'golem:agent/common';
 import { AgentId } from './agent-id';
 import { AgentRegistry } from './agent-registry';
-import { AgentClassNameUtil } from './agent-name';
+import { AgentClassNameConstructor } from './agent-name';
 import * as Option from 'effect/Option';
 
 /**
@@ -59,7 +59,9 @@ export class BaseAgent {
    * @throws Will throw if metadata is missing or the agent is not properly registered.
    */
   getAgentType(): AgentType {
-    const agentClassName = AgentClassNameUtil.fromString(this.constructor.name);
+    const agentClassName = AgentClassNameConstructor.fromString(
+      this.constructor.name,
+    );
 
     return Option.getOrThrowWith(
       AgentRegistry.lookup(agentClassName),

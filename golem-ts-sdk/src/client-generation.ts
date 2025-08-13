@@ -26,17 +26,17 @@ import { constructWitValueFromTsValue } from './mapping/values/ts-to-wit';
 import { constructTsValueFromWitValue } from './mapping/values/wit-to-ts';
 import * as Either from 'effect/Either';
 import { AgentInitiatorRegistry } from './agent-Initiator';
-import { AgentClassNameUtil, AgentNameUtil } from './agent-name';
+import { AgentClassNameConstructor, AgentNameConstructor } from './agent-name';
 import * as Option from 'effect/Option';
 import { AgentRegistry } from './agent-registry';
 
 export function getLocalClient<T extends new (...args: any[]) => any>(ctor: T) {
   return (...args: any[]) => {
-    const agentClassName = AgentClassNameUtil.fromString(ctor.name);
+    const agentClassName = AgentClassNameConstructor.fromString(ctor.name);
 
     const agentInitiator = Option.getOrThrowWith(
       AgentInitiatorRegistry.lookup(
-        AgentNameUtil.fromAgentClassName(agentClassName),
+        AgentNameConstructor.fromAgentClassName(agentClassName),
       ),
       () => {
         new Error(
@@ -121,7 +121,7 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
       (type) => type.isClass() && type.name === ctor.name,
     )[0];
 
-    const agentClassName = AgentClassNameUtil.fromString(ctor.name);
+    const agentClassName = AgentClassNameConstructor.fromString(ctor.name);
 
     const agentType = Option.getOrThrowWith(
       AgentRegistry.lookup(agentClassName),

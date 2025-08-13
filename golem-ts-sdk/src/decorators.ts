@@ -12,14 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  AgentMethod,
-  DataSchema,
-  AgentType,
-  ElementSchema,
-  DataValue,
-  AgentError,
-} from 'golem:agent/common';
+import { AgentType, DataValue, AgentError } from 'golem:agent/common';
 import { WitValue } from 'golem:rpc/types@0.2.2';
 import { AgentInternal } from './agent-internal';
 import { ResolvedAgent } from './resolved-agent';
@@ -29,27 +22,17 @@ import { getLocalClient, getRemoteClient } from './client-generation';
 import { BaseAgent } from './base-agent';
 import { AgentInitiatorRegistry } from './agent-Initiator';
 import { createUniqueAgentId } from './agent-instance-counter';
-import {
-  AgentClassName,
-  AgentClassNameUtil,
-  AgentName,
-  AgentNameUtil,
-} from './agent-name';
+import { AgentClassNameConstructor, AgentNameConstructor } from './agent-name';
 import { AgentRegistry } from './agent-registry';
 import { constructTsValueFromWitValue } from './mapping/values/wit-to-ts';
 import { constructWitValueFromTsValue } from './mapping/values/ts-to-wit';
 import * as Either from 'effect/Either';
 import {
-  buildInputSchema,
-  buildOutputSchema,
+  ensureMeta,
+  getAgentMethodSchema,
   getConstructorDataSchema,
 } from './schema';
 import * as Option from 'effect/Option';
-
-const methodMetadata = new Map<
-  AgentClassName,
-  Map<string, { prompt?: string; description?: string }>
->();
 
 /**
  * Marks a class as an Agent and registers it in the global agent registry.
@@ -135,7 +118,7 @@ const methodMetadata = new Map<
  */
 export function agent() {
   return function <T extends new (...args: any[]) => any>(ctor: T) {
-    const agentClassName = AgentClassNameUtil.fromString(ctor.name);
+    const agentClassName = AgentClassNameConstructor.fromString(ctor.name);
 
     if (AgentRegistry.exists(agentClassName)) {
       return ctor;
@@ -158,46 +141,17 @@ export function agent() {
     );
 
     let filteredType = classType as ClassType;
-    let methodNames = filteredType.getMethods();
 
-    const methods: AgentMethod[] = methodNames.map((methodInfo) => {
-      const signature = methodInfo.getSignatures()[0];
-
-      const parameters = signature.getParameters();
-
-      const returnType: Type = signature.returnType;
-
-      const methodName = methodInfo.name.toString();
-
-      const baseMeta =
-        methodMetadata.get(agentClassName)?.get(methodName) ?? {};
-
-      const inputSchemaEither = buildInputSchema(parameters);
-
-      const inputSchema = Either.getOrElse(inputSchemaEither, (err) => {
-        throw new Error(
-          `Failed to construct input schema for method ${methodName}: ${err}`,
+    const methods = Either.getOrThrowWith(
+      getAgentMethodSchema(filteredType, agentClassName),
+      (err) => {
+        new Error(
+          `Failed to get agent method schema for ${agentClassName}: ${err}`,
         );
-      });
+      },
+    );
 
-      const outputSchemaEither = buildOutputSchema(returnType);
-
-      const outputSchema = Either.getOrElse(outputSchemaEither, (err) => {
-        throw new Error(
-          `Failed to construct output schema for method ${methodName}: ${err}`,
-        );
-      });
-
-      return {
-        name: methodName,
-        description: baseMeta.description ?? '',
-        promptHint: baseMeta.prompt ?? '',
-        inputSchema: inputSchema,
-        outputSchema: outputSchema,
-      };
-    });
-
-    const agentName = AgentNameUtil.fromAgentClassName(agentClassName);
+    const agentName = AgentNameConstructor.fromAgentClassName(agentClassName);
 
     const agentType: AgentType = {
       typeName: agentName,
@@ -218,7 +172,7 @@ export function agent() {
     (ctor as any).createLocal = getLocalClient(ctor);
 
     AgentInitiatorRegistry.register(
-      AgentNameUtil.fromAgentClassName(agentClassName),
+      AgentNameConstructor.fromAgentClassName(agentClassName),
       {
         initiate: (_agentName: string, constructorParams: DataValue) => {
           const constructorInfo = (classType as ClassType).getConstructors()[0];
@@ -353,18 +307,6 @@ export function agent() {
       },
     );
   };
-}
-
-function ensureMeta(target: any, method: string) {
-  const className = target.constructor.name;
-  if (!methodMetadata.has(className)) {
-    methodMetadata.set(className, new Map());
-  }
-  const classMeta = methodMetadata.get(className)!;
-  if (!classMeta.has(method)) {
-    classMeta.set(method, {});
-  }
-  return classMeta.get(method)!;
 }
 
 export function prompt(prompt: string) {

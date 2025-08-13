@@ -20,7 +20,7 @@ import { AgentError, AgentType, DataValue } from 'golem:agent/common';
 import { constructWitValueFromValue } from './mapping/values/value';
 import { createCustomError } from './agent-error';
 import { AgentInitiatorRegistry } from './agent-Initiator';
-import { AgentName, AgentNameUtil } from './agent-name';
+import { AgentName, AgentNameConstructor } from './agent-name';
 import { AgentRegistry } from './agent-registry';
 import * as Option from 'effect/Option';
 
@@ -100,7 +100,7 @@ class Agent {
     input: DataValue,
   ): Promise<Result<Agent, AgentError>> {
     const initiator = AgentInitiatorRegistry.lookup(
-      AgentNameUtil.fromString(agentType),
+      AgentNameConstructor.fromString(agentType),
     );
 
     if (Option.isNone(initiator)) {

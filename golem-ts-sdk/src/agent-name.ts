@@ -16,7 +16,7 @@ import { Branded } from './branding';
 
 export type AgentName = Branded<string, 'AgentName'>;
 
-export const AgentNameUtil = {
+export const AgentNameConstructor = {
   fromString(name: string): AgentName {
     return name as AgentName;
   },
@@ -29,7 +29,7 @@ export const AgentNameUtil = {
 
 export type AgentClassName = Branded<string, 'AgentClassName'>;
 
-export const AgentClassNameUtil = {
+export const AgentClassNameConstructor = {
   fromString(name: string): AgentClassName {
     return name as AgentClassName;
   },

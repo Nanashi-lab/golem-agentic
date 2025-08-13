@@ -1,8 +1,9 @@
 import { ClassType, ParameterInfo, Type } from 'rttist';
 import * as Either from 'effect/Either';
-import { DataSchema, ElementSchema } from 'golem:agent/common';
+import { AgentMethod, DataSchema, ElementSchema } from 'golem:agent/common';
 import { constructWitTypeFromTsType } from './mapping/types/ts-to-wit';
 import { Metadata } from './type_metadata';
+import { AgentClassName } from './agent-name';
 
 export function getConstructorDataSchema(
   classType: Type,
@@ -48,6 +49,74 @@ export function getConstructorDataSchema(
       val: nameAndElementSchema,
     };
   });
+}
+
+const methodMetadata = new Map<
+  AgentClassName,
+  Map<string, { prompt?: string; description?: string }>
+>();
+
+export function ensureMeta(target: any, method: string) {
+  const className = target.constructor.name;
+  if (!methodMetadata.has(className)) {
+    methodMetadata.set(className, new Map());
+  }
+  const classMeta = methodMetadata.get(className)!;
+  if (!classMeta.has(method)) {
+    classMeta.set(method, {});
+  }
+  return classMeta.get(method)!;
+}
+
+export function getAgentMethodSchema(
+  classType: Type,
+  agentClassName: AgentClassName,
+): Either.Either<AgentMethod[], string> {
+  let filteredType = classType as ClassType;
+  let methodNames = filteredType.getMethods();
+
+  return Either.all(
+    methodNames.map((methodInfo) => {
+      const signature = methodInfo.getSignatures()[0];
+
+      const parameters = signature.getParameters();
+
+      const returnType: Type = signature.returnType;
+
+      const methodName = methodInfo.name.toString();
+
+      const baseMeta =
+        methodMetadata.get(agentClassName)?.get(methodName) ?? {};
+
+      const inputSchemaEither = buildInputSchema(parameters);
+
+      if (Either.isLeft(inputSchemaEither)) {
+        return Either.left(
+          `Failed to construct input schema for method ${methodName}: ${inputSchemaEither.left}`,
+        );
+      }
+
+      const inputSchema = inputSchemaEither.right;
+
+      const outputSchemaEither = buildOutputSchema(returnType);
+
+      if (Either.isLeft(outputSchemaEither)) {
+        return Either.left(
+          `Failed to construct output schema for method ${methodName}: ${outputSchemaEither.left}`,
+        );
+      }
+
+      const outputSchema = outputSchemaEither.right;
+
+      return Either.right({
+        name: methodName,
+        description: baseMeta.description ?? '',
+        promptHint: baseMeta.prompt ?? '',
+        inputSchema: inputSchema,
+        outputSchema: outputSchema,
+      });
+    }),
+  );
 }
 
 export function buildInputSchema(
