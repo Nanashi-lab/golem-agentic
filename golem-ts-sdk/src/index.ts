@@ -22,16 +22,19 @@ import { createCustomError } from './internal/agentError';
 import { AgentInitiatorRegistry } from './internal/agentInitiator';
 import { AgentRegistry } from './internal/agentRegistry';
 import * as Option from 'effect/Option';
+import * as AgentName from './AgentName';
+
 export { BaseAgent } from './baseAgent';
 export { AgentId } from './agentId';
 export { prompt, description, agent } from './decorators';
-export { Metadata } from './typeMetadata';
+export { Metadata, TypeMetadata } from './typeMetadata';
 export * as Either from './newTypes/Either';
 export * as UnstructuredText from './newTypes/TextInput';
-import * as AgentName from './AgentName';
+export * as AgentName from './AgentName';
+export * as AgentClassName from './AgentClassName';
 
 /// Registry
-export const agents = new Map<AgentId, Agent>();
+const agents = new Map<AgentId, Agent>();
 
 const UninitiatedAgentErrorMessage: string =
   'Agent is not initialized. Please create an agent first using static function called create';
@@ -121,12 +124,12 @@ class Agent {
         tag: 'ok',
         val: agent,
       };
-    } else {
-      return {
-        tag: 'err',
-        val: initiateResult.val,
-      };
     }
+
+    return {
+      tag: 'err',
+      val: initiateResult.val,
+    };
   }
 }
 

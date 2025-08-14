@@ -21,7 +21,7 @@ import { ClassType, ParameterInfo, Type } from 'rttist';
 import { getLocalClient, getRemoteClient } from './internal/clientGeneration';
 import { BaseAgent } from './baseAgent';
 import { AgentInitiatorRegistry } from './internal/agentInitiator';
-import { createUniqueAgentId } from './agent-instance-counter';
+import { createUniqueAgentId } from './internal/agentInstanceSequence';
 import { AgentRegistry } from './internal/agentRegistry';
 import { constructTsValueFromWitValue } from './internal/mapping/values/wit-to-ts';
 import { constructWitValueFromTsValue } from './internal/mapping/values/ts-to-wit';
