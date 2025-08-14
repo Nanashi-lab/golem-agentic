@@ -12,7 +12,7 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-//import { Either } from '../src';
+import { Either } from '../src/newTypes/Either';
 
 interface SimpleInterfaceType {
   n: number;
@@ -68,7 +68,7 @@ export type ObjectComplexType = {
   i: TupleComplexType;
   j: MapType;
   k: SimpleInterfaceType;
-  //l: Either.Either<number, string>;
+  l: Either<number, string>;
   //m: Either.Either<number, string> // FIXME: Effect.Either is inferred as Invalid by RTTIST
 };
 

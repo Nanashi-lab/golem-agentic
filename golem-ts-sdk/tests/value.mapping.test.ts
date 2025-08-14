@@ -145,7 +145,7 @@ describe('typescript value to wit value round-trip conversions', () => {
         i: ['', 0, { a: '', b: 0, c: false }],
         j: new Map<string, number>(),
         k: { n: 0 },
-       // l: { tag: 'ok', val: 1 },
+        l: { tag: 'ok', val: 1 },
         // m: Either.left('failed')
       },
       unionComplexProp: 1,
@@ -199,7 +199,7 @@ describe('typescript value to wit value round-trip conversions', () => {
         i: ['', 0, { a: '', b: 0, c: false }],
         j: new Map<string, number>(),
         k: { n: 0 },
-       // l: { tag: 'ok', val: 1 },
+        l: { tag: 'ok', val: 1 },
       },
     };
 
@@ -243,7 +243,7 @@ describe('typescript value to wit value round-trip conversions', () => {
         i: ['', 0, { a: '', b: 0, c: false }],
         j: new Map<string, number>(),
         k: { n: 0 },
-       // l: { tag: 'ok', val: 1 },
+        l: { tag: 'ok', val: 1 },
       },
     };
 
