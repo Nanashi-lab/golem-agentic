@@ -1,5 +1,6 @@
 declare module 'golem:agent/common' {
   import * as golemRpc022Types from 'golem:rpc/types@0.2.2';
+  export type ValueAndType = golemRpc022Types.ValueAndType;
   export type WitType = golemRpc022Types.WitType;
   export type WitValue = golemRpc022Types.WitValue;
   export type Url = string;
@@ -123,6 +124,6 @@ declare module 'golem:agent/common' {
   } |
   {
     tag: 'custom-error'
-    val: DataValue
+    val: ValueAndType
   };
 }

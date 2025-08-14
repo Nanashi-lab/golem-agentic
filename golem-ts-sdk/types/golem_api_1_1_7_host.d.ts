@@ -34,6 +34,7 @@ declare module 'golem:api/host@1.1.7' {
   export type Duration = wasiClocks023MonotonicClock.Duration;
   export type ComponentId = golemRpc022Types.ComponentId;
   export type Uuid = golemRpc022Types.Uuid;
+  export type ValueAndType = golemRpc022Types.ValueAndType;
   export type WorkerId = golemRpc022Types.WorkerId;
   export type OplogIndex = bigint;
   export type PromiseId = {
@@ -88,6 +89,11 @@ declare module 'golem:api/host@1.1.7' {
     comparator: StringFilterComparator;
     value: string;
   };
+  export type WorkerWasiConfigVarsFilter = {
+    name: string;
+    comparator: StringFilterComparator;
+    value: string;
+  };
   export type WorkerPropertyFilter = {
     tag: 'name'
     val: WorkerNameFilter
@@ -107,6 +113,10 @@ declare module 'golem:api/host@1.1.7' {
   {
     tag: 'env'
     val: WorkerEnvFilter
+  } |
+  {
+    tag: 'wasi-config-vars'
+    val: WorkerWasiConfigVarsFilter
   };
   export type WorkerAllFilter = {
     filters: WorkerPropertyFilter[];
@@ -118,6 +128,7 @@ declare module 'golem:api/host@1.1.7' {
     workerId: WorkerId;
     args: string[];
     env: [string, string][];
+    wasiConfigVars: [string, string][];
     status: WorkerStatus;
     componentVersion: bigint;
     retryCount: bigint;

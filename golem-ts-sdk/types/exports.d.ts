@@ -2,6 +2,7 @@ declare module 'agent-guest' {
   import * as golemAgentCommon from 'golem:agent/common';
   export namespace guest {
     export function getAgent(agentType: string, agentId: string): Promise<Agent>;
+    export function invokeAgent(agentType: string, agentId: string, methodName: string, input: DataValue): Promise<Result<DataValue, AgentError>>;
     export function discoverAgents(): Promise<Agent[]>;
     export function discoverAgentTypes(): Promise<AgentType[]>;
     export class Agent {

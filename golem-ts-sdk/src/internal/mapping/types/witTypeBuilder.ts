@@ -14,7 +14,7 @@
 
 // Copied from wasm-rpc rust implementation
 import {NamedWitTypeNode, NodeIndex, ResourceMode, WitTypeNode} from "golem:rpc/types@0.2.2";
-import {AnalysedType, getNameFromAnalysedType, NameOptionTypePair, NameTypePair} from "./AnalysedType";
+import {AnalysedType, getNameFromAnalysedType, getOwnerFromAnalysedType, NameOptionTypePair, NameTypePair} from "./AnalysedType";
 import {WitType} from "golem:agent/common";
 
 export class WitTypeBuilder {
@@ -29,11 +29,12 @@ export class WitTypeBuilder {
 
         const idx = this.nodes.length;
         const boolType: WitTypeNode = { tag: 'prim-bool-type' };
-        this.nodes.push({  name: undefined,  type: boolType });
+        this.nodes.push({  name: undefined, owner: undefined,  type: boolType });
 
         const node: WitTypeNode = this.convert(typ);
         const name = getNameFromAnalysedType(typ);
-        this.nodes[idx] = { name, type: node };
+        const owner = getOwnerFromAnalysedType(typ);
+        this.nodes[idx] = { name, owner, type: node };
         this.mapping.set(hash, idx);
         return idx;
     }

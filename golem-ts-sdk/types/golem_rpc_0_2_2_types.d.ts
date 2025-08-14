@@ -114,6 +114,7 @@ declare module 'golem:rpc/types@0.2.2' {
   };
   export type NamedWitTypeNode = {
     name: string | undefined;
+    owner: string | undefined;
     type: WitTypeNode;
   };
   export type WitType = {
