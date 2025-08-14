@@ -7,16 +7,19 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "declaration": true,
     "declarationMap": false,
-    "emitDeclarationOnly": false
+    "emitDeclarationOnly": false,
+    "types": ["vitest/globals"]
   },
   "include": [
     "src/**/*",
-    "types"
+    "tests/**/*",
+    "types",
+    "tests/support"
   ],
   "exclude": [
     "node_modules"

@@ -23,22 +23,36 @@ jobs:
       - name: Install wasm-rquickjs
         run: cargo install wasm-rquickjs-cli   
         
-      - uses: useblacksmith/rust-cache@v3
-        with:
-          prefix-key: v3-rust
-          shared-key: debug
-          cache-all-crates: true
-          save-if: true          
-
       - name: Install dependencies
         working-directory: ./golem-ts-sdk
         run: |
           npm install
 
+      - name: Check code quality
+        working-directory: ./golem-ts-sdk
+        run: |
+          npm run lint || (
+            echo "Linting issues found. Please fix them before proceeding. `npm run lint:fix` may help"
+            exit 1
+          )     
+
+      - name: Check code formatting
+        working-directory: ./golem-ts-sdk
+        run: |
+          npm run format:check || (
+            echo "Code formatting issues found. Please run 'npm run format' to fix them."
+            exit 1
+          )      
+
       - name: Build the package
         working-directory: ./golem-ts-sdk
         run: |
           npm run build
+
+      - name: Run tests
+        working-directory: ./golem-ts-sdk
+        run: |
+          npm run test    
 
   publish:
     needs: build
@@ -58,13 +72,6 @@ jobs:
       - name: Setup Rust
         run: rustup update stable --no-self-update && rustup default stable
 
-      - uses: useblacksmith/rust-cache@v3
-        with:
-          prefix-key: v3-rust
-          shared-key: debug
-          cache-all-crates: true
-          save-if: true     
-
       - name: Install wasm-rquickjs
         run: cargo install wasm-rquickjs-cli
 
@@ -81,6 +88,6 @@ jobs:
       - name: Publish to npm
         working-directory: ./golem-ts-sdk
         run: |
-          npm publish --access public --tag test
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

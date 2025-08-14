@@ -1,33 +1,44 @@
 import {
     BaseAgent,
-    Agent,
-    Prompt,
-    Description,
+    agent,
+    prompt,
+    description,
 } from '@golemcloud/golem-ts-sdk';
 
-@Agent()
-class AssistantAgent extends BaseAgent {
-    @Prompt("Ask your question")
-    @Description("This method allows the agent to answer your question")
-    async ask(name: string): Promise<string> {
-        const customData = { data: "Sample data", value: 42 };
+import * as Either from '@golemcloud/golem-ts-sdk';
 
-        // Can be used after solving https://github.com/golemcloud/wasm-rquickjs/issues/2
-        // const remoteWeatherClient = WeatherAgent.createRemote("");
-        // const remoteWeather = await remoteWeatherClient.getWeather(name, customData);
+type Question = {
+    text: string
+}
+
+type Location = {lat: number, long: number};
+type LocationName = string;
+
+type Loc = Location | LocationName;
+
+@agent()
+class AssistantAgent extends BaseAgent {
+    @prompt("Ask your question")
+    @description("This method allows the agent to answer your question")
+    async ask(question: Question): Promise<string> {
+        console.log(question);
+
+        const location: Loc = { lat: 12.34, long: 56.78 };
+
+        const remoteWeatherClient = WeatherAgent.createRemote("afsal");
+        const remoteWeather = await remoteWeatherClient.getWeather(location);
 
         const localWeatherClient = WeatherAgent.createLocal("afsal");
-        const localWeather = await localWeatherClient.getWeather(name, customData);
+        const localWeather = await localWeatherClient.getWeather(location);
 
         return (
-            `Hello! I'm the assistant agent (${this.getId()}) reporting on the weather in ${name}. ` +
-            `Here’s what the weather agent says: "\n${localWeather}\n". ` +
-            `Info retrieved using weather agent (${localWeatherClient.getId()}).`
+            `Remote agent result: ${remoteWeather}\n` +
+            `Local agent result: ${localWeather}\n`
         );
     }
 }
 
-@Agent()
+@agent()
 class WeatherAgent extends BaseAgent {
     private readonly userName: string;
 
@@ -36,17 +47,14 @@ class WeatherAgent extends BaseAgent {
         this.userName = username;
     }
 
-    @Prompt("Get weather")
-    @Description("Weather forecast weather for you")
-    async getWeather(name: string, param2: CustomData): Promise<string> {
+    @prompt("Get weather")
+    @description("Weather forecast weather for you")
+    async getWeather(location: Location): Promise<Either.Either<string, string>> {
         return Promise.resolve(
-            `Hi ${this.userName} Weather in ${name} is sunny. Params passed: ${name} ${JSON.stringify(param2)}. ` +
-            `Computed by weather-agent ${this.getId()}. `
+            Either.ok(
+                `Hi ${this.userName} ! Weather in ${location} is sunny. ` +
+                `Reported by weather-agent ${this.getId()}. `
+            )
         );
     }
-}
-
-interface CustomData {
-    data: String;
-    value: number;
 }
