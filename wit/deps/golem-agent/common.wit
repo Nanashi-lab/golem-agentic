@@ -103,6 +103,6 @@ interface common {
     invalid-method(string),
     invalid-type(string),
     invalid-agent-id(string),
-    custom-error(data-value),
+    custom-error(value-and-type),
   }
 }
