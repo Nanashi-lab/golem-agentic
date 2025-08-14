@@ -1,7 +1,7 @@
 import { ClassType, ParameterInfo, Type } from 'rttist';
 import * as Either from 'effect/Either';
 import { AgentMethod, DataSchema, ElementSchema } from 'golem:agent/common';
-import { constructWitTypeFromTsType } from './mapping/types/tsToWit';
+import * as WitType from './mapping/types/WitType';
 import { AgentClassName } from '../newTypes/AgentClassName';
 import { AgentMethodMetadataRegistry } from './registry/agentMethodMetadataRegistry';
 
@@ -23,7 +23,7 @@ export function getConstructorDataSchema(
 
   const constructorParamTypes = Either.all(
     constructorParamInfos.map((paramInfo) =>
-      constructWitTypeFromTsType(paramInfo.type),
+      WitType.fromTsType(paramInfo.type),
     ),
   );
 
@@ -136,7 +136,7 @@ export function buildOutputSchema(
 function convertToElementSchema(
   type: Type,
 ): Either.Either<ElementSchema, string> {
-  return Either.map(constructWitTypeFromTsType(type), (witType) => {
+  return Either.map(WitType.fromTsType(type), (witType) => {
     return {
       tag: 'component-model',
       val: witType,
