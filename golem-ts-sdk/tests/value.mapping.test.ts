@@ -1,3 +1,17 @@
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 import { describe, it, expect } from 'vitest';
 import {
   getTestMapType,
@@ -13,8 +27,6 @@ import {
 } from './utils';
 import { TestInterfaceType } from './testData';
 import * as Value from '../src/internal/mapping/values/Value';
-import { constructWitValueFromTsValue } from '../src/internal/mapping/values/ts-to-wit';
-import { constructTsValueFromWitValue } from '../src/internal/mapping/values/wit-to-ts';
 import {
   interfaceArb,
   listArb,
@@ -30,6 +42,7 @@ import * as fc from 'fast-check';
 import { Type } from 'rttist';
 import * as EffectEither from 'effect/Either';
 import * as Either from '../src/newTypes/Either';
+import * as WitValue from '../src/internal/mapping/values/WitValue';
 
 describe('typescript value to wit value round-trip conversions', () => {
   it('should correctly perform round-trip conversion for arbitrary values of interface type', () => {
@@ -255,7 +268,7 @@ describe('typescript value to wit value round-trip conversions', () => {
 });
 
 function runRoundTripTest<T>(data: T, type: Type) {
-  const witValueEither = constructWitValueFromTsValue(data, type);
+  const witValueEither = WitValue.fromTsValue(data, type);
 
   const witValue = EffectEither.getOrElse(witValueEither, (err) => {
     throw new Error(err);
@@ -267,7 +280,7 @@ function runRoundTripTest<T>(data: T, type: Type) {
   expect(witValueReturned).toEqual(witValue);
 
   // Round trip ts-value -> wit-value -> ts-value
-  const tsValueReturned = constructTsValueFromWitValue(witValueReturned, type);
+  const tsValueReturned = WitValue.toTsValue(witValueReturned, type);
 
   expect(tsValueReturned).toEqual(data);
 }

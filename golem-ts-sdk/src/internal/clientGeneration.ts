@@ -14,17 +14,16 @@
 
 import { Metadata, TypeMetadata } from '../typeMetadata';
 import { ClassType } from 'rttist';
-import { WasmRpc, WitValue, WorkerId } from 'golem:rpc/types@0.2.2';
+import { WasmRpc, WorkerId } from 'golem:rpc/types@0.2.2';
 import { ComponentId, getSelfMetadata } from 'golem:api/host@1.1.7';
 import { DataValue } from 'golem:agent/common';
-import { constructWitValueFromTsValue } from './mapping/values/ts-to-wit';
-import { constructTsValueFromWitValue } from './mapping/values/wit-to-ts';
 import * as Either from 'effect/Either';
 import * as Option from 'effect/Option';
 import * as AgentClassName from '../newTypes/AgentClassName';
 import * as AgentName from '../newTypes/AgentName';
 import * as Value from './mapping/values/Value';
 import { AgentInitiatorRegistry } from './registry/agentInitiatorRegistry';
+import * as WitValue from './mapping/values/WitValue';
 
 export function getLocalClient<T extends new (...args: any[]) => any>(ctor: T) {
   return (...args: any[]) => {
@@ -55,7 +54,7 @@ export function getLocalClient<T extends new (...args: any[]) => any>(ctor: T) {
     const parameterWitValuesResult = Either.all(
       args.map((fnArg, index) => {
         const typ = parameters[index].type;
-        return constructWitValueFromTsValue(fnArg, typ);
+        return WitValue.fromTsValue(fnArg, typ);
       }),
     );
 
@@ -175,7 +174,7 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
             const parameterWitValuesResult = Either.all(
               fnArgs.map((fnArg, index) => {
                 const typ = paramInfo[index].type;
-                return constructWitValueFromTsValue(fnArg, typ);
+                return WitValue.fromTsValue(fnArg, typ);
               }),
             );
 
@@ -193,7 +192,7 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
                 })()
               : parameterWitValuesResult.right;
 
-            const inputArgs: WitValue[] = [
+            const inputArgs: WitValue.WitValue[] = [
               resourceWitValue,
               ...parameterWitValues,
             ];
@@ -209,7 +208,7 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
                   })()
                 : result.val;
 
-            return constructTsValueFromWitValue(rpcWitValue, returnType);
+            return WitValue.toTsValue(rpcWitValue, returnType);
           };
         }
         return val;

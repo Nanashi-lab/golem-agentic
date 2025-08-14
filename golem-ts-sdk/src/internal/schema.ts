@@ -1,7 +1,21 @@
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 import { ClassType, ParameterInfo, Type } from 'rttist';
 import * as Either from 'effect/Either';
 import { AgentMethod, DataSchema, ElementSchema } from 'golem:agent/common';
-import { constructWitTypeFromTsType } from './mapping/types/tsToWit';
+import * as WitType from './mapping/types/WitType';
 import { AgentClassName } from '../newTypes/AgentClassName';
 import { AgentMethodMetadataRegistry } from './registry/agentMethodMetadataRegistry';
 
@@ -23,7 +37,7 @@ export function getConstructorDataSchema(
 
   const constructorParamTypes = Either.all(
     constructorParamInfos.map((paramInfo) =>
-      constructWitTypeFromTsType(paramInfo.type),
+      WitType.fromTsType(paramInfo.type),
     ),
   );
 
@@ -136,7 +150,7 @@ export function buildOutputSchema(
 function convertToElementSchema(
   type: Type,
 ): Either.Either<ElementSchema, string> {
-  return Either.map(constructWitTypeFromTsType(type), (witType) => {
+  return Either.map(WitType.fromTsType(type), (witType) => {
     return {
       tag: 'component-model',
       val: witType,

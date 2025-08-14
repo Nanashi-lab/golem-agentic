@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import { AgentType, DataValue, AgentError } from 'golem:agent/common';
-import { WitValue } from 'golem:rpc/types@0.2.2';
 import { AgentInternal } from './internal/agentInternal';
 import { ResolvedAgent } from './internal/resolvedAgent';
 import { TypeMetadata } from './typeMetadata';
@@ -22,8 +21,7 @@ import { getLocalClient, getRemoteClient } from './internal/clientGeneration';
 import { BaseAgent } from './baseAgent';
 import { createUniqueAgentId } from './internal/agentInstanceSequence';
 import { AgentTypeRegistry } from './internal/registry/agentTypeRegistry';
-import { constructTsValueFromWitValue } from './internal/mapping/values/wit-to-ts';
-import { constructWitValueFromTsValue } from './internal/mapping/values/ts-to-wit';
+import * as WitValue from './internal/mapping/values/WitValue';
 import * as Either from 'effect/Either';
 import {
   getAgentMethodSchema,
@@ -191,7 +189,7 @@ export function agent() {
 
           const convertedConstructorArgs = constructorParamWitValues.map(
             (witVal, idx) => {
-              return constructTsValueFromWitValue(
+              return WitValue.toTsValue(
                 witVal,
                 constructorParamTypes[idx].type,
               );
@@ -252,10 +250,7 @@ export function agent() {
               const returnType: Type = methodSignature.returnType;
 
               const convertedArgs = argsWitValues.map((witVal, idx) => {
-                return constructTsValueFromWitValue(
-                  witVal,
-                  paramTypes[idx].type,
-                );
+                return WitValue.toTsValue(witVal, paramTypes[idx].type);
               });
 
               const result = await fn.apply(instance, convertedArgs);
@@ -285,10 +280,7 @@ export function agent() {
                 };
               }
 
-              const returnValue = constructWitValueFromTsValue(
-                result,
-                returnType,
-              );
+              const returnValue = WitValue.fromTsValue(result, returnType);
 
               if (Either.isLeft(returnValue)) {
                 const agentError: AgentError = {
@@ -342,7 +334,7 @@ export function description(desc: string) {
 }
 
 // FIXME: in the next verison, handle all dataValues
-function getWitValueFromDataValue(dataValue: DataValue): WitValue[] {
+function getWitValueFromDataValue(dataValue: DataValue): WitValue.WitValue[] {
   if (dataValue.tag === 'tuple') {
     return dataValue.val.map((elem) => {
       if (elem.tag === 'component-model') {
@@ -358,7 +350,9 @@ function getWitValueFromDataValue(dataValue: DataValue): WitValue[] {
 
 // Why is return value a tuple with a single element?
 // why should it have a name?
-function getDataValueFromWitValueReturned(witValues: WitValue): DataValue {
+function getDataValueFromWitValueReturned(
+  witValues: WitValue.WitValue,
+): DataValue {
   return {
     tag: 'tuple',
     val: [

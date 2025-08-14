@@ -18,12 +18,14 @@ import * as Either from "effect/Either";
 import {WitType} from "golem:agent/common";
 import * as AnalysedType from "./AnalysedType";
 
-export function constructWitTypeFromTsType(type: Type): Either.Either<WitType, string> {
-    return Either.flatMap(AnalysedType.fromTsType(type), (analysedType) => {
+export { WitType } from "golem:rpc/types@0.2.2";
+
+export const fromTsType = (type: Type): Either.Either<WitType, string> => {
+    const analysedTypeEither = AnalysedType.fromTsType(type);
+    return Either.flatMap(analysedTypeEither, (analysedType) => {
         const builder = new WitTypeBuilder();
         builder.add(analysedType);
         const result = builder.build();
         return Either.right(result);
-    })
-}
-
+    });
+};
