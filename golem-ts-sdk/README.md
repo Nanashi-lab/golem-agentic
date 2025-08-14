@@ -1,4 +1,4 @@
-### Golem TypeScript SDK Example
+# Golem TypeScript SDK
 
 ```ts
 import {
