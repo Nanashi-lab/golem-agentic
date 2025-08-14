@@ -1,3 +1,6 @@
+### Golem TypeScript SDK Example
+
+```ts
 import {
     BaseAgent,
     agent,
@@ -11,7 +14,7 @@ type Question = {
     text: string
 }
 
-type Location = {lat: number, long: number};
+type Location = { lat: number, long: number };
 type LocationName = string;
 
 type Loc = Location | LocationName;
@@ -21,8 +24,9 @@ class AssistantAgent extends BaseAgent {
     @prompt("Ask your question")
     @description("This method allows the agent to answer your question")
     async ask(question: Question): Promise<string> {
+        
         console.log(question);
-
+        
         const location: Loc = { lat: 12.34, long: 56.78 };
 
         const remoteWeatherClient = WeatherAgent.createRemote("afsal");
@@ -58,3 +62,6 @@ class WeatherAgent extends BaseAgent {
         );
     }
 }
+
+
+```
