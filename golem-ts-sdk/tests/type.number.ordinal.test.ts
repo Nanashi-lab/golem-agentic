@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
 import fc from 'fast-check';
-import { numberToOrdinalKebab } from '../src/mapping/types/typeIndexOrdinal';
+import { numberToOrdinalKebab } from '../src/internal/mapping/types/typeIndexOrdinal';
 
 test('numberToOrdinalKebab produces valid kebab-case ordinals', () => {
   fc.assert(

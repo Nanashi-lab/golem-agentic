@@ -10,14 +10,14 @@ import {
   getPromiseType,
 } from './utils';
 
-import * as AnalysedType from '../src/mapping/types/AnalysedType';
+import * as AnalysedType from '../src/internal/mapping/types/AnalysedType';
 
 import * as Either from 'effect/Either';
 import * as Option from 'effect/Option';
 import {
   NameOptionTypePair,
   NameTypePair,
-} from '../src/mapping/types/AnalysedType';
+} from '../src/internal/mapping/types/AnalysedType';
 
 // Interface type indirectly tests primitive types, union, list etc
 describe('TypeScript Interface to AnalysedType', () => {

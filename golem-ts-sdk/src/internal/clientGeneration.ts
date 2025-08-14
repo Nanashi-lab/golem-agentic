@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Metadata, TypeMetadata } from '../type_metadata';
+import { Metadata, TypeMetadata } from '../typeMetadata';
 import { ClassType } from 'rttist';
 import { WasmRpc, WitValue, WorkerId } from 'golem:rpc/types@0.2.2';
 import { ComponentId, getSelfMetadata } from 'golem:api/host@1.1.7';
 import { DataValue } from 'golem:agent/common';
-import { constructWitValueFromTsValue } from '../mapping/values/ts-to-wit';
-import { constructTsValueFromWitValue } from '../mapping/values/wit-to-ts';
+import { constructWitValueFromTsValue } from './mapping/values/ts-to-wit';
+import { constructTsValueFromWitValue } from './mapping/values/wit-to-ts';
 import * as Either from 'effect/Either';
 import { AgentInitiatorRegistry } from './agentInitiator';
 import * as Option from 'effect/Option';
 import * as AgentClassName from '../AgentClassName';
 import * as AgentName from '../AgentName';
-import * as Value from '../mapping/values/Value';
+import * as Value from './mapping/values/Value';
 
 export function getLocalClient<T extends new (...args: any[]) => any>(ctor: T) {
   return (...args: any[]) => {

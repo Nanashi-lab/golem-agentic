@@ -1,7 +1,7 @@
 import { ClassType, ParameterInfo, Type } from 'rttist';
 import * as Either from 'effect/Either';
 import { AgentMethod, DataSchema, ElementSchema } from 'golem:agent/common';
-import { constructWitTypeFromTsType } from '../mapping/types/tsToWit';
+import { constructWitTypeFromTsType } from './mapping/types/tsToWit';
 import { AgentClassName } from '../AgentClassName';
 import { MethodMetadata } from './methodMetadata';
 

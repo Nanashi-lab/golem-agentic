@@ -16,15 +16,15 @@ import { AgentType, DataValue, AgentError } from 'golem:agent/common';
 import { WitValue } from 'golem:rpc/types@0.2.2';
 import { AgentInternal } from './internal/agentInternal';
 import { ResolvedAgent } from './internal/resolvedAgent';
-import { TypeMetadata } from './type_metadata';
+import { TypeMetadata } from './typeMetadata';
 import { ClassType, ParameterInfo, Type } from 'rttist';
 import { getLocalClient, getRemoteClient } from './internal/clientGeneration';
 import { BaseAgent } from './baseAgent';
 import { AgentInitiatorRegistry } from './internal/agentInitiator';
 import { createUniqueAgentId } from './agent-instance-counter';
 import { AgentRegistry } from './internal/agentRegistry';
-import { constructTsValueFromWitValue } from './mapping/values/wit-to-ts';
-import { constructWitValueFromTsValue } from './mapping/values/ts-to-wit';
+import { constructTsValueFromWitValue } from './internal/mapping/values/wit-to-ts';
+import { constructWitValueFromTsValue } from './internal/mapping/values/ts-to-wit';
 import * as Either from 'effect/Either';
 import {
   getAgentMethodSchema,

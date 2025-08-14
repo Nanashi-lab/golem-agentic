@@ -1,8 +1,11 @@
-import { PackageName } from '../src/type_metadata';
+import { PackageName } from '../src/typeMetadata';
 import { Metadata } from '../src';
 import { Type } from 'rttist';
 import './setup';
-import { AnalysedType, NameTypePair } from '../src/mapping/types/AnalysedType';
+import {
+  AnalysedType,
+  NameTypePair,
+} from '../src/internal/mapping/types/AnalysedType';
 
 export function getAll() {
   return Metadata.getTypes().filter(
