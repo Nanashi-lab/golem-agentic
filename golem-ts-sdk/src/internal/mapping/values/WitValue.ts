@@ -17,11 +17,20 @@ import { WitValue } from 'golem:rpc/types@0.2.2';
 import * as Either from 'effect/Either';
 import * as Value from './Value';
 
-export function constructWitValueFromTsValue(
+export { WitValue } from 'golem:rpc/types@0.2.2';
+
+export const fromTsValue = (
   tsValue: any,
   tsType: Type,
-): Either.Either<WitValue, string> {
+): Either.Either<WitValue, string> => {
   const valueEither = Value.fromTsValue(tsValue, tsType);
-
   return Either.map(valueEither, Value.toWitValue);
-}
+};
+
+export const toTsValue: (witValue: WitValue, expectedType: Type) => any = (
+  witValue: WitValue,
+  expectedType: Type,
+): any => {
+  const value = Value.fromWitValue(witValue);
+  return Value.toTsValue(value, expectedType);
+};
