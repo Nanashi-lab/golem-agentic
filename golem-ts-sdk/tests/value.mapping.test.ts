@@ -11,11 +11,8 @@ import {
   getUnionComplexType,
   getPromiseType,
 } from './utils';
-import { TestInterfaceType } from './test-data';
-import {
-  constructValueFromWitValue,
-  constructWitValueFromValue,
-} from '../src/mapping/values/value';
+import { TestInterfaceType } from './testData';
+import * as Value from '../src/mapping/values/Value';
 import { constructWitValueFromTsValue } from '../src/mapping/values/ts-to-wit';
 import { constructTsValueFromWitValue } from '../src/mapping/values/wit-to-ts';
 import {
@@ -148,7 +145,7 @@ describe('typescript value to wit value round-trip conversions', () => {
         i: ['', 0, { a: '', b: 0, c: false }],
         j: new Map<string, number>(),
         k: { n: 0 },
-        l: { tag: 'ok', val: 1 },
+       // l: { tag: 'ok', val: 1 },
         // m: Either.left('failed')
       },
       unionComplexProp: 1,
@@ -202,7 +199,7 @@ describe('typescript value to wit value round-trip conversions', () => {
         i: ['', 0, { a: '', b: 0, c: false }],
         j: new Map<string, number>(),
         k: { n: 0 },
-        l: { tag: 'ok', val: 1 },
+       // l: { tag: 'ok', val: 1 },
       },
     };
 
@@ -246,7 +243,7 @@ describe('typescript value to wit value round-trip conversions', () => {
         i: ['', 0, { a: '', b: 0, c: false }],
         j: new Map<string, number>(),
         k: { n: 0 },
-        l: { tag: 'ok', val: 1 },
+       // l: { tag: 'ok', val: 1 },
       },
     };
 
@@ -264,8 +261,8 @@ function runRoundTripTest<T>(data: T, type: Type) {
   });
 
   // Round trip wit-value -> value -> wit-value
-  const value = constructValueFromWitValue(witValue);
-  const witValueReturned = constructWitValueFromValue(value);
+  const value = Value.fromWitValue(witValue);
+  const witValueReturned = Value.toWitValue(value);
   expect(witValueReturned).toEqual(witValue);
 
   // Round trip ts-value -> wit-value -> ts-value

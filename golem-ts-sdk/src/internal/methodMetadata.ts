@@ -1,4 +1,4 @@
-import { AgentClassName } from './agent-name';
+import { AgentClassName } from '../AgentClassName';
 
 const methodMetadata = new Map<
   AgentClassName,

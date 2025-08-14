@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { AgentType } from 'golem:agent/common';
-import { AgentClassName } from './agent-name';
+import { AgentClassName } from '../AgentClassName';
 import * as Option from 'effect/Option';
 
 const agentRegistry = new Map<AgentClassName, AgentType>();

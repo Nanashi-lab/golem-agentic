@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Type } from 'rttist';
-import { WitValue } from 'golem:rpc/types@0.2.2';
-import * as Either from 'effect/Either';
-import * as Value from './Value';
+import { Branded } from './internal/branding';
+import { AgentClassName } from './AgentClassName';
 
-export function constructWitValueFromTsValue(
-  tsValue: any,
-  tsType: Type,
-): Either.Either<WitValue, string> {
-  const valueEither = Value.fromTsValue(tsValue, tsType);
+export type AgentName = Branded<string, 'AgentName'>;
 
-  return Either.map(valueEither, Value.toWitValue);
-}
+export const fromString = (name: string): AgentName => {
+  return name as AgentName;
+};
+
+export const fromAgentClassName = (
+  agentClassName: AgentClassName,
+): AgentName => {
+  const name: string = agentClassName.toString();
+  return name as AgentName;
+};

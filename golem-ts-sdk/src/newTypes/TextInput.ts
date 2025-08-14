@@ -12,25 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Branded } from './branding';
-
-export type AgentName = Branded<string, 'AgentName'>;
-
-export const AgentNameConstructor = {
-  fromString(name: string): AgentName {
-    return name as AgentName;
-  },
-
-  fromAgentClassName(agentClassName: AgentClassName): AgentName {
-    const name: string = agentClassName.toString();
-    return name as AgentName;
-  },
+/**
+ * Represents text input for agent methods.
+ *
+ * Unlike a plain `string`, `TextInput` includes additional metadata,
+ * such as `languageCode`, to support unstructured text in multiple languages.
+ */
+export type TextInput = {
+  input: string;
+  languageCode: string;
 };
 
-export type AgentClassName = Branded<string, 'AgentClassName'>;
-
-export const AgentClassNameConstructor = {
-  fromString(name: string): AgentClassName {
-    return name as AgentClassName;
-  },
-};
+/**
+ * Creates a `TextInput` with a default language code of `'en'`.
+ *
+ * @param input - The text content.
+ * @returns A `TextInput` object with `languageCode` set to `'en'`.
+ */
+export function defaultTextInput(input: string): TextInput {
+  return {
+    input,
+    languageCode: 'en',
+  };
+}

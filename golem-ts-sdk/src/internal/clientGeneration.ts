@@ -12,31 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Metadata, TypeMetadata } from './type_metadata';
+import { Metadata, TypeMetadata } from '../type_metadata';
 import { ClassType } from 'rttist';
 import { WasmRpc, WitValue, WorkerId } from 'golem:rpc/types@0.2.2';
 import { ComponentId, getSelfMetadata } from 'golem:api/host@1.1.7';
 import { DataValue } from 'golem:agent/common';
-import {
-  constructValueFromWitValue,
-  constructWitValueFromValue,
-  Value,
-} from './mapping/values/value';
-import { constructWitValueFromTsValue } from './mapping/values/ts-to-wit';
-import { constructTsValueFromWitValue } from './mapping/values/wit-to-ts';
+import { constructWitValueFromTsValue } from '../mapping/values/ts-to-wit';
+import { constructTsValueFromWitValue } from '../mapping/values/wit-to-ts';
 import * as Either from 'effect/Either';
-import { AgentInitiatorRegistry } from './agent-Initiator';
-import { AgentClassNameConstructor, AgentNameConstructor } from './agent-name';
+import { AgentInitiatorRegistry } from './agentInitiator';
 import * as Option from 'effect/Option';
-import { AgentRegistry } from './agent-registry';
+import * as AgentClassName from '../AgentClassName';
+import * as AgentName from '../AgentName';
+import * as Value from '../mapping/values/Value';
 
 export function getLocalClient<T extends new (...args: any[]) => any>(ctor: T) {
   return (...args: any[]) => {
-    const agentClassName = AgentClassNameConstructor.fromString(ctor.name);
+    const agentClassName = AgentClassName.fromString(ctor.name);
 
     const agentInitiator = Option.getOrThrowWith(
       AgentInitiatorRegistry.lookup(
-        AgentNameConstructor.fromAgentClassName(agentClassName),
+        AgentName.fromAgentClassName(agentClassName),
       ),
       () => {
         new Error(
@@ -121,17 +117,6 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
       (type) => type.isClass() && type.name === ctor.name,
     )[0];
 
-    const agentClassName = AgentClassNameConstructor.fromString(ctor.name);
-
-    const agentType = Option.getOrThrowWith(
-      AgentRegistry.lookup(agentClassName),
-      () => {
-        new Error(
-          `Failed to find agent type for agent class: ${agentClassName}`,
-        );
-      },
-    );
-
     // getAgentComponent in code_first branch to be implemented
     // until then using self metadata
     const componentId: ComponentId = getSelfMetadata().workerId.componentId;
@@ -157,7 +142,7 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
           })()
         : result.val;
 
-    const resourceValue = constructValueFromWitValue(resourceWitValues);
+    const resourceValue = Value.fromWitValue(resourceWitValues);
 
     const resourceVal = (() => {
       switch (resourceValue.kind) {
@@ -170,7 +155,7 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
 
     const workerId = getWorkerName(resourceVal, componentId);
 
-    const resourceWitValue = constructWitValueFromValue(resourceVal);
+    const resourceWitValue = Value.toWitValue(resourceVal);
 
     return new Proxy(instance, {
       get(target, prop) {
@@ -233,7 +218,7 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
   };
 }
 
-function getWorkerName(value: Value, componentId: ComponentId): WorkerId {
+function getWorkerName(value: Value.Value, componentId: ComponentId): WorkerId {
   if (value.kind === 'handle') {
     const parts = value.uri.split('/');
     const workerName = parts[parts.length - 1];

@@ -2,13 +2,12 @@ import { PackageName } from '../src/type_metadata';
 import { Metadata } from '../src';
 import { Type } from 'rttist';
 import './setup';
-import { AnalysedType, NameTypePair } from '../src/mapping/types/analysed-type';
-import { expect } from 'vitest';
-import { ListComplexType } from './test-data';
+import { AnalysedType, NameTypePair } from '../src/mapping/types/AnalysedType';
 
 export function getAll() {
+  console.log(Metadata.getTypes().map(type => type.module.id).join(', '));
   return Metadata.getTypes().filter(
-    (type) => type.module.id == `@${PackageName}/tests/test-data`,
+    (type) => type.module.id == `@${PackageName}/tests/testData`,
   );
 }
 

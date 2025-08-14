@@ -1,5 +1,5 @@
 import { AgentError } from 'golem:agent/common';
-import { constructWitValueFromValue } from './mapping/values/value';
+import * as Value from '../mapping/values/Value';
 
 export function createCustomError(error: string): AgentError {
   return {
@@ -9,7 +9,7 @@ export function createCustomError(error: string): AgentError {
       val: [
         {
           tag: 'component-model',
-          val: constructWitValueFromValue({
+          val: Value.toWitValue({
             kind: 'string',
             value: error,
           }),

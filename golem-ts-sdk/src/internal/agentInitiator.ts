@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ResolvedAgent } from './resolved-agent';
+import { ResolvedAgent } from './resolvedAgent';
 import { Result } from 'golem:rpc/types@0.2.2';
 import { AgentError, DataValue } from 'golem:agent/common';
-import { AgentName } from './agent-name';
+import { AgentName } from '../AgentName';
 import * as Option from 'effect/Option';
 
 /**
