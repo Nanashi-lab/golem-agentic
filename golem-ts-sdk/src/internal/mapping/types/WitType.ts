@@ -18,7 +18,7 @@ import * as Either from "effect/Either";
 import {WitType} from "golem:agent/common";
 import * as AnalysedType from "./AnalysedType";
 
-export { WitType } from "golem:agent/common";
+export { WitType } from "golem:rpc/types@0.2.2";
 
 export const fromTsType = (type: Type): Either.Either<WitType, string> => {
     const analysedTypeEither = AnalysedType.fromTsType(type);
