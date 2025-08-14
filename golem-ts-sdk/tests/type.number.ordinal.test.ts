@@ -1,19 +1,16 @@
 import { test, expect } from 'vitest';
 import fc from 'fast-check';
-import { numberToOrdinalKebab } from '../src/mapping/types/type-index-ordinal';
+import { numberToOrdinalKebab } from '../src/internal/mapping/types/typeIndexOrdinal';
 
 test('numberToOrdinalKebab produces valid kebab-case ordinals', () => {
   fc.assert(
     fc.property(fc.integer({ min: 1, max: 999 }), (n) => {
       const result = numberToOrdinalKebab(n);
 
-      // 1. Should be lowercase letters and hyphens only
       expect(result).toMatch(/^[a-z-]+$/);
 
-      // 2. No spaces
       expect(result.includes(' ')).toBe(false);
 
-      // 3. Should end with a valid ordinal suffix
       expect(
         result.endsWith('th') ||
           result.endsWith('st') ||
@@ -21,7 +18,6 @@ test('numberToOrdinalKebab produces valid kebab-case ordinals', () => {
           result.endsWith('rd'),
       ).toBe(true);
 
-      // 4. Deterministic
       expect(numberToOrdinalKebab(n)).toBe(result);
     }),
   );

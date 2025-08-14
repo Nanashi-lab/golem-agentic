@@ -1,10 +1,9 @@
 import { ClassType, ParameterInfo, Type } from 'rttist';
 import * as Either from 'effect/Either';
 import { AgentMethod, DataSchema, ElementSchema } from 'golem:agent/common';
-import { constructWitTypeFromTsType } from './mapping/types/ts-to-wit';
-import { Metadata } from './type_metadata';
-import { AgentClassName } from './agent-name';
-import { MethodMetadata } from './method-metadata';
+import { constructWitTypeFromTsType } from './mapping/types/tsToWit';
+import { AgentClassName } from '../newTypes/AgentClassName';
+import { AgentMethodMetadataRegistry } from './registry/agentMethodMetadataRegistry';
 
 export function getConstructorDataSchema(
   classType: Type,
@@ -70,7 +69,8 @@ export function getAgentMethodSchema(
       const methodName = methodInfo.name.toString();
 
       const baseMeta =
-        MethodMetadata.lookup(agentClassName)?.get(methodName) ?? {};
+        AgentMethodMetadataRegistry.lookup(agentClassName)?.get(methodName) ??
+        {};
 
       const inputSchemaEither = buildInputSchema(parameters);
 

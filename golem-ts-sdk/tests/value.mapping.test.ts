@@ -11,13 +11,10 @@ import {
   getUnionComplexType,
   getPromiseType,
 } from './utils';
-import { TestInterfaceType } from './test-data';
-import {
-  constructValueFromWitValue,
-  constructWitValueFromValue,
-} from '../src/mapping/values/value';
-import { constructWitValueFromTsValue } from '../src/mapping/values/ts-to-wit';
-import { constructTsValueFromWitValue } from '../src/mapping/values/wit-to-ts';
+import { TestInterfaceType } from './testData';
+import * as Value from '../src/internal/mapping/values/Value';
+import { constructWitValueFromTsValue } from '../src/internal/mapping/values/ts-to-wit';
+import { constructTsValueFromWitValue } from '../src/internal/mapping/values/wit-to-ts';
 import {
   interfaceArb,
   listArb,
@@ -31,7 +28,8 @@ import {
 } from './arbitraries';
 import * as fc from 'fast-check';
 import { Type } from 'rttist';
-import * as Either from 'effect/Either';
+import * as EffectEither from 'effect/Either';
+import * as Either from '../src/newTypes/Either';
 
 describe('typescript value to wit value round-trip conversions', () => {
   it('should correctly perform round-trip conversion for arbitrary values of interface type', () => {
@@ -202,7 +200,7 @@ describe('typescript value to wit value round-trip conversions', () => {
         i: ['', 0, { a: '', b: 0, c: false }],
         j: new Map<string, number>(),
         k: { n: 0 },
-        l: { tag: 'ok', val: 1 },
+        l: Either.ok(1),
       },
     };
 
@@ -246,7 +244,7 @@ describe('typescript value to wit value round-trip conversions', () => {
         i: ['', 0, { a: '', b: 0, c: false }],
         j: new Map<string, number>(),
         k: { n: 0 },
-        l: { tag: 'ok', val: 1 },
+        l: Either.ok(1),
       },
     };
 
@@ -259,13 +257,13 @@ describe('typescript value to wit value round-trip conversions', () => {
 function runRoundTripTest<T>(data: T, type: Type) {
   const witValueEither = constructWitValueFromTsValue(data, type);
 
-  const witValue = Either.getOrElse(witValueEither, (err) => {
+  const witValue = EffectEither.getOrElse(witValueEither, (err) => {
     throw new Error(err);
   });
 
   // Round trip wit-value -> value -> wit-value
-  const value = constructValueFromWitValue(witValue);
-  const witValueReturned = constructWitValueFromValue(value);
+  const value = Value.fromWitValue(witValue);
+  const witValueReturned = Value.toWitValue(value);
   expect(witValueReturned).toEqual(witValue);
 
   // Round trip ts-value -> wit-value -> ts-value

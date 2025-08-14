@@ -13,26 +13,30 @@
 // limitations under the License.
 
 import type * as bindings from 'agent-guest';
-import { ResolvedAgent } from './resolved-agent';
-import { AgentId } from './agent-id';
+import { ResolvedAgent } from './internal/resolvedAgent';
+import { AgentId } from './agentId';
 import { Result } from 'golem:rpc/types@0.2.2';
 import { AgentError, AgentType, DataValue } from 'golem:agent/common';
-import { constructWitValueFromValue } from './mapping/values/value';
-import { createCustomError } from './agent-error';
-import { AgentInitiatorRegistry } from './agent-Initiator';
-import { AgentName, AgentNameConstructor } from './agent-name';
-import { AgentRegistry } from './agent-registry';
+import * as Value from './internal/mapping/values/Value';
+import { createCustomError } from './internal/agentError';
+import { AgentTypeRegistry } from './internal/registry/agentTypeRegistry';
 import * as Option from 'effect/Option';
+import * as AgentName from './newTypes/AgentName';
+import { AgentInitiatorRegistry } from './internal/registry/agentInitiatorRegistry';
 
-export { BaseAgent } from './base-agent';
-export { AgentId } from './agent-id';
+export { BaseAgent } from './baseAgent';
+export { AgentId } from './agentId';
 export { prompt, description, agent } from './decorators';
-export { Metadata } from './type_metadata';
-export { Either } from './new-types/either';
-export { UnstructuredText } from './new-types/text-input';
+export { Metadata, TypeMetadata } from './typeMetadata';
+export * as Either from './newTypes/Either';
+export * as UnstructuredText from './newTypes/TextInput';
+export * as AgentName from './newTypes/AgentName';
+export * as AgentClassName from './newTypes/AgentClassName';
 
-/// Registry
-export const agents = new Map<AgentId, Agent>();
+/// TODO; Try moving Agent registry to the `internal/registry` module
+// Moving `Agent` to other packages resulted in errors at runtime.
+// Need to check this again
+const agents = new Map<AgentId, Agent>();
 
 const UninitiatedAgentErrorMessage: string =
   'Agent is not initialized. Please create an agent first using static function called create';
@@ -44,7 +48,7 @@ const UninitializedAgentError: AgentError = {
     val: [
       {
         tag: 'component-model',
-        val: constructWitValueFromValue({
+        val: Value.toWitValue({
           kind: 'string',
           value: UninitiatedAgentErrorMessage,
         }),
@@ -56,7 +60,6 @@ const UninitializedAgentError: AgentError = {
 // An error can happen if the user agent is not composed (which will initialize the agent with precompiled wasm)
 function getResolvedAgentOrThrow(
   resolvedAgent: Option.Option<ResolvedAgent>,
-  agentName: Option.Option<AgentName>,
 ): ResolvedAgent {
   return Option.getOrThrowWith(
     resolvedAgent,
@@ -69,9 +72,7 @@ class Agent {
   resolvedAgent: Option.Option<ResolvedAgent> = Option.none();
 
   async getId(): Promise<string> {
-    return getResolvedAgentOrThrow(this.resolvedAgent, Option.none())
-      .getId()
-      .toString();
+    return getResolvedAgentOrThrow(this.resolvedAgent).getId().toString();
   }
 
   async invoke(
@@ -89,10 +90,7 @@ class Agent {
   }
 
   async getDefinition(): Promise<AgentType> {
-    return getResolvedAgentOrThrow(
-      this.resolvedAgent,
-      Option.none(),
-    ).getDefinition();
+    return getResolvedAgentOrThrow(this.resolvedAgent).getDefinition();
   }
 
   static async create(
@@ -100,7 +98,7 @@ class Agent {
     input: DataValue,
   ): Promise<Result<Agent, AgentError>> {
     const initiator = AgentInitiatorRegistry.lookup(
-      AgentNameConstructor.fromString(agentType),
+      AgentName.fromString(agentType),
     );
 
     if (Option.isNone(initiator)) {
@@ -128,12 +126,12 @@ class Agent {
         tag: 'ok',
         val: agent,
       };
-    } else {
-      return {
-        tag: 'err',
-        val: initiateResult.val,
-      };
     }
+
+    return {
+      tag: 'err',
+      val: initiateResult.val,
+    };
   }
 }
 
@@ -160,7 +158,7 @@ async function discoverAgents(): Promise<Agent[]> {
 }
 
 async function discoverAgentTypes(): Promise<bindings.guest.AgentType[]> {
-  return AgentRegistry.getRegisteredAgents();
+  return AgentTypeRegistry.getRegisteredAgents();
 }
 
 export const guest: typeof bindings.guest = {

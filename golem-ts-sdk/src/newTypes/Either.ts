@@ -2,8 +2,28 @@
 
 /**
  * A simple Either type that can be used to represent success or failure.
- * It is similar to Effect.Either. This is exposed as data types such as Effect.Either
- * are not supported by golem-ts-sdk.
+ * If you are familiar with effect's `Either`, this is exactly the same usage including the import styles.
+ *
+ * `Either` can be method parameters or result types for your agent as given below. It will
+ * take different representation in agent schema definitions, compared to a simple union type.
+ *
+ * This SDK exposes `Either` as interim, as we currently don't support direct use of effect's `Either`,
+ * and given it's quite commonly used these days.
+ *
+ *
+ * ```ts
+ *   import { Either } from '@golemcloud/golem-ts-sdk'
+ *
+ *   const foo: Either.Either<number, string> = Either.ok(1)
+ *   console.log(foo)
+ *
+ *   @agent()
+ *   class MyAgent extends BaseAgent {
+ *     async function process(): Promise<Either<number, string>> {
+ *         return Either.ok(1);
+ *     }
+ *   }
+ * ```
  *
  * SDK developer note: `namespace` cannot be used in the SDK, as it is not supported by RTTIST.
  * Hence, functionalities such as `map`, `mapBoth` are not under the namespace `Result` as in Effect.Either.
@@ -14,7 +34,7 @@ export type Either<T, E> = { tag: 'ok'; val: T } | { tag: 'err'; val: E };
  * Creates a Result with a successful value.
  * @param val
  */
-function ok<T, E = never>(val: T): Either<T, E> {
+export function ok<T, E = never>(val: T): Either<T, E> {
   return { tag: 'ok', val };
 }
 
@@ -22,7 +42,7 @@ function ok<T, E = never>(val: T): Either<T, E> {
  * Creates a Result with an error value.
  * @param val
  */
-function err<T = never, E = unknown>(val: E): Either<T, E> {
+export function err<T = never, E = unknown>(val: E): Either<T, E> {
   return { tag: 'err', val };
 }
 
@@ -32,7 +52,7 @@ function err<T = never, E = unknown>(val: E): Either<T, E> {
  * @param r The Result to map.
  * @param f The function to apply to the value if it is 'ok'.
  */
-function map<T, E, U>(r: Either<T, E>, f: (t: T) => U): Either<U, E> {
+export function map<T, E, U>(r: Either<T, E>, f: (t: T) => U): Either<U, E> {
   return r.tag === 'ok' ? ok(f(r.val)) : r;
 }
 
@@ -43,7 +63,7 @@ function map<T, E, U>(r: Either<T, E>, f: (t: T) => U): Either<U, E> {
  * @param onOk The function to apply to the value if it is 'ok'.
  * @param onErr The function to apply to the error if it is 'err'.
  */
-function mapBoth<T, E, U, F>(
+export function mapBoth<T, E, U, F>(
   r: Either<T, E>,
   onOk: (t: T) => U,
   onErr: (e: E) => F,
@@ -57,7 +77,7 @@ function mapBoth<T, E, U, F>(
  * @param ra The first Result.
  * @param rb The second Result.
  */
-function zipBoth<A, B, E>(
+export function zipBoth<A, B, E>(
   ra: Either<A, E>,
   rb: Either<B, E>,
 ): Either<[A, B], E> {
@@ -75,7 +95,7 @@ function zipBoth<A, B, E>(
  * If any Result is 'err', it returns that error.
  * @param results An array of Results to combine.
  */
-function allResults<T, E>(results: Either<T, E>[]): Either<T[], E> {
+export function allResults<T, E>(results: Either<T, E>[]): Either<T[], E> {
   const vals: T[] = [];
   for (const r of results) {
     if (r.tag === 'err') return r;

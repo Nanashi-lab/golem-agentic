@@ -14,19 +14,19 @@
 
 import { AgentError, AgentType, DataValue } from 'golem:agent/common';
 import { Result } from 'golem:rpc/types@0.2.2';
-import { AgentInternal } from './agent-internal';
-import { AgentId } from './agent-id';
-import { AgentRegistry } from './agent-registry';
-import { AgentClassName } from './agent-name';
+import { AgentInternal } from './agentInternal';
+import { AgentId } from '../agentId';
+import { AgentTypeRegistry } from './registry/agentTypeRegistry';
 import * as Option from 'effect/Option';
+import * as AgentClassName from '../newTypes/AgentClassName';
 
 export class ResolvedAgent {
   readonly classInstance: any;
   private agentInternal: AgentInternal;
-  private readonly agentClassName: AgentClassName;
+  private readonly agentClassName: AgentClassName.AgentClassName;
 
   constructor(
-    agentClassName: AgentClassName,
+    agentClassName: AgentClassName.AgentClassName,
     tsAgentInternal: AgentInternal,
     originalInstance: any,
   ) {
@@ -48,7 +48,7 @@ export class ResolvedAgent {
 
   getDefinition(): AgentType {
     return Option.getOrThrowWith(
-      AgentRegistry.lookup(this.agentClassName),
+      AgentTypeRegistry.lookup(this.agentClassName),
       () => new Error(`Agent class ${this.agentClassName} is not registered.`),
     );
   }

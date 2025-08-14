@@ -12,25 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Branded } from './branding';
+import { Branded } from '../internal/branding';
+import { AgentClassName } from './AgentClassName';
 
 export type AgentName = Branded<string, 'AgentName'>;
 
-export const AgentNameConstructor = {
-  fromString(name: string): AgentName {
-    return name as AgentName;
-  },
-
-  fromAgentClassName(agentClassName: AgentClassName): AgentName {
-    const name: string = agentClassName.toString();
-    return name as AgentName;
-  },
+export const fromString = (name: string): AgentName => {
+  return name as AgentName;
 };
 
-export type AgentClassName = Branded<string, 'AgentClassName'>;
-
-export const AgentClassNameConstructor = {
-  fromString(name: string): AgentClassName {
-    return name as AgentClassName;
-  },
+export const fromAgentClassName = (
+  agentClassName: AgentClassName,
+): AgentName => {
+  const name: string = agentClassName.toString();
+  return name as AgentName;
 };

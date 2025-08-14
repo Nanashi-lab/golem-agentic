@@ -12,12 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Branded } from '../branding';
+import { Result } from 'golem:rpc/types@0.2.2';
+import { AgentError, AgentType, DataValue } from 'golem:agent/common';
+import { AgentId } from '../agentId';
 
-export type UnstructuredText = Branded<string, 'UnstructuredText'>;
-
-export function createUnstructuredText(
-  unstructuredText: string,
-): UnstructuredText {
-  return unstructuredText as UnstructuredText;
+/**
+ * An AgentInternal is an internal interface that represents the basic usage of an agent
+ * It is constructed only after instantiating of an agent through the AgentInitiator.
+ */
+export interface AgentInternal {
+  getId(): AgentId;
+  invoke(
+    method: string,
+    args: DataValue,
+  ): Promise<Result<DataValue, AgentError>>;
+  getAgentType(): AgentType;
 }

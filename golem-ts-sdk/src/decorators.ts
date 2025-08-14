@@ -14,22 +14,26 @@
 
 import { AgentType, DataValue, AgentError } from 'golem:agent/common';
 import { WitValue } from 'golem:rpc/types@0.2.2';
-import { AgentInternal } from './agent-internal';
-import { ResolvedAgent } from './resolved-agent';
-import { TypeMetadata } from './type_metadata';
+import { AgentInternal } from './internal/agentInternal';
+import { ResolvedAgent } from './internal/resolvedAgent';
+import { TypeMetadata } from './typeMetadata';
 import { ClassType, ParameterInfo, Type } from 'rttist';
-import { getLocalClient, getRemoteClient } from './client-generation';
-import { BaseAgent } from './base-agent';
-import { AgentInitiatorRegistry } from './agent-Initiator';
-import { createUniqueAgentId } from './agent-instance-counter';
-import { AgentClassNameConstructor, AgentNameConstructor } from './agent-name';
-import { AgentRegistry } from './agent-registry';
-import { constructTsValueFromWitValue } from './mapping/values/wit-to-ts';
-import { constructWitValueFromTsValue } from './mapping/values/ts-to-wit';
+import { getLocalClient, getRemoteClient } from './internal/clientGeneration';
+import { BaseAgent } from './baseAgent';
+import { createUniqueAgentId } from './internal/agentInstanceSequence';
+import { AgentTypeRegistry } from './internal/registry/agentTypeRegistry';
+import { constructTsValueFromWitValue } from './internal/mapping/values/wit-to-ts';
+import { constructWitValueFromTsValue } from './internal/mapping/values/ts-to-wit';
 import * as Either from 'effect/Either';
-import { getAgentMethodSchema, getConstructorDataSchema } from './schema';
+import {
+  getAgentMethodSchema,
+  getConstructorDataSchema,
+} from './internal/schema';
 import * as Option from 'effect/Option';
-import { MethodMetadata } from './method-metadata';
+import { AgentMethodMetadataRegistry } from './internal/registry/agentMethodMetadataRegistry';
+import * as AgentClassName from './newTypes/AgentClassName';
+import * as AgentName from './newTypes/AgentName';
+import { AgentInitiatorRegistry } from './internal/registry/agentInitiatorRegistry';
 
 /**
  * Marks a class as an Agent and registers it in the global agent registry.
@@ -115,9 +119,9 @@ import { MethodMetadata } from './method-metadata';
  */
 export function agent() {
   return function <T extends new (...args: any[]) => any>(ctor: T) {
-    const agentClassName = AgentClassNameConstructor.fromString(ctor.name);
+    const agentClassName = AgentClassName.fromString(ctor.name);
 
-    if (AgentRegistry.exists(agentClassName)) {
+    if (AgentTypeRegistry.exists(agentClassName)) {
       return ctor;
     }
 
@@ -153,7 +157,7 @@ export function agent() {
 
     const methods = methodSchemaEither.right;
 
-    const agentName = AgentNameConstructor.fromAgentClassName(agentClassName);
+    const agentName = AgentName.fromAgentClassName(agentClassName);
 
     const agentType: AgentType = {
       typeName: agentName,
@@ -168,13 +172,13 @@ export function agent() {
       dependencies: [],
     };
 
-    AgentRegistry.register(agentClassName, agentType);
+    AgentTypeRegistry.register(agentClassName, agentType);
 
     (ctor as any).createRemote = getRemoteClient(ctor);
     (ctor as any).createLocal = getLocalClient(ctor);
 
     AgentInitiatorRegistry.register(
-      AgentNameConstructor.fromAgentClassName(agentClassName),
+      AgentName.fromAgentClassName(agentClassName),
       {
         initiate: (_agentName: string, constructorParams: DataValue) => {
           const constructorInfo = (classType as ClassType).getConstructors()[0];
@@ -204,11 +208,15 @@ export function agent() {
               return uniqueAgentId;
             },
             getAgentType: () => {
-              return Option.getOrThrowWith(
-                AgentRegistry.lookup(agentClassName),
-                () =>
-                  new Error(`Failed to find agent type for ${agentClassName}`),
-              );
+              const agentType = AgentTypeRegistry.lookup(agentClassName);
+
+              if (Option.isNone(agentType)) {
+                throw new Error(
+                  `Failed to find agent type for ${agentClassName}. Ensure it is decorated with @agent() and registered properly.`,
+                );
+              }
+
+              return agentType.value;
             },
             invoke: async (method, args) => {
               const fn = instance[method];
@@ -217,7 +225,7 @@ export function agent() {
                   `Method ${method} not found on agent ${agentClassName}`,
                 );
 
-              const agentTypeOpt = AgentRegistry.lookup(agentClassName);
+              const agentTypeOpt = AgentTypeRegistry.lookup(agentClassName);
 
               if (Option.isNone(agentTypeOpt)) {
                 const error: AgentError = {
@@ -258,7 +266,7 @@ export function agent() {
 
               if (!methodDef) {
                 const entriesAsStrings = Array.from(
-                  AgentRegistry.entries(),
+                  AgentTypeRegistry.entries(),
                 ).map(
                   ([key, value]) =>
                     `Key: ${key}, Value: ${JSON.stringify(value, null, 2)}`,
@@ -313,19 +321,23 @@ export function agent() {
 
 export function prompt(prompt: string) {
   return function (target: Object, propertyKey: string) {
-    const agentClassName = AgentClassNameConstructor.fromString(
-      target.constructor.name,
+    const agentClassName = AgentClassName.fromString(target.constructor.name);
+    AgentMethodMetadataRegistry.setPromptName(
+      agentClassName,
+      propertyKey,
+      prompt,
     );
-    MethodMetadata.setPromptName(agentClassName, propertyKey, prompt);
   };
 }
 
 export function description(desc: string) {
   return function (target: Object, propertyKey: string) {
-    const agentClassName = AgentClassNameConstructor.fromString(
-      target.constructor.name,
+    const agentClassName = AgentClassName.fromString(target.constructor.name);
+    AgentMethodMetadataRegistry.setDescription(
+      agentClassName,
+      propertyKey,
+      desc,
     );
-    MethodMetadata.setDescription(agentClassName, propertyKey, desc);
   };
 }
 

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { BaseMetadataLibrary, GlobalMetadata, Type } from 'rttist';
-import { AgentClassName } from './agent-name';
+import { AgentClassName } from './newTypes/AgentClassName';
 import * as Option from 'effect/Option';
 
 export const PackageName = '@golemcloud/golem-ts-sdk';

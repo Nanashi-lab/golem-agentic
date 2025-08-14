@@ -1,4 +1,4 @@
 import { metadataCollection } from '../.metadata/metadata.index';
-import { TypeMetadata } from '../src/type_metadata';
+import { TypeMetadata } from '../src/typeMetadata';
 
 TypeMetadata.update(metadataCollection);

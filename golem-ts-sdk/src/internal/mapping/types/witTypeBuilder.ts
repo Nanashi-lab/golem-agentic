@@ -14,7 +14,7 @@
 
 // Copied from wasm-rpc rust implementation
 import {NamedWitTypeNode, NodeIndex, ResourceMode, WitTypeNode} from "golem:rpc/types@0.2.2";
-import {AnalysedType, getNameFromAnalysedType, NameOptionTypePair, NameTypePair} from "./analysed-type";
+import {AnalysedType, getNameFromAnalysedType, NameOptionTypePair, NameTypePair} from "./AnalysedType";
 import {WitType} from "golem:agent/common";
 
 export class WitTypeBuilder {

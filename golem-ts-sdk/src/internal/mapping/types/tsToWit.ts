@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Result } from 'golem:rpc/types@0.2.2';
-import { AgentError, AgentType, DataValue } from 'golem:agent/common';
-import { AgentId } from './agent-id';
+import {Type} from "rttist";
+import {WitTypeBuilder} from "./witTypeBuilder";
+import * as Either from "effect/Either";
+import {WitType} from "golem:agent/common";
+import * as AnalysedType from "./AnalysedType";
 
-/**
- * An AgentInternal is an internal interface that represents the basic usage of an agent
- * It is constructed only after instantiating of an agent through the AgentInitiator.
- */
-export interface AgentInternal {
-  getId(): AgentId;
-  invoke(
-    method: string,
-    args: DataValue,
-  ): Promise<Result<DataValue, AgentError>>;
-  getAgentType(): AgentType;
+export function constructWitTypeFromTsType(type: Type): Either.Either<WitType, string> {
+    return Either.flatMap(AnalysedType.fromTsType(type), (analysedType) => {
+        const builder = new WitTypeBuilder();
+        builder.add(analysedType);
+        const result = builder.build();
+        return Either.right(result);
+    })
 }
+

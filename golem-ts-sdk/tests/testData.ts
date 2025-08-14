@@ -11,7 +11,8 @@
 // functions in type-utils.ts in tests module.
 
 // ─────────────────────────────────────────────────────────────────────────────
-import { Either } from '../src/new-types/either';
+
+import { Either } from '../src/newTypes/Either';
 
 interface SimpleInterfaceType {
   n: number;

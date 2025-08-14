@@ -10,7 +10,7 @@ import {
   TupleType,
   UnionComplexType,
   UnionType,
-} from './test-data';
+} from './testData';
 
 export const mapArb: fc.Arbitrary<MapType> = fc
   .dictionary(fc.string(), fc.integer())
