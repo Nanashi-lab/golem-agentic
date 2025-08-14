@@ -21,6 +21,7 @@ type Loc = Location | LocationName;
 
 @agent()
 class AssistantAgent extends BaseAgent {
+    
     @prompt("Ask your question")
     @description("This method allows the agent to answer your question")
     async ask(question: Question): Promise<string> {
