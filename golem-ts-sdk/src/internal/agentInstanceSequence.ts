@@ -14,7 +14,7 @@
 
 import { getSelfMetadata } from 'golem:api/host@1.1.7';
 import { AgentId } from '../agentId';
-import { AgentName } from '../AgentName';
+import { AgentName } from '../newTypes/AgentName';
 
 /**
  * Maintains a counter for each agent type to ensure unique IDs for each instance.

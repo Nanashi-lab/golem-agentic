@@ -20,9 +20,8 @@ import { TypeMetadata } from './typeMetadata';
 import { ClassType, ParameterInfo, Type } from 'rttist';
 import { getLocalClient, getRemoteClient } from './internal/clientGeneration';
 import { BaseAgent } from './baseAgent';
-import { AgentInitiatorRegistry } from './internal/agentInitiator';
 import { createUniqueAgentId } from './internal/agentInstanceSequence';
-import { AgentRegistry } from './internal/agentRegistry';
+import { AgentTypeRegistry } from './internal/registry/agentTypeRegistry';
 import { constructTsValueFromWitValue } from './internal/mapping/values/wit-to-ts';
 import { constructWitValueFromTsValue } from './internal/mapping/values/ts-to-wit';
 import * as Either from 'effect/Either';
@@ -31,9 +30,10 @@ import {
   getConstructorDataSchema,
 } from './internal/schema';
 import * as Option from 'effect/Option';
-import { MethodMetadata } from './internal/methodMetadata';
-import * as AgentClassName from './AgentClassName';
-import * as AgentName from './AgentName';
+import { AgentMethodMetadataRegistry } from './internal/registry/agentMethodMetadataRegistry';
+import * as AgentClassName from './newTypes/AgentClassName';
+import * as AgentName from './newTypes/AgentName';
+import { AgentInitiatorRegistry } from './internal/registry/agentInitiatorRegistry';
 
 /**
  * Marks a class as an Agent and registers it in the global agent registry.
@@ -121,7 +121,7 @@ export function agent() {
   return function <T extends new (...args: any[]) => any>(ctor: T) {
     const agentClassName = AgentClassName.fromString(ctor.name);
 
-    if (AgentRegistry.exists(agentClassName)) {
+    if (AgentTypeRegistry.exists(agentClassName)) {
       return ctor;
     }
 
@@ -172,7 +172,7 @@ export function agent() {
       dependencies: [],
     };
 
-    AgentRegistry.register(agentClassName, agentType);
+    AgentTypeRegistry.register(agentClassName, agentType);
 
     (ctor as any).createRemote = getRemoteClient(ctor);
     (ctor as any).createLocal = getLocalClient(ctor);
@@ -208,7 +208,7 @@ export function agent() {
               return uniqueAgentId;
             },
             getAgentType: () => {
-              const agentType = AgentRegistry.lookup(agentClassName);
+              const agentType = AgentTypeRegistry.lookup(agentClassName);
 
               if (Option.isNone(agentType)) {
                 throw new Error(
@@ -225,7 +225,7 @@ export function agent() {
                   `Method ${method} not found on agent ${agentClassName}`,
                 );
 
-              const agentTypeOpt = AgentRegistry.lookup(agentClassName);
+              const agentTypeOpt = AgentTypeRegistry.lookup(agentClassName);
 
               if (Option.isNone(agentTypeOpt)) {
                 const error: AgentError = {
@@ -266,7 +266,7 @@ export function agent() {
 
               if (!methodDef) {
                 const entriesAsStrings = Array.from(
-                  AgentRegistry.entries(),
+                  AgentTypeRegistry.entries(),
                 ).map(
                   ([key, value]) =>
                     `Key: ${key}, Value: ${JSON.stringify(value, null, 2)}`,
@@ -322,14 +322,22 @@ export function agent() {
 export function prompt(prompt: string) {
   return function (target: Object, propertyKey: string) {
     const agentClassName = AgentClassName.fromString(target.constructor.name);
-    MethodMetadata.setPromptName(agentClassName, propertyKey, prompt);
+    AgentMethodMetadataRegistry.setPromptName(
+      agentClassName,
+      propertyKey,
+      prompt,
+    );
   };
 }
 
 export function description(desc: string) {
   return function (target: Object, propertyKey: string) {
     const agentClassName = AgentClassName.fromString(target.constructor.name);
-    MethodMetadata.setDescription(agentClassName, propertyKey, desc);
+    AgentMethodMetadataRegistry.setDescription(
+      agentClassName,
+      propertyKey,
+      desc,
+    );
   };
 }
 

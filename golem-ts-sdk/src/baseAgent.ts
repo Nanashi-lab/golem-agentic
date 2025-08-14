@@ -14,9 +14,9 @@
 
 import { AgentType } from 'golem:agent/common';
 import { AgentId } from './agentId';
-import { AgentRegistry } from './internal/agentRegistry';
+import { AgentTypeRegistry } from './internal/registry/agentTypeRegistry';
 import * as Option from 'effect/Option';
-import * as AgentClassName from './AgentClassName';
+import * as AgentClassName from './newTypes/AgentClassName';
 
 /**
  * BaseAgent is the foundational class for defining agent implementations.
@@ -61,7 +61,7 @@ export class BaseAgent {
   getAgentType(): AgentType {
     const agentClassName = AgentClassName.fromString(this.constructor.name);
 
-    const agentType = AgentRegistry.lookup(agentClassName);
+    const agentType = AgentTypeRegistry.lookup(agentClassName);
 
     if (Option.isNone(agentType)) {
       throw new Error(

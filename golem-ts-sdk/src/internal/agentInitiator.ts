@@ -15,7 +15,7 @@
 import { ResolvedAgent } from './resolvedAgent';
 import { Result } from 'golem:rpc/types@0.2.2';
 import { AgentError, DataValue } from 'golem:agent/common';
-import { AgentName } from '../AgentName';
+import { AgentName } from '../newTypes/AgentName';
 import * as Option from 'effect/Option';
 
 /**
@@ -41,24 +41,4 @@ export type AgentInitiator = {
     agentName: string,
     constructorParams: DataValue,
   ): Result<ResolvedAgent, AgentError>;
-};
-
-const agentInitiators = new Map<AgentName, AgentInitiator>();
-
-export const AgentInitiatorRegistry = {
-  register(agentName: AgentName, agentInitiator: AgentInitiator): void {
-    agentInitiators.set(agentName, agentInitiator);
-  },
-
-  lookup(agentName: AgentName): Option.Option<AgentInitiator> {
-    return Option.fromNullable(agentInitiators.get(agentName));
-  },
-
-  has(agentName: AgentName): boolean {
-    return agentInitiators.has(agentName);
-  },
-
-  entries(): IterableIterator<[AgentName, AgentInitiator]> {
-    return agentInitiators.entries();
-  },
 };

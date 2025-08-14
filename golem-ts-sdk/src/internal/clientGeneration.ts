@@ -20,11 +20,11 @@ import { DataValue } from 'golem:agent/common';
 import { constructWitValueFromTsValue } from './mapping/values/ts-to-wit';
 import { constructTsValueFromWitValue } from './mapping/values/wit-to-ts';
 import * as Either from 'effect/Either';
-import { AgentInitiatorRegistry } from './agentInitiator';
 import * as Option from 'effect/Option';
-import * as AgentClassName from '../AgentClassName';
-import * as AgentName from '../AgentName';
+import * as AgentClassName from '../newTypes/AgentClassName';
+import * as AgentName from '../newTypes/AgentName';
 import * as Value from './mapping/values/Value';
+import { AgentInitiatorRegistry } from './registry/agentInitiatorRegistry';
 
 export function getLocalClient<T extends new (...args: any[]) => any>(ctor: T) {
   return (...args: any[]) => {

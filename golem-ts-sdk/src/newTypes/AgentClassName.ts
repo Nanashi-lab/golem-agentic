@@ -1,4 +1,4 @@
-import { Branded } from './internal/branding';
+import { Branded } from '../internal/branding';
 
 export type AgentClassName = Branded<string, 'AgentClassName'>;
 

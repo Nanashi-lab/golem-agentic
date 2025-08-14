@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { AgentName } from './AgentName';
+import { AgentName } from './newTypes/AgentName';
 
 /**
  * Represents a globally unique identifier for an agent instance.

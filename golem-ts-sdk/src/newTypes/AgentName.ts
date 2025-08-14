@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Branded } from './internal/branding';
+import { Branded } from '../internal/branding';
 import { AgentClassName } from './AgentClassName';
 
 export type AgentName = Branded<string, 'AgentName'>;

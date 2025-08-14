@@ -19,10 +19,10 @@ import { Result } from 'golem:rpc/types@0.2.2';
 import { AgentError, AgentType, DataValue } from 'golem:agent/common';
 import * as Value from './internal/mapping/values/Value';
 import { createCustomError } from './internal/agentError';
-import { AgentInitiatorRegistry } from './internal/agentInitiator';
-import { AgentRegistry } from './internal/agentRegistry';
+import { AgentTypeRegistry } from './internal/registry/agentTypeRegistry';
 import * as Option from 'effect/Option';
-import * as AgentName from './AgentName';
+import * as AgentName from './newTypes/AgentName';
+import { AgentInitiatorRegistry } from './internal/registry/agentInitiatorRegistry';
 
 export { BaseAgent } from './baseAgent';
 export { AgentId } from './agentId';
@@ -30,10 +30,12 @@ export { prompt, description, agent } from './decorators';
 export { Metadata, TypeMetadata } from './typeMetadata';
 export * as Either from './newTypes/Either';
 export * as UnstructuredText from './newTypes/TextInput';
-export * as AgentName from './AgentName';
-export * as AgentClassName from './AgentClassName';
+export * as AgentName from './newTypes/AgentName';
+export * as AgentClassName from './newTypes/AgentClassName';
 
-/// Registry
+/// TODO; Try moving Agent registry to the `internal/registry` module
+// Moving `Agent` to other packages resulted in errors at runtime.
+// Need to check this again
 const agents = new Map<AgentId, Agent>();
 
 const UninitiatedAgentErrorMessage: string =
@@ -156,7 +158,7 @@ async function discoverAgents(): Promise<Agent[]> {
 }
 
 async function discoverAgentTypes(): Promise<bindings.guest.AgentType[]> {
-  return AgentRegistry.getRegisteredAgents();
+  return AgentTypeRegistry.getRegisteredAgents();
 }
 
 export const guest: typeof bindings.guest = {
