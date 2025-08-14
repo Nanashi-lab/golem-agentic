@@ -1,3 +1,19 @@
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import { Either } from '../src/newTypes/Either';
+
 // DO NOT RENAME INTERFACES OR PROPERTIES.
 // These names are introspected using RTTIST metadata reflection
 // and are used in unit tests.
@@ -9,10 +25,6 @@
 // This will at least ensure the mapping layer does not break for these types.
 // However, you can/should explicitly test the behavior of a specific type by adding necessary utility
 // functions in type-utils.ts in tests module.
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-import { Either } from '../src/newTypes/Either';
 
 interface SimpleInterfaceType {
   n: number;
