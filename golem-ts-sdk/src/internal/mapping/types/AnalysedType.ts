@@ -77,49 +77,83 @@ export function getNameFromAnalysedType(typ: AnalysedType): string | undefined {
   }
 }
 
+export function getOwnerFromAnalysedType(typ: AnalysedType): string | undefined {
+  switch (typ.kind) {
+    case 'variant':
+      return typ.value.owner;
+    case 'result':
+      return typ.value.owner;
+    case 'option':
+      return typ.value.owner;
+    case 'enum':
+      return typ.value.owner;
+    case 'flags':
+      return typ.value.owner;
+    case 'record':
+      return typ.value.owner;
+    case 'tuple':
+      return typ.value.owner;
+    case 'list':
+      return typ.value.owner;
+    case 'handle':
+      return typ.value.owner;
+    default:
+      return undefined;
+  }
+}
+
 export interface TypeResult {
   name: string | undefined;
+  owner: string | undefined;
   ok?: AnalysedType;
   err?: AnalysedType;
 }
 
 export interface TypeVariant {
   name: string | undefined;
+  owner: string | undefined;
   cases: NameOptionTypePair[];
 }
 
 export interface TypeOption {
   name: string | undefined;
+  owner: string | undefined;
   inner: AnalysedType;
 }
 
 export interface TypeEnum {
   name: string | undefined;
+  owner: string | undefined;
   cases: string[];
 }
 
 export interface TypeFlags {
   name: string | undefined;
+  owner: string | undefined;
   names: string[];
 }
 
 export interface TypeRecord {
   name: string | undefined;
+  owner: string | undefined;
   fields: NameTypePair[];
 }
 
 export interface TypeTuple {
   name: string | undefined;
+  owner: string | undefined;
   items: AnalysedType[];
 }
 
 export interface TypeList {
   name: string | undefined;
+  owner: string | undefined;
   inner: AnalysedType;
 }
 
 export interface TypeHandle {
   name: string | undefined;
+  owner: string | undefined;
   resourceId: AnalysedResourceId;
   mode: AnalysedResourceMode;
 }
@@ -149,25 +183,25 @@ export const unitCase=  (name: string): NameOptionTypePair => ({ name });
  export const u8 =  (): AnalysedType => ({ kind: 'u8' });
  export const s8 =  (): AnalysedType => ({ kind: 's8' });
 
- export const list = (inner: AnalysedType): AnalysedType => ({ kind: 'list', value: { name: undefined, inner } });
-export const option = (inner: AnalysedType): AnalysedType => ({ kind: 'option', value: { name: undefined, inner } });
- export const tuple =  (items: AnalysedType[]): AnalysedType => ({ kind: 'tuple', value: { name: undefined, items } });
- export const record = (fields: NameTypePair[]): AnalysedType => ({ kind: 'record', value: { name: undefined, fields } });
- export const flags =  (names: string[]): AnalysedType => ({ kind: 'flags', value: { name: undefined, names } });
- export const enum_ = (cases: string[]): AnalysedType => ({ kind: 'enum', value: { name: undefined, cases } });
- export const variant = (cases: NameOptionTypePair[]): AnalysedType => ({ kind: 'variant', value: { name: undefined, cases } });
+ export const list = (inner: AnalysedType): AnalysedType => ({ kind: 'list', value: { name: undefined, owner: undefined, inner } });
+export const option = (inner: AnalysedType): AnalysedType => ({ kind: 'option', value: { name: undefined, owner: undefined, inner } });
+ export const tuple =  (items: AnalysedType[]): AnalysedType => ({ kind: 'tuple', value: { name: undefined, owner: undefined, items } });
+ export const record = (fields: NameTypePair[]): AnalysedType => ({ kind: 'record', value: { name: undefined, owner: undefined, fields } });
+ export const flags =  (names: string[]): AnalysedType => ({ kind: 'flags', value: { name: undefined, owner: undefined, names } });
+ export const enum_ = (cases: string[]): AnalysedType => ({ kind: 'enum', value: { name: undefined, owner: undefined, cases } });
+ export const variant = (cases: NameOptionTypePair[]): AnalysedType => ({ kind: 'variant', value: { name: undefined, owner: undefined, cases } });
 
  export const resultOk =  (ok: AnalysedType): AnalysedType =>
-      ({ kind: 'result', value: { name: undefined, ok } });
+      ({ kind: 'result', value: { name: undefined, owner: undefined, ok } });
  export const resultErr = (err: AnalysedType): AnalysedType =>
-      ({ kind: 'result', value: { name: undefined, err } });
+      ({ kind: 'result', value: { name: undefined, owner: undefined, err } });
 
  export const result = (ok: AnalysedType, err: AnalysedType): AnalysedType =>
-      ({ kind: 'result', value: { name: undefined, ok, err } });
+      ({ kind: 'result', value: { name: undefined, owner: undefined, ok, err } });
 
 
  export const handle =  (resourceId: AnalysedResourceId, mode: AnalysedResourceMode): AnalysedType =>
-      ({ kind: 'handle', value: { name: undefined, resourceId, mode } });
+      ({ kind: 'handle', value: { name: undefined, owner: undefined, resourceId, mode } });
 
 
 export function fromTsType(type: TsType): Either.Either<AnalysedType, string> {
@@ -470,6 +504,3 @@ export function fromTsType(type: TsType): Either.Either<AnalysedType, string> {
       return Either.left(`The following type is not supported as argument or return type in agentic context ${type.displayName}`);
   }
 }
-
-
-

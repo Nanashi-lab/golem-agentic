@@ -41,21 +41,9 @@ const agents = new Map<AgentId, Agent>();
 const UninitiatedAgentErrorMessage: string =
   'Agent is not initialized. Please create an agent first using static function called create';
 
-const UninitializedAgentError: AgentError = {
-  tag: 'custom-error',
-  val: {
-    tag: 'tuple',
-    val: [
-      {
-        tag: 'component-model',
-        val: Value.toWitValue({
-          kind: 'string',
-          value: UninitiatedAgentErrorMessage,
-        }),
-      },
-    ],
-  },
-};
+const UninitializedAgentError: AgentError = createCustomError(
+  UninitiatedAgentErrorMessage,
+);
 
 // An error can happen if the user agent is not composed (which will initialize the agent with precompiled wasm)
 function getResolvedAgentOrThrow(
@@ -161,9 +149,20 @@ async function discoverAgentTypes(): Promise<bindings.guest.AgentType[]> {
   return AgentTypeRegistry.getRegisteredAgents();
 }
 
+async function invokeAgent(
+  agentType: string,
+  agentId: string,
+  methodName: string,
+  input: DataValue,
+): Promise<Result<DataValue, AgentError>> {
+  const agent = await getAgent(agentType, agentId);
+  return agent.invoke(methodName, input);
+}
+
 export const guest: typeof bindings.guest = {
   getAgent,
   discoverAgents,
   discoverAgentTypes,
+  invokeAgent,
   Agent,
 };
