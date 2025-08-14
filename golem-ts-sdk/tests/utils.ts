@@ -5,7 +5,6 @@ import './setup';
 import { AnalysedType, NameTypePair } from '../src/mapping/types/AnalysedType';
 
 export function getAll() {
-  console.log(Metadata.getTypes().map(type => type.module.id).join(', '));
   return Metadata.getTypes().filter(
     (type) => type.module.id == `@${PackageName}/tests/testData`,
   );
