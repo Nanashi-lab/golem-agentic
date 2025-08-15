@@ -48,6 +48,157 @@ class AgentId {
     }
 }
 
+var dist = {};
+
+var consts = {};
+
+var hasRequiredConsts;
+
+function requireConsts () {
+	if (hasRequiredConsts) return consts;
+	hasRequiredConsts = 1;
+	(function (exports) {
+		Object.defineProperty(exports, "__esModule", { value: true });
+		exports.TypeIds = exports.ModuleIds = exports.CALLSITE_ARGS_TYPE_PROPERTY = exports.CALLSITE_TYPE_ARGS_PROPERTY = exports.PROTOTYPE_TYPE_INSTANCE_PROPERTY = exports.PROTOTYPE_TYPE_PROPERTY = void 0;
+		exports.PROTOTYPE_TYPE_PROPERTY = "[[type]]";
+		exports.PROTOTYPE_TYPE_INSTANCE_PROPERTY = "[[$type]]";
+		exports.CALLSITE_TYPE_ARGS_PROPERTY = "[[csTArgs]]";
+		exports.CALLSITE_ARGS_TYPE_PROPERTY = "[[csArgsT]]";
+		exports.ModuleIds = {
+		    Native: "::native",
+		    Dynamic: "::dynamic",
+		    Invalid: "::invalid",
+		    RttistType: "@rttist/dist/Type",
+		    RttistModule: "@rttist/dist/Module",
+		};
+		exports.TypeIds = {
+		    Invalid: `${exports.ModuleIds.Invalid}::Invalid`,
+		    NonPrimitiveObject: "#object",
+		    Function: "#Function",
+		    Any: "#any",
+		    Unknown: "#unknown",
+		    Void: "#void",
+		    Never: "#never",
+		    Null: "#null",
+		    Undefined: "#undefined",
+		    Intrinsic: "#intrinsic",
+		    String: "#String",
+		    Number: "#Number",
+		    BigInt: "#BigInt",
+		    Boolean: "#Boolean",
+		    True: "#true",
+		    False: "#false",
+		    Date: "#Date",
+		    Error: "#Error",
+		    Symbol: "#Symbol",
+		    UniqueSymbol: "#UniqueSymbol",
+		    RegExp: "#RegExp",
+		    Int8Array: "#Int8Array",
+		    Uint8Array: "#Uint8Array",
+		    Uint8ClampedArray: "#Uint8ClampedArray",
+		    Int16Array: "#Int16Array",
+		    Uint16Array: "#Uint16Array",
+		    Int32Array: "#Int32Array",
+		    Uint32Array: "#Uint32Array",
+		    Float32Array: "#Float32Array",
+		    Float64Array: "#Float64Array",
+		    BigInt64Array: "#BigInt64Array",
+		    BigUint64Array: "#BigUint64Array",
+		    ArrayDefinition: "#Array",
+		    TupleDefinition: "#Tuple",
+		    ReadonlyArrayDefinition: "#ReadonlyArray",
+		    MapDefinition: "#Map",
+		    WeakMapDefinition: "#WeakMap",
+		    SetDefinition: "#Set",
+		    WeakSetDefinition: "#WeakSet",
+		    PromiseDefinition: "#Promise",
+		    GeneratorDefinition: "#Generator",
+		    AsyncGeneratorDefinition: "#AsyncGenerator",
+		    IteratorDefinition: "#Iterator",
+		    IterableDefinition: "#Iterable",
+		    IterableIteratorDefinition: "#IterableIterator",
+		    AsyncIteratorDefinition: "#AsyncIterator",
+		    AsyncIterableDefinition: "#AsyncIterable",
+		    AsyncIterableIteratorDefinition: "#AsyncIterableIterator",
+		    ArrayBuffer: "#ArrayBuffer",
+		    SharedArrayBuffer: "#SharedArrayBuffer",
+		    Atomics: "#Atomics",
+		    DataView: "#DataView",
+		}; 
+	} (consts));
+	return consts;
+}
+
+var declarations = {};
+
+var hasRequiredDeclarations;
+
+function requireDeclarations () {
+	if (hasRequiredDeclarations) return declarations;
+	hasRequiredDeclarations = 1;
+	Object.defineProperty(declarations, "__esModule", { value: true });
+	return declarations;
+}
+
+var getCallsiteTypeArguments = {};
+
+var hasRequiredGetCallsiteTypeArguments;
+
+function requireGetCallsiteTypeArguments () {
+	if (hasRequiredGetCallsiteTypeArguments) return getCallsiteTypeArguments;
+	hasRequiredGetCallsiteTypeArguments = 1;
+	Object.defineProperty(getCallsiteTypeArguments, "__esModule", { value: true });
+	getCallsiteTypeArguments.getCallsiteTypeArguments = getCallsiteTypeArguments$1;
+	const consts_1 = requireConsts();
+	function getCallsiteTypeArguments$1(fn) {
+	    const callsiteArgs = fn[consts_1.CALLSITE_TYPE_ARGS_PROPERTY];
+	    fn[consts_1.CALLSITE_TYPE_ARGS_PROPERTY] = undefined;
+	    return callsiteArgs;
+	}
+	return getCallsiteTypeArguments;
+}
+
+var hasRequiredDist;
+
+function requireDist () {
+	if (hasRequiredDist) return dist;
+	hasRequiredDist = 1;
+	(function (exports) {
+		var __createBinding = (dist && dist.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+		    if (k2 === undefined) k2 = k;
+		    var desc = Object.getOwnPropertyDescriptor(m, k);
+		    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+		      desc = { enumerable: true, get: function() { return m[k]; } };
+		    }
+		    Object.defineProperty(o, k2, desc);
+		}) : (function(o, m, k, k2) {
+		    if (k2 === undefined) k2 = k;
+		    o[k2] = m[k];
+		}));
+		var __exportStar = (dist && dist.__exportStar) || function(m, exports) {
+		    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+		};
+		Object.defineProperty(exports, "__esModule", { value: true });
+		__exportStar(requireConsts(), exports);
+		__exportStar(requireDeclarations(), exports);
+		__exportStar(requireGetCallsiteTypeArguments(), exports); 
+	} (dist));
+	return dist;
+}
+
+var distExports = requireDist();
+
+var m={current:null,setScope(n){this.current=n;},doWithScope(n,e){let t=this.current;this.setScope(n);try{e();}finally{this.setScope(t);}}};var Se=null;function We(n){Se=n;}function j(){if(!Se)throw new Error("Type factory is not set");return Se}var Le=null;function Ye(n){Le=n;}function qe(){if(!Le)throw new Error("Type factory is not set");return Le}function*Re(){for(let n=0;n<100;n++)yield distExports.TypeIds.Invalid;}function ve(n,e,t){let a=n[distExports.CALLSITE_TYPE_ARGS_PROPERTY];if(n[distExports.CALLSITE_TYPE_ARGS_PROPERTY]=void 0,e!==void 0);return a||Re()}var De=Symbol.for("rttist/Type"),ke=Symbol.for("rttist/Module");function G(n){return n&&typeof n=="object"&&n.constructor.__type===De}function $(n){return n&&typeof n=="object"&&n.constructor.__type===ke}var W=class{constructor(e){this.metadataLibrary=m.current;if(!e)throw new Error("Invalid module reference.");this._reference=e;}get module(){return this._module??(this._module=this.metadataLibrary.resolveModule(this._reference)),this._module}};var y=class{constructor(e){this.metadataLibrary=m.current;if(!e)throw new Error("Invalid type reference.");this._reference=e;}get type(){return this._type??(this._type=this.metadataLibrary.resolveType(this._reference)),this._type}};var T=class{constructor(e){this.metadataLibrary=m.current;this._references=e,this.length=e.length;}get types(){return this._types??(this._types=Object.freeze(this._references.map(e=>this.metadataLibrary.resolveType(e)))),this._types}};var u=(r=>(r[r.Invalid=0]="Invalid",r[r.Unknown=1]="Unknown",r[r.Any=2]="Any",r[r.Never=3]="Never",r[r.Void=4]="Void",r[r.Undefined=5]="Undefined",r[r.Null=6]="Null",r[r.Intrinsic=7]="Intrinsic",r[r.Boolean=8]="Boolean",r[r.False=9]="False",r[r.True=10]="True",r[r.Number=11]="Number",r[r.BigInt=12]="BigInt",r[r.String=13]="String",r[r.Symbol=14]="Symbol",r[r.NonPrimitiveObject=15]="NonPrimitiveObject",r[r.ObjectType=16]="ObjectType",r[r.FunctionType=17]="FunctionType",r[r.Date=18]="Date",r[r.Error=19]="Error",r[r.RegExp=20]="RegExp",r[r.Int8Array=21]="Int8Array",r[r.Uint8Array=22]="Uint8Array",r[r.Uint8ClampedArray=23]="Uint8ClampedArray",r[r.Int16Array=24]="Int16Array",r[r.Uint16Array=25]="Uint16Array",r[r.Int32Array=26]="Int32Array",r[r.Uint32Array=27]="Uint32Array",r[r.Float32Array=28]="Float32Array",r[r.Float64Array=29]="Float64Array",r[r.BigInt64Array=30]="BigInt64Array",r[r.BigUint64Array=31]="BigUint64Array",r[r.ArrayBuffer=32]="ArrayBuffer",r[r.SharedArrayBuffer=33]="SharedArrayBuffer",r[r.Atomics=34]="Atomics",r[r.DataView=35]="DataView",r[r.ArrayDefinition=36]="ArrayDefinition",r[r.ReadonlyArrayDefinition=37]="ReadonlyArrayDefinition",r[r.TupleDefinition=38]="TupleDefinition",r[r.MapDefinition=39]="MapDefinition",r[r.WeakMapDefinition=40]="WeakMapDefinition",r[r.SetDefinition=41]="SetDefinition",r[r.WeakSetDefinition=42]="WeakSetDefinition",r[r.PromiseDefinition=43]="PromiseDefinition",r[r.GeneratorDefinition=44]="GeneratorDefinition",r[r.AsyncGeneratorDefinition=45]="AsyncGeneratorDefinition",r[r.IteratorDefinition=46]="IteratorDefinition",r[r.IterableDefinition=47]="IterableDefinition",r[r.IterableIteratorDefinition=48]="IterableIteratorDefinition",r[r.AsyncIteratorDefinition=49]="AsyncIteratorDefinition",r[r.AsyncIterableDefinition=50]="AsyncIterableDefinition",r[r.AsyncIterableIteratorDefinition=51]="AsyncIterableIteratorDefinition",r[r.Module=60]="Module",r[r.Namespace=61]="Namespace",r[r.Object=62]="Object",r[r.Interface=63]="Interface",r[r.Class=64]="Class",r[r.Union=65]="Union",r[r.Intersection=66]="Intersection",r[r.ConditionalType=67]="ConditionalType",r[r.IndexedAccess=68]="IndexedAccess",r[r.TypeParameter=69]="TypeParameter",r[r.Alias=70]="Alias",r[r.Method=71]="Method",r[r.Function=72]="Function",r[r.GeneratorFunction=73]="GeneratorFunction",r[r.NumberLiteral=74]="NumberLiteral",r[r.BigIntLiteral=75]="BigIntLiteral",r[r.StringLiteral=76]="StringLiteral",r[r.TemplateLiteral=77]="TemplateLiteral",r[r.EnumLiteral=78]="EnumLiteral",r[r.RegExpLiteral=79]="RegExpLiteral",r[r.Enum=80]="Enum",r[r.UniqueSymbol=81]="UniqueSymbol",r[r.ESSymbol=82]="ESSymbol",r[r.Promise=83]="Promise",r[r.Generator=84]="Generator",r[r.AsyncGenerator=85]="AsyncGenerator",r[r.Iterator=86]="Iterator",r[r.Iterable=87]="Iterable",r[r.IterableIterator=88]="IterableIterator",r[r.AsyncIterator=89]="AsyncIterator",r[r.AsyncIterable=90]="AsyncIterable",r[r.AsyncIterableIterator=91]="AsyncIterableIterator",r[r.Jsx=92]="Jsx",r[r.Type=93]="Type",r[r.TypeCtor=94]="TypeCtor",r))(u||{});var C=(a=>(a[a.None=0]="None",a[a.Getter=1]="Getter",a[a.Setter=2]="Setter",a))(C||{});var S=(a=>(a[a.Public=0]="Public",a[a.Private=1]="Private",a[a.Protected=2]="Protected",a))(S||{});var we=new Set([76,74,10,9,75,79,77]),Ee=new Set([13,8,11,12,14,81,6,5]);var Pe=(t=>(t[t.ES=0]="ES",t[t.Unique=1]="Unique",t))(Pe||{});function Y(n){return ((n||0)&24)>>3}function Xe(n){return ((n||0)&96)>>5}var Ne=(a=>(a[a.None=0]="None",a[a.Optional=1]="Optional",a[a.Rest=2]="Rest",a))(Ne||{}),lt=(o=>(o[o.Optional=1]="Optional",o[o.Static=2]="Static",o[o.Private=8]="Private",o[o.Protected=16]="Protected",o))(lt||{}),Ze=(t=>(t[t.None=0]="None",t[t.Readonly=1]="Readonly",t))(Ze||{}),Oe=(d=>(d[d.None=0]="None",d[d.Optional=1]="Optional",d[d.Readonly=2]="Readonly",d[d.Static=4]="Static",d[d.Private=8]="Private",d[d.Protected=16]="Protected",d[d.Getter=32]="Getter",d[d.Setter=64]="Setter",d))(Oe||{});var L=class L{constructor(e){this._isIterable=false;this.metadataLibrary=m.current;if(!e.module)throw new Error("Type must have a module.");this._id=e.id,this._kind=e.kind,this._name=e.name,this._exported=e.exported||false,this._moduleRef=new W(e.module),this._nullable=e.nullable||this.metadataLibrary.configuration.nullability||false,this._definitionRef=e.genericTypeDefinition?new y(e.genericTypeDefinition):void 0,this._isGenericTypeDefinition=e.isGenericTypeDefinition||false,this._typeArgumentsRef=new T(e.typeArguments||[]);}get id(){return this._id}get displayName(){return `<${u[this._kind]} ${this._name} [${this._id}]>`}get kind(){return this._kind}get module(){return this._moduleRef.module}get name(){return this._name}get exported(){return this._exported}get iterable(){return this._isIterable}get nullable(){return this._nullable}get genericTypeDefinition(){return this._isGenericTypeDefinition?this:this._definitionRef?.type}[Symbol.for("nodejs.util.inspect.custom")](){return this.toString()}is(e){if(e===void 0){let[t]=ve(this.is);e=this.metadataLibrary.resolveType(t);}return this._id===e._id}getTypeArguments(){return this._typeArgumentsRef.types}isGenericType(){return this._typeArgumentsRef.length>0}isGenericTypeDefinition(){return this._isGenericTypeDefinition}isTypeParameter(){return this._kind===69}isUnion(){return this._kind===65}isIntersection(){return this._kind===66}isClass(){return this._kind===64}isInterface(){return this._kind===63}isTypeAlias(){return this._kind===70}isLiteral(){return we.has(this._kind)}isUnionOrIntersection(){return this.isUnion()||this.isIntersection()}isArray(){return this.isGenericType()&&(this.genericTypeDefinition===L.ArrayDefinition||this.genericTypeDefinition===L.ReadonlyArrayDefinition)}isTuple(){return this.isGenericType()&&this.genericTypeDefinition===L.TupleDefinition}isEnum(){return this._kind===80}isConditional(){return this._kind===67}isObjectLike(){return this.isObject()||this.isClass()||this.isInterface()}isObject(){return this._kind===62}isTemplate(){return this._kind===77}isFunction(){return this._kind===72}isESSymbol(){return this._kind===82}isUniqueSymbol(){return this._kind===81}isInstantiable(){return this.isClass()||this.isFunction()}isPrimitive(){return Ee.has(this._kind)}isString(){return this._kind===13||this._kind===76||this._kind===77}isNumber(){return this._kind===11||this._kind===74}isBigInt(){return this._kind===12||this._kind===75}isBoolean(){return this._kind===8||this._kind===10||this._kind===9}isAny(){return this._kind===2}isNever(){return this._kind===3}isVoid(){return this._kind===4}isIntrinsic(){return this._kind===7}isUndefined(){return this._kind===5}isNull(){return this._kind===6}toString(){let e=this.getPropsToStringify();return `${this.displayName} {
+    \`\`\`typeinfo
+    typelib: ${this.metadataLibrary.name}
+    module:  ${this.module.id}
+    \`\`\``+(e.length?`
+`:"")+this.stringifyProps(e,1)+`
+}`}getPropsToStringify(){return []}stringifyProps(e,t){let a="    ".repeat(t);return e.map(o=>(Array.isArray(o)?this.stringifyProps(o,1):o).replace(/^/gm,a)).join(`
+`)}};L.__type=De;var i=L;function V(){return typeof globalThis=="object"?globalThis:typeof window=="object"?window:global}function J(n,e){let t=V(),a=Symbol.for(n);return t[a]||(t[a]=e())}var Ue=class{constructor(){this.importMap={};}registerImporters(e){Object.keys(e).forEach(t=>{this.importMap[t]=e[t];});}import(e){return this.importMap[e]?.()??Promise.resolve(void 0)}},Ge=J("rttist/ModuleImporter",()=>new Ue);var H=class{constructor(e){this.metadataLibrary=m.current;this._references=e,this.length=e.length;}get modules(){return this._modules??(this._modules=Object.freeze(this._references.map(e=>this.metadataLibrary.resolveModule(e)))),this._modules}};var c=class{get id(){return this._id}constructor(e){this._id=e.id,this._import=e.import??(()=>Ge.import(e.id)),this.name=e.name,this.path=e.path,this._childrenRefs=new H(e.children||[]),this._types=Object.freeze((e.types||[]).map(t=>(t.module=e.id,j().create(t))));}getChildren(){return this._childrenRefs.modules}getTypes(){return this._types}import(){return this._import()}};c.__type=ke;var b=class{constructor(e){this.metadata=e,this.name=e.name,this.id=e.id,this._args=Object.freeze(e.args||[]);}getArguments(){return this._args}is(e){return e.id===this.id}};var X=class{get keyType(){return this._keyTypeRef.type}get type(){return this._typeRef.type}constructor(e){this.metadata=e,this._keyTypeRef=new y(e.key),this._typeRef=new y(e.type),this.readonly=(e.flags&1)!==0;}};var R=class{constructor(e){if(typeof e=="object"){if(this.key=e.key,this.kind=e.kind,e.kind===0){this.name=Symbol[e.key];return}this.name=Symbol.for(e.key);return}this.name=e;}isString(){return typeof this.name=="string"}isNumber(){return typeof this.name=="number"}isSymbol(){return typeof this.name=="symbol"}toString(){return this.isSymbol()?`Symbol.for('${this.key}')`:this.name.toString()}};var Q=class{get type(){return this._type.type}constructor(e){this.name=e.name,this._type=new y(e.type),this.optional=(e.flags&1)!==0,this.rest=(e.flags&2)!==0,this._decorators=Object.freeze((e.decorators||[]).map(t=>new b(t)));}getDecorators(){return this._decorators}toString(){return this.getDecorators().map(e=>"@"+e.name).join(" ")+(this.rest?"...":"")+`${this.name.toString()}${this.optional?"?":""}: ${this.type.displayName}`}};var I=class{get returnType(){return this._returnTypeRef.type}constructor(e){this.metadata=e,this._parameters=Object.freeze((e.parameters||[]).map(t=>new Q(t))),this._typeParametersRef=new T(e.typeParameters||[]),this._returnTypeRef=new y(e.returnType);}getParameters(){return this._parameters}getTypeParameters(){return this._typeParametersRef.types}toString(){return `(${this._parameters.map(t=>t.toString()).join(", ")}): ${this.returnType.displayName}`}};var Z=class{get name(){return this._name}get optional(){return this._optional}get accessModifier(){return this._accessModifier}constructor(e){this.metadata=e,this._name=new R(e.name),this._signatures=Object.freeze((e.signatures||[]).map(t=>new I(t))),this._decorators=Object.freeze((e.decorators||[]).map(t=>new b(t))),this._accessModifier=Y(e.flags),this._optional=(e.flags&1)!==0;}getDecorators(){return this._decorators}getSignatures(){return this._signatures}toString(){let e=this._signatures.map(t=>(this._accessModifier?S[this._accessModifier]+" ":"")+this._name.toString()+(this._optional?"?":"")+t.toString()).join(`
+`);return this._decorators.map(t=>"@"+t.name).join(`
+`)+e}};var z=class{get type(){return this._type.type}constructor(e){this.name=new R(e.name),this._type=new y(e.type),this._decorators=Object.freeze((e.decorators||[]).map(t=>new b(t))),this.metadata=e,this.accessModifier=Y(e.flags),this.accessor=Xe(e.flags),this.optional=(e.flags&1)!==0,this.readonly=(e.flags&2)!==0;}getDecorators(){return this._decorators}toString(){return this.getDecorators().map(e=>"@"+e.name).join(" ")+(this.accessor?C[this.accessor]+" ":"")+(this.accessModifier?S[this.accessModifier]+" ":"")+(this.readonly?"readonly ":"")+`${this.name.toString()}${this.optional?"?":""}: ${this.type.displayName}`}};function K(n){return Object.freeze((n.signatures||[]).map(e=>new I(e)))}function ze(n){return Object.freeze((n.properties||[]).map(e=>new z(e)))}function Ke(n){return Object.freeze((n.methods||[]).map(e=>new Z(e)))}function et(n){return Object.freeze((n.indexes||[]).map(e=>new X(e)))}var M=class extends i{constructor(e){super(e),this._properties=ze(e),this._methods=Ke(e),this._indexes=et(e),this._isIterable=this._properties?.some(t=>t.name.isSymbol()&&t.name.name===Symbol.iterator)||this._methods?.some(t=>t.name.isSymbol()&&t.name.name===Symbol.iterator);}getProperties(){return this._properties}getProperty(e){return this._properties.find(t=>t.name.name===e)}getIndexes(){return this._indexes}getMethods(){return this._methods}getMethod(e){return this._methods.find(t=>t.name.name===e)}getPropsToStringify(){return [...this._properties.map(e=>e.toString()),...this._methods.map(e=>e.toString())]}};var v=class extends M{get extends(){return this._extendsRef?.type}get implements(){return this._implementsRef.types}get abstract(){return this._abstract}constructor(e){super(e),this._ctor=e.ctor??(()=>this.module.import().then(t=>t?.[e.name])),this._implementsRef=new T(e.implements||[]),this._extendsRef=e.extends===void 0?void 0:new y(e.extends),this._constructors=Object.freeze((e.constructors??[]).map(t=>new I(t))),this._decorators=Object.freeze((e.decorators??[]).map(t=>new b(t))),this._abstract=e.abstract??false;}getCtor(){return this._ctor()}getConstructors(){return this._constructors}getDecorators(){return this._decorators}isSubclassOf(e){return e.isClass()&&(this.extends!==void 0&&(this.extends.is(e)||this.extends.isClass()&&this.extends.isSubclassOf(e)||this.extends.isGenericType()&&this.extends.genericTypeDefinition.isClass()&&this.extends.genericTypeDefinition.isSubclassOf(e))||this.isGenericType()&&(this.genericTypeDefinition.is(e)||this.genericTypeDefinition?.isClass()&&this.genericTypeDefinition.isSubclassOf(e)))}isDerivedFrom(e){return this.is(e)||this.extends?.isDerivedFrom(e)||this.implements.some(t=>t.isInterface()?t.isDerivedFrom(e):t.is(e))||false}};var ee=class extends i{get extends(){return this._extendsRef.type}get trueType(){return this._trueTypeRef.type}get falseType(){return this._falseTypeRef.type}constructor(e){super(e),this._extendsRef=new y(e.extends),this._trueTypeRef=new y(e.trueType),this._falseTypeRef=new y(e.falseType);}};var te=class extends i{constructor(e){super(e),this._entries=Object.entries(e.entries||{}).map(([t,a])=>Object.freeze([t,a]));}getEnumerators(){return this.getEntries().map(e=>e[0])}getValues(){return this.getEntries().map(e=>e[1])}getEntries(){return this._entries.slice()}};var D=class extends i{constructor(e){super(e),this._signatures=K(e);}getSignatures(){return this._signatures}};var re=class extends i{constructor(e){super(e),this._signatures=K(e);}getSignatures(){return this._signatures}};var ne=class extends M{get extends(){return this._extendsRef.types}constructor(e){super(e),this._extendsRef=new T(e.extends||[]);}isDerivedFrom(e){return this.is(e)||this.extends.some(t=>t.isInterface()?t.isDerivedFrom(e):t.is(e))||false}};var k=class extends i{get types(){return this._types.types}constructor(e){super(e),this._types=new T(e.types||[]);}toString(){return `${this.types.map(e=>e.toString()).join(this.operatorSymbol)}`}};var w=class extends k{constructor(t){super(t);this.operatorSymbol=" & ";}};var A=class extends i{constructor(e){super(e),this.value=this.parseValue(e.value);}isStringLiteral(){return this._kind===76}isNumberLiteral(){return this._kind===74}isBooleanLiteral(){return this._kind===10||this._kind===9}isBigIntLiteral(){return this._kind===75}isRegExpLiteral(){return this._kind===79}isTrue(){return this.kind===10}isFalse(){return this.kind===9}parseValue(e){switch(this._kind){case 76:return e+"";case 74:return Number(e);case 9:case 10:return e==="true"||e===true;case 75:return BigInt(e[e.length-1]==="n"?e.slice(0,-1):e);case 79:return new RegExp(e)}return e}toString(){return `${u[this._kind]}(${this.value})`}};var ae=class extends M{constructor(e){super(e);}};var ie=class extends i{constructor(e){super(e),this.head=e.head,this.templateSpans=e.templateSpans;}};var oe=class extends i{get constraint(){return this._constraint?.type}get default(){return this._default?.type}constructor(e){super(e),this._constraint=e.constraint?new y(e.constraint):void 0,this._default=e.default?new y(e.default):void 0;}};var E=class extends k{constructor(t){super(t);this.operatorSymbol=" | ";}};var se=class extends i{get key(){return this._key}get symbol(){return this._symbol}constructor(e){super(e),this._key=e.key,this._symbol=Symbol[e.key];}toString(){return "@@"+this._key}};var pe=class extends i{get key(){return this._key}get symbol(){return this._symbol}constructor(e){super(e),this._key=e.key,e.key!==void 0&&(this._symbol=Symbol.for(e.key));}hasKey(){return this._key!==void 0}};var ye=class extends i{get target(){return this._target.type}constructor(e){super(e),this._target=new y(e.target);}getPropsToStringify(){return [`target: ${this._target.type.id}`]}};var de=class extends i{get objectType(){return this._objectTypeRef.type}get indexType(){return this._indexTypeRef.type}constructor(e){super(e),this._objectTypeRef=new y(e.objectType),this._indexTypeRef=new y(e.indexType);}};var le=class extends i{constructor(e){super(e),this.value=this.parseValue(e.value),this.enumRef=new y(e.enum);}isStringLiteral(){return this._kind===76}isNumberLiteral(){return this._kind===74}parseValue(e){switch(this._kind){case 76:return e+"";case 74:return Number(e)}return e}};var h=class extends i{get genericTypeDefinition(){return this._definitionRef.type}constructor(e,t){t.genericTypeDefinition=e,super(t);}getTypeArguments(){return this._typeArgumentsRef.types}};var P=class extends h{constructor(e){super(distExports.TypeIds.PromiseDefinition,e);}},ce=class extends h{constructor(e){super(distExports.TypeIds.ArrayDefinition,e);}},me=class extends h{constructor(e){super(distExports.TypeIds.ReadonlyArrayDefinition,e);}},fe=class extends h{constructor(e){super(distExports.TypeIds.SetDefinition,e);}},ue=class extends h{constructor(e){super(distExports.TypeIds.WeakSetDefinition,e);}},Te=class extends h{constructor(e){super(distExports.TypeIds.MapDefinition,e);}},he=class extends h{constructor(e){super(distExports.TypeIds.WeakMapDefinition,e);}},be=class extends h{constructor(e){super(distExports.TypeIds.TupleDefinition,e);}};var ge=class extends i{};var Ae=class extends i{};var ct=1,Ie=class{static create(e,t,a){return new v({kind:64,id:`${ct++}#${e}`,name:t.name,typeArguments:a.map(p=>p.id),module:t.module.id,properties:t.getProperties().map(p=>p.metadata),indexes:t.getIndexes().map(p=>p.metadata),methods:t.getMethods().map(p=>p.metadata),constructors:t.getConstructors().map(p=>p.metadata),decorators:t.getDecorators(),ctor:t.getCtor,extends:t.extends?.id,exported:t.exported,implements:t.implements.map(p=>p.id),nullable:t.nullable,isGenericTypeDefinition:false,genericTypeDefinition:t.id,abstract:t.abstract})}};function mt(n){switch(n.kind){case 74:case 75:case 76:case 79:return new A(n);case 77:return new ie(n);case 81:return new pe(n);case 82:return new se(n);case 62:return new ae(n);case 63:return new ne(n);case 64:return new v(n);case 69:return new oe(n);case 70:return new ye(n);case 67:return new ee(n);case 68:return new de(n);case 60:return new Ae(n);case 61:return new ge(n);case 65:return new E(n);case 66:return new w(n);case 72:return new D(n);case 73:return new re(n);case 80:return new te(n);case 78:return new le(n);case 83:return new P(n)}return console.warn("Creating Type of unknown TypeKind.",n),new i(n)}var Me=class{static create(e){return mt(e)}};var xe=class n{constructor(e){this.metadataLibrary=e;this.createdTypes={};}getGenericClass(e,t){let a=this.metadataLibrary.getType(e);if(!a.isClass())return console.error("GenericTypeRegister.getGenericClass called for type which is not a ClassType."),class{};let o=n.getId(a,t),p=this.createdTypes[o];if(!p){let g=`${e.name}{${t.map(d=>d.name).join(",")}}`;this.createdTypes[o]=p={[g]:class extends e{}}[g];let f=qe().create(o,a,t);this.metadataLibrary.addType(f),p.prototype[distExports.PROTOTYPE_TYPE_INSTANCE_PROPERTY]=f,p.prototype[distExports.PROTOTYPE_TYPE_PROPERTY]=f.id;}return p}static getId(e,t){return `${e.id}{${t.map(a=>a.id).join(",")}}`}};var tt=false,Ce,rt,nt={},l={};function F(){return tt||(Ce=new i({kind:63,name:"Array",id:`#Array{${distExports.TypeIds.Any}}`,module:distExports.ModuleIds.Native,genericTypeDefinition:"#Array",typeArguments:[distExports.TypeIds.Any]}),rt=new D({kind:72,name:"Function",id:"#Function:unknown",module:distExports.ModuleIds.Native,signatures:[{parameters:[{name:"x",flags:2,type:Ce.id}],returnType:distExports.TypeIds.Unknown}]}),l={ArrayDefinition:s("Array","ArrayDefinition"),ReadonlyArrayDefinition:s("ReadonlyArray","ReadonlyArrayDefinition"),TupleDefinition:s("Tuple","TupleDefinition"),MapDefinition:s("Map","MapDefinition"),WeakMapDefinition:s("WeakMap","WeakMapDefinition"),SetDefinition:s("Set","SetDefinition"),WeakSetDefinition:s("WeakSet","WeakSetDefinition"),PromiseDefinition:s("Promise","PromiseDefinition"),GeneratorDefinition:s("Generator","GeneratorDefinition"),AsyncGeneratorDefinition:s("AsyncGenerator","AsyncGeneratorDefinition"),IteratorDefinition:s("Iterator","IteratorDefinition"),IterableDefinition:s("Iterable","IterableDefinition"),IterableIteratorDefinition:s("IterableIterator","IterableIteratorDefinition"),AsyncIteratorDefinition:s("AsyncIterator","AsyncIteratorDefinition"),AsyncIterableDefinition:s("AsyncIterable","AsyncIterableDefinition"),AsyncIterableIteratorDefinition:s("AsyncIterableIterator","AsyncIterableIteratorDefinition")},nt={Invalid:s("Invalid","Invalid",distExports.ModuleIds.Invalid),NonPrimitiveObject:s("object","NonPrimitiveObject"),Any:s("any","Any"),Unknown:s("unknown","Unknown"),Void:s("void","Void"),Never:s("never","Never"),Null:s("null","Null"),Undefined:s("undefined","Undefined"),Intrinsic:s("intrinsic","Intrinsic"),String:s("String","String"),Number:s("Number","Number"),BigInt:s("BigInt","BigInt"),Boolean:s("Boolean","Boolean"),True:new A({id:distExports.TypeIds.True,kind:10,name:"true",module:distExports.ModuleIds.Native,value:true}),False:new A({id:distExports.TypeIds.False,kind:9,name:"false",module:distExports.ModuleIds.Native,value:false}),Date:s("Date","Date"),Error:s("Error","Error"),Symbol:s("Symbol","Symbol"),UniqueSymbol:s("UniqueSymbol","UniqueSymbol"),RegExp:s("RegExp","RegExp"),Int8Array:s("Int8Array","Int8Array"),Uint8Array:s("Uint8Array","Uint8Array"),Uint8ClampedArray:s("Uint8ClampedArray","Uint8ClampedArray"),Int16Array:s("Int16Array","Int16Array"),Uint16Array:s("Uint16Array","Uint16Array"),Int32Array:s("Int32Array","Int32Array"),Uint32Array:s("Uint32Array","Uint32Array"),Float32Array:s("Float32Array","Float32Array"),Float64Array:s("Float64Array","Float64Array"),BigInt64Array:s("BigInt64Array","BigInt64Array"),BigUint64Array:s("BigUint64Array","BigUint64Array"),ArrayBuffer:s("ArrayBuffer","ArrayBuffer"),SharedArrayBuffer:s("SharedArrayBuffer","SharedArrayBuffer"),Atomics:s("Atomics","Atomics"),DataView:s("DataView","DataView"),ArrayDefinition:l.ArrayDefinition,ReadonlyArrayDefinition:l.ReadonlyArrayDefinition,TupleDefinition:l.TupleDefinition,MapDefinition:l.MapDefinition,WeakMapDefinition:l.WeakMapDefinition,SetDefinition:l.SetDefinition,WeakSetDefinition:l.WeakSetDefinition,PromiseDefinition:l.PromiseDefinition,GeneratorDefinition:l.GeneratorDefinition,AsyncGeneratorDefinition:l.AsyncGeneratorDefinition,IteratorDefinition:l.IteratorDefinition,IterableDefinition:l.IterableDefinition,IterableIteratorDefinition:l.IterableIteratorDefinition,AsyncIteratorDefinition:l.AsyncIteratorDefinition,AsyncIterableDefinition:l.AsyncIterableDefinition,AsyncIterableIteratorDefinition:l.AsyncIterableIteratorDefinition},tt=true),{AnyArray:Ce,UnknownFunction:rt,nativeTypes:nt,nativeGenericTypeDefinitions:l}}function s(n,e,t=distExports.ModuleIds.Native){let a=u[e],o=distExports.TypeIds[e],p=e.endsWith("Definition");if(o===void 0||a===void 0)throw new Error(`Invalid prop name. kind = ${a}, id = ${o}`);return new i({kind:a,name:n,id:o,module:t,isGenericTypeDefinition:p})}function it(n,e){if(n===void 0)return i.Undefined;if(n===null)return i.Null;if(typeof n=="string")return i.String;if(typeof n=="symbol")return i.Symbol;if(typeof n=="number")return i.Number;if(typeof n=="boolean")return i.Boolean;if(typeof n=="bigint")return i.BigInt;if(n instanceof Date)return i.Date;if(n instanceof Error)return i.Error;if(n instanceof RegExp)return i.RegExp;if(n instanceof Int8Array)return i.Int8Array;if(n instanceof Uint8Array)return i.Uint8Array;if(n instanceof Uint8ClampedArray)return i.Uint8ClampedArray;if(n instanceof Int16Array)return i.Int16Array;if(n instanceof Uint16Array)return i.Uint16Array;if(n instanceof Int32Array)return i.Int32Array;if(n instanceof Uint32Array)return i.Uint32Array;if(n instanceof Float32Array)return i.Float32Array;if(n instanceof Float64Array)return i.Float64Array;if(n instanceof BigInt64Array)return i.BigInt64Array;if(n instanceof BigUint64Array)return i.BigUint64Array;if(G(n))return i.Type;if($(n))return i.Module;if(n.constructor===void 0)return i.Unknown;if(n.constructor===Object)return i.NonPrimitiveObject;if(Array.isArray(n))return F().AnyArray;let t=n.prototype?.[distExports.PROTOTYPE_TYPE_INSTANCE_PROPERTY]||n.constructor.prototype[distExports.PROTOTYPE_TYPE_INSTANCE_PROPERTY];if(t!==void 0)return t;let a=n.prototype?.[distExports.PROTOTYPE_TYPE_PROPERTY]||n.constructor.prototype[distExports.PROTOTYPE_TYPE_PROPERTY]||n[distExports.PROTOTYPE_TYPE_PROPERTY]||void 0;return a!==void 0?e.resolveType(a):typeof n=="function"?F().UnknownFunction:i.Unknown}var Be="reflect-gettype-error-disable",Tt=/^([#@][^,|&]+?)\{(.+?)}(\?)?$/,ht=new Map([["#Promise",P],["#Array",ce],["#ReadonlyArray",me],["#Set",fe],["#WeakSet",ue],["#Map",Te],["#WeakMap",he],["#Tuple",be]]),_e=class{constructor(e,t,a){this.configuration=e;this.name=t;this.parentLibrary=a;this.modules=new Map;this.types=new Map;this.genericTypeRegister=new xe(this);this.aliases=new Map;if(!a&&new.target!==U)throw new Error("Cannot instantiate new MetadataLibrary without parent.");this.isGlobalMetadataLibrary=new.target===U,this.getType=this.getType.bind(this),this.resolveType=this.resolveType.bind(this),this.getGenericClass=this.getGenericClass.bind(this),this.constructGeneric=this.constructGeneric.bind(this);}asExpandable(){return this}toString(){return `${this.name} (${this.modules.size} modules, ${this.types.size} types) ${JSON.stringify(this.configuration,void 0,4)}`}[Symbol.for("nodejs.util.inspect.custom")](){return this.toString()}getGenericClass(e,...t){if(t.length===0){let a=distExports.getCallsiteTypeArguments(this.getGenericClass);if(a?.[0]!==void 0){let o=this.resolveType(a[0]);return this.genericTypeRegister.getGenericClass(e,o.isGenericType()?o.getTypeArguments():[])}}return this.genericTypeRegister.getGenericClass(e,t)}constructGeneric(e,t,a,o){let p=this.getGenericClass(e,...t.map(g=>G(g)?g:this.resolveType(g)));return o!==void 0&&(o=this.inheritNewTarget(o,p)),Reflect.construct(p,a,o??p)}inheritNewTarget(e,t){let a=e.name!==void 0?`${e.name}{}`:t.name,o={[a]:class{}}[a];return Object.setPrototypeOf(o.prototype,e.prototype),o.prototype[distExports.PROTOTYPE_TYPE_PROPERTY]=t.prototype[distExports.PROTOTYPE_TYPE_PROPERTY],o}findType(e){for(let[t,a]of this.types)if(e(a))return a;if(this.parentLibrary!==void 0)return this.parentLibrary.findType(e)}getTypes(){return Array.from(this.types.values()).concat(this.parentLibrary?.getTypes()??[])}findModule(e){for(let[t,a]of this.modules)if(e(a))return a;if(this.parentLibrary!==void 0)return this.parentLibrary.findModule(e)}getModules(){return Array.from(this.modules.values()).concat(this.parentLibrary?.getModules()??[])}resolveType(e){if(!e)throw new Error("Invalid type reference.");let t=this.types.get(e)??this.parentLibrary?.types.get(e);if(t!==void 0)return t;let a=this.handleAdhocType(e);return a||i.Invalid}resolveModule(e){if(!e)throw new Error("Invalid module reference.");return this.modules.get(e)??this.parentLibrary?.modules.get(e)??c.Invalid}addMetadata(e,t){if(this.parentLibrary){this.parentLibrary.addMetadata(e,t);return}m.doWithScope(this,()=>{let a=new c(e);this.addModule(a);});}clearMetadata(e){let t=`${e}/`;for(let a of this.types.keys())a.startsWith(t)&&(this.types.delete(a),this.parentLibrary?.types.delete(a));for(let a of this.modules.keys())a.startsWith(t)&&(this.modules.delete(a),this.parentLibrary?.modules.delete(a));}addModule(...e){if(this.parentLibrary){this.parentLibrary.addModule(...e);return}for(let t of e){if(!$(t))throw new Error("Given module is not an instance of the Module class.");if(t.id!==distExports.ModuleIds.Native&&t.id!==distExports.ModuleIds.Invalid&&this.modules.has(t.id))throw new Error(`Module with id '${t.id}' already exists.`);this.modules.set(t.id,t),this.addType(...t.getTypes());}}addType(...e){if(this.parentLibrary){this.parentLibrary.addType(...e);return}for(let t of e){if(!G(t))throw new Error("Given type is not an instance of the Type class.");if(!t.id)throw new Error("Given type has invalid id.");if(this.types.has(t.id)){if(t.id.slice(0,distExports.ModuleIds.Native.length)===distExports.ModuleIds.Native)continue;return}this.types.set(t.id,t);}}addAliases(e){if(this.parentLibrary){this.parentLibrary.addAliases(e);return}for(let[t,a]of Object.entries(e))this.aliases.set(t,a);}getType(...e){if(e.length)return it(e[0],this);let t=distExports.getCallsiteTypeArguments(this.getType);return t!==void 0?t.length===0||t[0]===void 0?i.Invalid:this.resolveType(t[0]):(V()[Be]||console.debug("[ERR] RTTIST: You are calling `getType()` function directly. More information at https://github.com/rttist/rttist/issues/17. To suppress this message, create field '"+Be+"' in global object (window | global | globalThis) eg. `window['"+Be+"'] = true;`"),i.Invalid)}createLiteralType(e){let t=e.slice(3,-1),a=t[t.length-1]==="n"?75:t[0]==="'"?76:t==="true"?10:t==="false"?9:t[0]==="/"?79:74;return new A({id:e,value:a===76?t.slice(1,-1):t,kind:a,module:distExports.ModuleIds.Native,name:t})}getTypeIdInfo(e){let t=e.match(Tt);if(t)return {type:t[1],arguments:t[2].split(","),nullable:t[3]==="?"}}handleAdhocType(e){if(e.slice(0,3)==="#L("){let o=this.createLiteralType(e);return this.addType(o),o}let t=this.getTypeIdInfo(e);if(!t)return;if(t.type==="#|"||t.type==="#&"){let o=new(t.type==="#|"?E:w)({id:e,module:distExports.ModuleIds.Native,name:t.type,kind:65,types:t.arguments,nullable:t.nullable});return this.addType(o),o}let a=ht.get(t.type);if(a){let o=new a({id:e,module:distExports.ModuleIds.Native,name:`${t.type.slice(1)}<'${t.arguments.length}>`,kind:93,typeArguments:t.arguments.map(p=>p)});return this.addType(o),o}if(t.type[0]==="@"){let o=new i({id:e,module:distExports.ModuleIds.Native,name:`${t.type.slice(1)}<'${t.arguments.length}>`,kind:93,typeArguments:t.arguments.map(p=>p),genericTypeDefinition:t.type});return this.addType(o),o}}},U=class extends _e{constructor(e){super(e,"Global metadata library");}};var B=J("rttist/Metadata",()=>new U({nullability:false}));We(Me);Ye(Ie);m.setScope(B);var{nativeTypes:pt,nativeGenericTypeDefinitions:Mt,AnyArray:xt,UnknownFunction:_t}=F();for(let[n,e]of Object.entries(pt).concat(Object.entries(Mt)))i[n]=e;c.Invalid=new c({id:distExports.ModuleIds.Invalid,name:"invalid",path:""});c.Dynamic=new c({id:distExports.ModuleIds.Dynamic,name:"dynamic",path:""});c.Native=new c({id:distExports.ModuleIds.Native,name:"native",path:""});B.addType(...Object.values(pt));B.addType(xt,_t);B.addModule(c.Native,c.Invalid,c.Dynamic);
+
 // Copyright 2024-2025 Golem Cloud
 //
 // Licensed under the Golem Source License v1.0 (the "License");
@@ -61,231 +212,9 @@ class AgentId {
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-function constructValueFromWitValue(wit) {
-    if (!wit.nodes.length)
-        throw new Error('Empty nodes in WitValue');
-    return buildTree(wit.nodes[wit.nodes.length - 1], wit.nodes);
-}
-function buildTree(node, nodes) {
-    switch (node.tag) {
-        case 'record-value':
-            return {
-                kind: 'record',
-                value: node.val.map((idx) => buildTree(nodes[idx], nodes)),
-            };
-        case 'variant-value': {
-            const [caseIdx, maybeIndex] = node.val;
-            if (maybeIndex !== undefined) {
-                return {
-                    kind: 'variant',
-                    caseIdx,
-                    caseValue: buildTree(nodes[maybeIndex], nodes),
-                };
-            }
-            else {
-                return {
-                    kind: 'variant',
-                    caseIdx,
-                    caseValue: undefined,
-                };
-            }
-        }
-        case 'enum-value':
-            return { kind: 'enum', value: node.val };
-        case 'flags-value':
-            return { kind: 'flags', value: node.val };
-        case 'tuple-value':
-            return {
-                kind: 'tuple',
-                value: node.val.map((idx) => buildTree(nodes[idx], nodes)),
-            };
-        case 'list-value':
-            return {
-                kind: 'list',
-                value: node.val.map((idx) => buildTree(nodes[idx], nodes)),
-            };
-        case 'option-value':
-            if (node.val === undefined) {
-                return { kind: 'option', value: undefined };
-            }
-            return {
-                kind: 'option',
-                value: buildTree(nodes[node.val], nodes),
-            };
-        case 'result-value': {
-            const res = node.val;
-            if (res.tag === 'ok') {
-                return {
-                    kind: 'result',
-                    value: {
-                        ok: res.val !== undefined
-                            ? buildTree(nodes[res.val], nodes)
-                            : undefined,
-                    },
-                };
-            }
-            else {
-                return {
-                    kind: 'result',
-                    value: {
-                        err: res.val !== undefined
-                            ? buildTree(nodes[res.val], nodes)
-                            : undefined,
-                    },
-                };
-            }
-        }
-        case 'prim-u8':
-            return { kind: 'u8', value: node.val };
-        case 'prim-u16':
-            return { kind: 'u16', value: node.val };
-        case 'prim-u32':
-            return { kind: 'u32', value: node.val };
-        case 'prim-u64':
-            return { kind: 'u64', value: node.val };
-        case 'prim-s8':
-            return { kind: 's8', value: node.val };
-        case 'prim-s16':
-            return { kind: 's16', value: node.val };
-        case 'prim-s32':
-            return { kind: 's32', value: node.val };
-        case 'prim-s64':
-            return { kind: 's64', value: node.val };
-        case 'prim-float32':
-            return { kind: 'f32', value: node.val };
-        case 'prim-float64':
-            return { kind: 'f64', value: node.val };
-        case 'prim-char':
-            return { kind: 'char', value: node.val };
-        case 'prim-bool':
-            return { kind: 'bool', value: node.val };
-        case 'prim-string':
-            return { kind: 'string', value: node.val };
-        case 'handle': {
-            const [uri, resourceId] = node.val;
-            return {
-                kind: 'handle',
-                uri: uri.value,
-                resourceId,
-            };
-        }
-        default:
-            throw new Error(`Unhandled tag: ${node.tag}`);
-    }
-}
-function constructWitValueFromValue(value) {
-    const nodes = [];
-    buildNodes(value, nodes);
-    return { nodes: nodes };
-}
-function buildNodes(value, nodes) {
-    const push = (node) => {
-        nodes.push(node);
-        return nodes.length - 1;
-    };
-    switch (value.kind) {
-        case 'record':
-            const recordIndices = value.value.map((v) => buildNodes(v, nodes));
-            return push({ tag: 'record-value', val: recordIndices });
-        case 'variant':
-            return push({
-                tag: 'variant-value',
-                val: value.caseValue !== undefined
-                    ? [value.caseIdx, buildNodes(value.caseValue, nodes)]
-                    : [value.caseIdx, undefined],
-            });
-        case 'enum':
-            return push({ tag: 'enum-value', val: value.value });
-        case 'flags':
-            return push({ tag: 'flags-value', val: value.value });
-        case 'tuple':
-            const tupleIndices = value.value.map((v) => buildNodes(v, nodes));
-            return push({ tag: 'tuple-value', val: tupleIndices });
-        case 'list':
-            const listIndices = value.value.map((v) => buildNodes(v, nodes));
-            return push({ tag: 'list-value', val: listIndices });
-        case 'option':
-            return push({
-                tag: 'option-value',
-                val: value.value !== undefined
-                    ? buildNodes(value.value, nodes)
-                    : undefined,
-            });
-        case 'result':
-            if ('ok' in value.value) {
-                return push({
-                    tag: 'result-value',
-                    val: {
-                        tag: 'ok',
-                        val: value.value.ok !== undefined
-                            ? buildNodes(value.value.ok, nodes)
-                            : undefined,
-                    },
-                });
-            }
-            else {
-                return push({
-                    tag: 'result-value',
-                    val: {
-                        tag: 'err',
-                        val: value.value.err !== undefined
-                            ? buildNodes(value.value.err, nodes)
-                            : undefined,
-                    },
-                });
-            }
-        case 'u8':
-            return push({ tag: 'prim-u8', val: value.value });
-        case 'u16':
-            return push({ tag: 'prim-u16', val: value.value });
-        case 'u32':
-            return push({ tag: 'prim-u32', val: value.value });
-        case 'u64':
-            return push({ tag: 'prim-u64', val: value.value });
-        case 's8':
-            return push({ tag: 'prim-s8', val: value.value });
-        case 's16':
-            return push({ tag: 'prim-s16', val: value.value });
-        case 's32':
-            return push({ tag: 'prim-s32', val: value.value });
-        case 's64':
-            return push({ tag: 'prim-s64', val: value.value });
-        case 'f32':
-            return push({ tag: 'prim-float32', val: value.value });
-        case 'f64':
-            return push({ tag: 'prim-float64', val: value.value });
-        case 'char':
-            return push({ tag: 'prim-char', val: value.value });
-        case 'bool':
-            return push({ tag: 'prim-bool', val: value.value });
-        case 'string':
-            return push({ tag: 'prim-string', val: value.value });
-        case 'handle':
-            return push({
-                tag: 'handle',
-                val: [{ value: value.uri }, value.resourceId],
-            });
-        default:
-            throw new Error(`Unhandled kind: ${value.kind}`);
-    }
-}
-
-function createCustomError(error) {
-    return {
-        tag: 'custom-error',
-        val: {
-            tag: 'tuple',
-            val: [
-                {
-                    tag: 'component-model',
-                    val: constructWitValueFromValue({
-                        kind: 'string',
-                        value: error,
-                    }),
-                },
-            ],
-        },
-    };
+function isInBuiltResult(type) {
+    return type.name.startsWith("@golemcloud/golem-ts-sdk") &&
+        type.name.endsWith('Either<\'2>');
 }
 
 /**
@@ -1141,6 +1070,149 @@ const right$1 = right => {
 const getLeft$1 = self => isRight$1(self) ? none$1 : some$1(self.left);
 
 /**
+ * @since 2.0.0
+ */
+/**
+ * Constructs a new `Either` holding a `Right` value. This usually represents a successful value due to the right bias
+ * of this structure.
+ *
+ * @category constructors
+ * @since 2.0.0
+ */
+const right = right$1;
+/**
+ * Constructs a new `Either` holding a `Left` value. This usually represents a failure, due to the right-bias of this
+ * structure.
+ *
+ * @category constructors
+ * @since 2.0.0
+ */
+const left = left$1;
+/**
+ * Determine if a `Either` is a `Left`.
+ *
+ * @example
+ * ```ts
+ * import * as assert from "node:assert"
+ * import { Either } from "effect"
+ *
+ * assert.deepStrictEqual(Either.isLeft(Either.right(1)), false)
+ * assert.deepStrictEqual(Either.isLeft(Either.left("a")), true)
+ * ```
+ *
+ * @category guards
+ * @since 2.0.0
+ */
+const isLeft = isLeft$1;
+/**
+ * Determine if a `Either` is a `Right`.
+ *
+ * @example
+ * ```ts
+ * import * as assert from "node:assert"
+ * import { Either } from "effect"
+ *
+ * assert.deepStrictEqual(Either.isRight(Either.right(1)), true)
+ * assert.deepStrictEqual(Either.isRight(Either.left("a")), false)
+ * ```
+ *
+ * @category guards
+ * @since 2.0.0
+ */
+const isRight = isRight$1;
+/**
+ * Converts a `Either` to an `Option` discarding the value.
+ *
+ * @example
+ * ```ts
+ * import * as assert from "node:assert"
+ * import { Either, Option } from "effect"
+ *
+ * assert.deepStrictEqual(Either.getLeft(Either.right('ok')), Option.none())
+ * assert.deepStrictEqual(Either.getLeft(Either.left('err')), Option.some('err'))
+ * ```
+ *
+ * @category getters
+ * @since 2.0.0
+ */
+const getLeft = getLeft$1;
+/**
+ * Maps the `Right` side of an `Either` value to a new `Either` value.
+ *
+ * @category mapping
+ * @since 2.0.0
+ */
+const map$1 = /*#__PURE__*/dual(2, (self, f) => isRight(self) ? right(f(self.right)) : left(self.left));
+/**
+ * Returns the wrapped value if it's a `Right` or a default value if is a `Left`.
+ *
+ * @example
+ * ```ts
+ * import * as assert from "node:assert"
+ * import { Either } from "effect"
+ *
+ * assert.deepStrictEqual(Either.getOrElse(Either.right(1), (error) => error + "!"), 1)
+ * assert.deepStrictEqual(Either.getOrElse(Either.left("not a number"), (error) => error + "!"), "not a number!")
+ * ```
+ *
+ * @category getters
+ * @since 2.0.0
+ */
+const getOrElse$1 = /*#__PURE__*/dual(2, (self, onLeft) => isLeft(self) ? onLeft(self.left) : self.right);
+/**
+ * @category sequencing
+ * @since 2.0.0
+ */
+const flatMap = /*#__PURE__*/dual(2, (self, f) => isLeft(self) ? left(self.left) : f(self.right));
+/**
+ * @category zipping
+ * @since 2.0.0
+ */
+const zipWith = /*#__PURE__*/dual(3, (self, that, f) => flatMap(self, r => map$1(that, r2 => f(r, r2))));
+/**
+ * Takes a structure of `Either`s and returns an `Either` of values with the same structure.
+ *
+ * - If a tuple is supplied, then the returned `Either` will contain a tuple with the same length.
+ * - If a struct is supplied, then the returned `Either` will contain a struct with the same keys.
+ * - If an iterable is supplied, then the returned `Either` will contain an array.
+ *
+ * @example
+ * ```ts
+ * import * as assert from "node:assert"
+ * import { Either } from "effect"
+ *
+ * assert.deepStrictEqual(Either.all([Either.right(1), Either.right(2)]), Either.right([1, 2]))
+ * assert.deepStrictEqual(Either.all({ right: Either.right(1), b: Either.right("hello") }), Either.right({ right: 1, b: "hello" }))
+ * assert.deepStrictEqual(Either.all({ right: Either.right(1), b: Either.left("error") }), Either.left("error"))
+ * ```
+ *
+ * @category combining
+ * @since 2.0.0
+ */
+// @ts-expect-error
+const all$1 = input => {
+  if (Symbol.iterator in input) {
+    const out = [];
+    for (const e of input) {
+      if (isLeft(e)) {
+        return e;
+      }
+      out.push(e.right);
+    }
+    return right(out);
+  }
+  const out = {};
+  for (const key of Object.keys(input)) {
+    const e = input[key];
+    if (isLeft(e)) {
+      return e;
+    }
+    out[key] = e.right;
+  }
+  return right(out);
+};
+
+/**
  * Represents the absence of a value by creating an empty `Option`.
  *
  * `Option.none` returns an `Option<never>`, which is a subtype of `Option<A>`.
@@ -1265,7 +1337,7 @@ const isSome = isSome$1;
  * @category Getters
  * @since 2.0.0
  */
-const getOrElse$1 = /*#__PURE__*/dual(2, (self, onNone) => isNone(self) ? onNone() : self.value);
+const getOrElse = /*#__PURE__*/dual(2, (self, onNone) => isNone(self) ? onNone() : self.value);
 /**
  * Converts a nullable value into an `Option`. Returns `None` if the value is
  * `null` or `undefined`, otherwise wraps the value in a `Some`.
@@ -1337,551 +1409,217 @@ const getOrThrowWith = /*#__PURE__*/dual(2, (self, onNone) => {
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-const agentInitiators = new Map();
-const AgentInitiatorRegistry = {
-    register(agentName, agentInitiator) {
-        agentInitiators.set(agentName, agentInitiator);
-    },
-    lookup(agentName) {
-        return fromNullable(agentInitiators.get(agentName));
-    },
-    has(agentName) {
-        return agentInitiators.has(agentName);
-    },
-    entries() {
-        return agentInitiators.entries();
-    },
-};
-
-// Copyright 2024-2025 Golem Cloud
-//
-// Licensed under the Golem Source License v1.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://license.golem.cloud/LICENSE
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-const AgentNameConstructor = {
-    fromString(name) {
-        return name;
-    },
-    fromAgentClassName(agentClassName) {
-        const name = agentClassName.toString();
-        return name;
-    },
-};
-const AgentClassNameConstructor = {
-    fromString(name) {
-        return name;
-    },
-};
-
-// Copyright 2024-2025 Golem Cloud
-//
-// Licensed under the Golem Source License v1.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://license.golem.cloud/LICENSE
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-const agentRegistry = new Map();
-const AgentRegistry = {
-    register(agentClassName, agentType) {
-        agentRegistry.set(agentClassName, agentType);
-    },
-    entries() {
-        return agentRegistry.entries();
-    },
-    getRegisteredAgents() {
-        return Array.from(agentRegistry.values());
-    },
-    lookup(agentClassName) {
-        return fromNullable(agentRegistry.get(agentClassName));
-    },
-    exists(agentClassName) {
-        return agentRegistry.has(agentClassName);
-    },
-};
-
-// Copyright 2024-2025 Golem Cloud
-//
-// Licensed under the Golem Source License v1.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://license.golem.cloud/LICENSE
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-/**
- * BaseAgent is the foundational class for defining agent implementations.
- *
- * All agents must extend this class and **must** be decorated with the `@Agent()` decorator.
- * Do **not** need to override the methods and manually implement them in this class.
- * The `@Agent()` decorator handles all runtime wiring (e.g., `getId()`, `createRemote()`, etc.).
- *
- * Example usage:
- *
- * ```ts
- * @Agent()
- * class AssistantAgent extends BaseAgent {
- *   @Prompt("Ask your question")
- *   @Description("This method allows the agent to answer your question")
- *   async ask(name: string): Promise<string> {
- *      return `Hello ${name}, I'm the assistant agent (${this.getId()})!`;
- *   }
- * }
- * ```
- */
-class BaseAgent {
-    /**
-     * Returns the unique `AgentId` for this agent instance.
-     *
-     * This is automatically populated by the `@Agent()` decorator at runtime.
-     *
-     * @throws Will throw if accessed before the agent is initialized.
-     */
-    getId() {
-        throw new Error('An agent ID will be created at runtime');
-    }
-    /**
-     * Returns the `AgentType` metadata registered for this agent.
-     *
-     * This information is retrieved from the runtime agent registry and reflects
-     * metadata defined via decorators like `@Agent()`, `@Prompt()`, etc.
-     *
-     * @throws Will throw if metadata is missing or the agent is not properly registered.
-     */
-    getAgentType() {
-        const agentClassName = AgentClassNameConstructor.fromString(this.constructor.name);
-        return getOrThrowWith(AgentRegistry.lookup(agentClassName), () => new Error(`Failed to find agent type for ${this.constructor.name}`));
-    }
-    /**
-     * Creates a remote client instance of this agent type.
-     *
-     * This remote client will communicate with an agent instance running
-     * in a separate container, effectively offloading computation to that remote context.
-     *
-     * @param args - Constructor arguments for the agent
-     * @returns A remote proxy instance of the agent
-     *
-     * @example
-     * const remoteClient = MyAgent.createRemote("arg1", "arg2") where `arg1`, `arg2` are the constructor arguments
-     * validated at compile time.
-     */
-    static createRemote(...args) {
-        throw new Error('A remote client will be created at runtime');
-    }
-    /**
-     * Creates a local instance of the agent within the current container.
-     *
-     * This method is preferred over directly calling `new MyAgent(arg1, arg2)` as it ensures
-     * correct initialization, agent ID assignment, etc.
-     *
-     * @param args - Constructor arguments for the agent
-     * @returns A locally instantiated agent
-     *
-     * @example
-     * const localClient = MyAgent.createLocal("arg1", "arg2") where `arg1`, `arg2` are the constructor arguments
-     * validated at compile time.;
-     */
-    static createLocal(...args) {
-        throw new Error('A local client will be created at runtime');
-    }
+function fromWitValue(wit) {
+    if (!wit.nodes.length)
+        throw new Error('Empty nodes in WitValue');
+    return buildTree(wit.nodes[wit.nodes.length - 1], wit.nodes);
 }
-
-// Copyright 2024-2025 Golem Cloud
-//
-// Licensed under the Golem Source License v1.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://license.golem.cloud/LICENSE
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-class ResolvedAgent {
-    constructor(agentClassName, tsAgentInternal, originalInstance) {
-        this.agentClassName = agentClassName;
-        this.agentInternal = tsAgentInternal;
-        this.classInstance = originalInstance;
-    }
-    getId() {
-        return this.agentInternal.getId();
-    }
-    invoke(methodName, args) {
-        return this.agentInternal.invoke(methodName, args);
-    }
-    getDefinition() {
-        return getOrThrowWith(AgentRegistry.lookup(this.agentClassName), () => new Error(`Agent class ${this.agentClassName} is not registered.`));
-    }
-}
-
-var dist = {};
-
-var consts = {};
-
-var hasRequiredConsts;
-
-function requireConsts () {
-	if (hasRequiredConsts) return consts;
-	hasRequiredConsts = 1;
-	(function (exports) {
-		Object.defineProperty(exports, "__esModule", { value: true });
-		exports.TypeIds = exports.ModuleIds = exports.CALLSITE_ARGS_TYPE_PROPERTY = exports.CALLSITE_TYPE_ARGS_PROPERTY = exports.PROTOTYPE_TYPE_INSTANCE_PROPERTY = exports.PROTOTYPE_TYPE_PROPERTY = void 0;
-		exports.PROTOTYPE_TYPE_PROPERTY = "[[type]]";
-		exports.PROTOTYPE_TYPE_INSTANCE_PROPERTY = "[[$type]]";
-		exports.CALLSITE_TYPE_ARGS_PROPERTY = "[[csTArgs]]";
-		exports.CALLSITE_ARGS_TYPE_PROPERTY = "[[csArgsT]]";
-		exports.ModuleIds = {
-		    Native: "::native",
-		    Dynamic: "::dynamic",
-		    Invalid: "::invalid",
-		    RttistType: "@rttist/dist/Type",
-		    RttistModule: "@rttist/dist/Module",
-		};
-		exports.TypeIds = {
-		    Invalid: `${exports.ModuleIds.Invalid}::Invalid`,
-		    NonPrimitiveObject: "#object",
-		    Function: "#Function",
-		    Any: "#any",
-		    Unknown: "#unknown",
-		    Void: "#void",
-		    Never: "#never",
-		    Null: "#null",
-		    Undefined: "#undefined",
-		    Intrinsic: "#intrinsic",
-		    String: "#String",
-		    Number: "#Number",
-		    BigInt: "#BigInt",
-		    Boolean: "#Boolean",
-		    True: "#true",
-		    False: "#false",
-		    Date: "#Date",
-		    Error: "#Error",
-		    Symbol: "#Symbol",
-		    UniqueSymbol: "#UniqueSymbol",
-		    RegExp: "#RegExp",
-		    Int8Array: "#Int8Array",
-		    Uint8Array: "#Uint8Array",
-		    Uint8ClampedArray: "#Uint8ClampedArray",
-		    Int16Array: "#Int16Array",
-		    Uint16Array: "#Uint16Array",
-		    Int32Array: "#Int32Array",
-		    Uint32Array: "#Uint32Array",
-		    Float32Array: "#Float32Array",
-		    Float64Array: "#Float64Array",
-		    BigInt64Array: "#BigInt64Array",
-		    BigUint64Array: "#BigUint64Array",
-		    ArrayDefinition: "#Array",
-		    TupleDefinition: "#Tuple",
-		    ReadonlyArrayDefinition: "#ReadonlyArray",
-		    MapDefinition: "#Map",
-		    WeakMapDefinition: "#WeakMap",
-		    SetDefinition: "#Set",
-		    WeakSetDefinition: "#WeakSet",
-		    PromiseDefinition: "#Promise",
-		    GeneratorDefinition: "#Generator",
-		    AsyncGeneratorDefinition: "#AsyncGenerator",
-		    IteratorDefinition: "#Iterator",
-		    IterableDefinition: "#Iterable",
-		    IterableIteratorDefinition: "#IterableIterator",
-		    AsyncIteratorDefinition: "#AsyncIterator",
-		    AsyncIterableDefinition: "#AsyncIterable",
-		    AsyncIterableIteratorDefinition: "#AsyncIterableIterator",
-		    ArrayBuffer: "#ArrayBuffer",
-		    SharedArrayBuffer: "#SharedArrayBuffer",
-		    Atomics: "#Atomics",
-		    DataView: "#DataView",
-		}; 
-	} (consts));
-	return consts;
-}
-
-var declarations = {};
-
-var hasRequiredDeclarations;
-
-function requireDeclarations () {
-	if (hasRequiredDeclarations) return declarations;
-	hasRequiredDeclarations = 1;
-	Object.defineProperty(declarations, "__esModule", { value: true });
-	return declarations;
-}
-
-var getCallsiteTypeArguments = {};
-
-var hasRequiredGetCallsiteTypeArguments;
-
-function requireGetCallsiteTypeArguments () {
-	if (hasRequiredGetCallsiteTypeArguments) return getCallsiteTypeArguments;
-	hasRequiredGetCallsiteTypeArguments = 1;
-	Object.defineProperty(getCallsiteTypeArguments, "__esModule", { value: true });
-	getCallsiteTypeArguments.getCallsiteTypeArguments = getCallsiteTypeArguments$1;
-	const consts_1 = requireConsts();
-	function getCallsiteTypeArguments$1(fn) {
-	    const callsiteArgs = fn[consts_1.CALLSITE_TYPE_ARGS_PROPERTY];
-	    fn[consts_1.CALLSITE_TYPE_ARGS_PROPERTY] = undefined;
-	    return callsiteArgs;
-	}
-	return getCallsiteTypeArguments;
-}
-
-var hasRequiredDist;
-
-function requireDist () {
-	if (hasRequiredDist) return dist;
-	hasRequiredDist = 1;
-	(function (exports) {
-		var __createBinding = (dist && dist.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-		    if (k2 === undefined) k2 = k;
-		    var desc = Object.getOwnPropertyDescriptor(m, k);
-		    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-		      desc = { enumerable: true, get: function() { return m[k]; } };
-		    }
-		    Object.defineProperty(o, k2, desc);
-		}) : (function(o, m, k, k2) {
-		    if (k2 === undefined) k2 = k;
-		    o[k2] = m[k];
-		}));
-		var __exportStar = (dist && dist.__exportStar) || function(m, exports) {
-		    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-		};
-		Object.defineProperty(exports, "__esModule", { value: true });
-		__exportStar(requireConsts(), exports);
-		__exportStar(requireDeclarations(), exports);
-		__exportStar(requireGetCallsiteTypeArguments(), exports); 
-	} (dist));
-	return dist;
-}
-
-var distExports = requireDist();
-
-var m={current:null,setScope(n){this.current=n;},doWithScope(n,e){let t=this.current;this.setScope(n);try{e();}finally{this.setScope(t);}}};var Se=null;function We(n){Se=n;}function j(){if(!Se)throw new Error("Type factory is not set");return Se}var Le=null;function Ye(n){Le=n;}function qe(){if(!Le)throw new Error("Type factory is not set");return Le}function*Re(){for(let n=0;n<100;n++)yield distExports.TypeIds.Invalid;}function ve(n,e,t){let a=n[distExports.CALLSITE_TYPE_ARGS_PROPERTY];if(n[distExports.CALLSITE_TYPE_ARGS_PROPERTY]=void 0,e!==void 0);return a||Re()}var De=Symbol.for("rttist/Type"),ke=Symbol.for("rttist/Module");function G(n){return n&&typeof n=="object"&&n.constructor.__type===De}function $(n){return n&&typeof n=="object"&&n.constructor.__type===ke}var W=class{constructor(e){this.metadataLibrary=m.current;if(!e)throw new Error("Invalid module reference.");this._reference=e;}get module(){return this._module??(this._module=this.metadataLibrary.resolveModule(this._reference)),this._module}};var y=class{constructor(e){this.metadataLibrary=m.current;if(!e)throw new Error("Invalid type reference.");this._reference=e;}get type(){return this._type??(this._type=this.metadataLibrary.resolveType(this._reference)),this._type}};var T=class{constructor(e){this.metadataLibrary=m.current;this._references=e,this.length=e.length;}get types(){return this._types??(this._types=Object.freeze(this._references.map(e=>this.metadataLibrary.resolveType(e)))),this._types}};var u=(r=>(r[r.Invalid=0]="Invalid",r[r.Unknown=1]="Unknown",r[r.Any=2]="Any",r[r.Never=3]="Never",r[r.Void=4]="Void",r[r.Undefined=5]="Undefined",r[r.Null=6]="Null",r[r.Intrinsic=7]="Intrinsic",r[r.Boolean=8]="Boolean",r[r.False=9]="False",r[r.True=10]="True",r[r.Number=11]="Number",r[r.BigInt=12]="BigInt",r[r.String=13]="String",r[r.Symbol=14]="Symbol",r[r.NonPrimitiveObject=15]="NonPrimitiveObject",r[r.ObjectType=16]="ObjectType",r[r.FunctionType=17]="FunctionType",r[r.Date=18]="Date",r[r.Error=19]="Error",r[r.RegExp=20]="RegExp",r[r.Int8Array=21]="Int8Array",r[r.Uint8Array=22]="Uint8Array",r[r.Uint8ClampedArray=23]="Uint8ClampedArray",r[r.Int16Array=24]="Int16Array",r[r.Uint16Array=25]="Uint16Array",r[r.Int32Array=26]="Int32Array",r[r.Uint32Array=27]="Uint32Array",r[r.Float32Array=28]="Float32Array",r[r.Float64Array=29]="Float64Array",r[r.BigInt64Array=30]="BigInt64Array",r[r.BigUint64Array=31]="BigUint64Array",r[r.ArrayBuffer=32]="ArrayBuffer",r[r.SharedArrayBuffer=33]="SharedArrayBuffer",r[r.Atomics=34]="Atomics",r[r.DataView=35]="DataView",r[r.ArrayDefinition=36]="ArrayDefinition",r[r.ReadonlyArrayDefinition=37]="ReadonlyArrayDefinition",r[r.TupleDefinition=38]="TupleDefinition",r[r.MapDefinition=39]="MapDefinition",r[r.WeakMapDefinition=40]="WeakMapDefinition",r[r.SetDefinition=41]="SetDefinition",r[r.WeakSetDefinition=42]="WeakSetDefinition",r[r.PromiseDefinition=43]="PromiseDefinition",r[r.GeneratorDefinition=44]="GeneratorDefinition",r[r.AsyncGeneratorDefinition=45]="AsyncGeneratorDefinition",r[r.IteratorDefinition=46]="IteratorDefinition",r[r.IterableDefinition=47]="IterableDefinition",r[r.IterableIteratorDefinition=48]="IterableIteratorDefinition",r[r.AsyncIteratorDefinition=49]="AsyncIteratorDefinition",r[r.AsyncIterableDefinition=50]="AsyncIterableDefinition",r[r.AsyncIterableIteratorDefinition=51]="AsyncIterableIteratorDefinition",r[r.Module=60]="Module",r[r.Namespace=61]="Namespace",r[r.Object=62]="Object",r[r.Interface=63]="Interface",r[r.Class=64]="Class",r[r.Union=65]="Union",r[r.Intersection=66]="Intersection",r[r.ConditionalType=67]="ConditionalType",r[r.IndexedAccess=68]="IndexedAccess",r[r.TypeParameter=69]="TypeParameter",r[r.Alias=70]="Alias",r[r.Method=71]="Method",r[r.Function=72]="Function",r[r.GeneratorFunction=73]="GeneratorFunction",r[r.NumberLiteral=74]="NumberLiteral",r[r.BigIntLiteral=75]="BigIntLiteral",r[r.StringLiteral=76]="StringLiteral",r[r.TemplateLiteral=77]="TemplateLiteral",r[r.EnumLiteral=78]="EnumLiteral",r[r.RegExpLiteral=79]="RegExpLiteral",r[r.Enum=80]="Enum",r[r.UniqueSymbol=81]="UniqueSymbol",r[r.ESSymbol=82]="ESSymbol",r[r.Promise=83]="Promise",r[r.Generator=84]="Generator",r[r.AsyncGenerator=85]="AsyncGenerator",r[r.Iterator=86]="Iterator",r[r.Iterable=87]="Iterable",r[r.IterableIterator=88]="IterableIterator",r[r.AsyncIterator=89]="AsyncIterator",r[r.AsyncIterable=90]="AsyncIterable",r[r.AsyncIterableIterator=91]="AsyncIterableIterator",r[r.Jsx=92]="Jsx",r[r.Type=93]="Type",r[r.TypeCtor=94]="TypeCtor",r))(u||{});var C=(a=>(a[a.None=0]="None",a[a.Getter=1]="Getter",a[a.Setter=2]="Setter",a))(C||{});var S=(a=>(a[a.Public=0]="Public",a[a.Private=1]="Private",a[a.Protected=2]="Protected",a))(S||{});var we=new Set([76,74,10,9,75,79,77]),Ee=new Set([13,8,11,12,14,81,6,5]);var Pe=(t=>(t[t.ES=0]="ES",t[t.Unique=1]="Unique",t))(Pe||{});function Y(n){return ((n||0)&24)>>3}function Xe(n){return ((n||0)&96)>>5}var Ne=(a=>(a[a.None=0]="None",a[a.Optional=1]="Optional",a[a.Rest=2]="Rest",a))(Ne||{}),lt=(o=>(o[o.Optional=1]="Optional",o[o.Static=2]="Static",o[o.Private=8]="Private",o[o.Protected=16]="Protected",o))(lt||{}),Ze=(t=>(t[t.None=0]="None",t[t.Readonly=1]="Readonly",t))(Ze||{}),Oe=(d=>(d[d.None=0]="None",d[d.Optional=1]="Optional",d[d.Readonly=2]="Readonly",d[d.Static=4]="Static",d[d.Private=8]="Private",d[d.Protected=16]="Protected",d[d.Getter=32]="Getter",d[d.Setter=64]="Setter",d))(Oe||{});var L=class L{constructor(e){this._isIterable=false;this.metadataLibrary=m.current;if(!e.module)throw new Error("Type must have a module.");this._id=e.id,this._kind=e.kind,this._name=e.name,this._exported=e.exported||false,this._moduleRef=new W(e.module),this._nullable=e.nullable||this.metadataLibrary.configuration.nullability||false,this._definitionRef=e.genericTypeDefinition?new y(e.genericTypeDefinition):void 0,this._isGenericTypeDefinition=e.isGenericTypeDefinition||false,this._typeArgumentsRef=new T(e.typeArguments||[]);}get id(){return this._id}get displayName(){return `<${u[this._kind]} ${this._name} [${this._id}]>`}get kind(){return this._kind}get module(){return this._moduleRef.module}get name(){return this._name}get exported(){return this._exported}get iterable(){return this._isIterable}get nullable(){return this._nullable}get genericTypeDefinition(){return this._isGenericTypeDefinition?this:this._definitionRef?.type}[Symbol.for("nodejs.util.inspect.custom")](){return this.toString()}is(e){if(e===void 0){let[t]=ve(this.is);e=this.metadataLibrary.resolveType(t);}return this._id===e._id}getTypeArguments(){return this._typeArgumentsRef.types}isGenericType(){return this._typeArgumentsRef.length>0}isGenericTypeDefinition(){return this._isGenericTypeDefinition}isTypeParameter(){return this._kind===69}isUnion(){return this._kind===65}isIntersection(){return this._kind===66}isClass(){return this._kind===64}isInterface(){return this._kind===63}isTypeAlias(){return this._kind===70}isLiteral(){return we.has(this._kind)}isUnionOrIntersection(){return this.isUnion()||this.isIntersection()}isArray(){return this.isGenericType()&&(this.genericTypeDefinition===L.ArrayDefinition||this.genericTypeDefinition===L.ReadonlyArrayDefinition)}isTuple(){return this.isGenericType()&&this.genericTypeDefinition===L.TupleDefinition}isEnum(){return this._kind===80}isConditional(){return this._kind===67}isObjectLike(){return this.isObject()||this.isClass()||this.isInterface()}isObject(){return this._kind===62}isTemplate(){return this._kind===77}isFunction(){return this._kind===72}isESSymbol(){return this._kind===82}isUniqueSymbol(){return this._kind===81}isInstantiable(){return this.isClass()||this.isFunction()}isPrimitive(){return Ee.has(this._kind)}isString(){return this._kind===13||this._kind===76||this._kind===77}isNumber(){return this._kind===11||this._kind===74}isBigInt(){return this._kind===12||this._kind===75}isBoolean(){return this._kind===8||this._kind===10||this._kind===9}isAny(){return this._kind===2}isNever(){return this._kind===3}isVoid(){return this._kind===4}isIntrinsic(){return this._kind===7}isUndefined(){return this._kind===5}isNull(){return this._kind===6}toString(){let e=this.getPropsToStringify();return `${this.displayName} {
-    \`\`\`typeinfo
-    typelib: ${this.metadataLibrary.name}
-    module:  ${this.module.id}
-    \`\`\``+(e.length?`
-`:"")+this.stringifyProps(e,1)+`
-}`}getPropsToStringify(){return []}stringifyProps(e,t){let a="    ".repeat(t);return e.map(o=>(Array.isArray(o)?this.stringifyProps(o,1):o).replace(/^/gm,a)).join(`
-`)}};L.__type=De;var i=L;function V(){return typeof globalThis=="object"?globalThis:typeof window=="object"?window:global}function J(n,e){let t=V(),a=Symbol.for(n);return t[a]||(t[a]=e())}var Ue=class{constructor(){this.importMap={};}registerImporters(e){Object.keys(e).forEach(t=>{this.importMap[t]=e[t];});}import(e){return this.importMap[e]?.()??Promise.resolve(void 0)}},Ge=J("rttist/ModuleImporter",()=>new Ue);var H=class{constructor(e){this.metadataLibrary=m.current;this._references=e,this.length=e.length;}get modules(){return this._modules??(this._modules=Object.freeze(this._references.map(e=>this.metadataLibrary.resolveModule(e)))),this._modules}};var c=class{get id(){return this._id}constructor(e){this._id=e.id,this._import=e.import??(()=>Ge.import(e.id)),this.name=e.name,this.path=e.path,this._childrenRefs=new H(e.children||[]),this._types=Object.freeze((e.types||[]).map(t=>(t.module=e.id,j().create(t))));}getChildren(){return this._childrenRefs.modules}getTypes(){return this._types}import(){return this._import()}};c.__type=ke;var b=class{constructor(e){this.metadata=e,this.name=e.name,this.id=e.id,this._args=Object.freeze(e.args||[]);}getArguments(){return this._args}is(e){return e.id===this.id}};var X=class{get keyType(){return this._keyTypeRef.type}get type(){return this._typeRef.type}constructor(e){this.metadata=e,this._keyTypeRef=new y(e.key),this._typeRef=new y(e.type),this.readonly=(e.flags&1)!==0;}};var R=class{constructor(e){if(typeof e=="object"){if(this.key=e.key,this.kind=e.kind,e.kind===0){this.name=Symbol[e.key];return}this.name=Symbol.for(e.key);return}this.name=e;}isString(){return typeof this.name=="string"}isNumber(){return typeof this.name=="number"}isSymbol(){return typeof this.name=="symbol"}toString(){return this.isSymbol()?`Symbol.for('${this.key}')`:this.name.toString()}};var Q=class{get type(){return this._type.type}constructor(e){this.name=e.name,this._type=new y(e.type),this.optional=(e.flags&1)!==0,this.rest=(e.flags&2)!==0,this._decorators=Object.freeze((e.decorators||[]).map(t=>new b(t)));}getDecorators(){return this._decorators}toString(){return this.getDecorators().map(e=>"@"+e.name).join(" ")+(this.rest?"...":"")+`${this.name.toString()}${this.optional?"?":""}: ${this.type.displayName}`}};var I=class{get returnType(){return this._returnTypeRef.type}constructor(e){this.metadata=e,this._parameters=Object.freeze((e.parameters||[]).map(t=>new Q(t))),this._typeParametersRef=new T(e.typeParameters||[]),this._returnTypeRef=new y(e.returnType);}getParameters(){return this._parameters}getTypeParameters(){return this._typeParametersRef.types}toString(){return `(${this._parameters.map(t=>t.toString()).join(", ")}): ${this.returnType.displayName}`}};var Z=class{get name(){return this._name}get optional(){return this._optional}get accessModifier(){return this._accessModifier}constructor(e){this.metadata=e,this._name=new R(e.name),this._signatures=Object.freeze((e.signatures||[]).map(t=>new I(t))),this._decorators=Object.freeze((e.decorators||[]).map(t=>new b(t))),this._accessModifier=Y(e.flags),this._optional=(e.flags&1)!==0;}getDecorators(){return this._decorators}getSignatures(){return this._signatures}toString(){let e=this._signatures.map(t=>(this._accessModifier?S[this._accessModifier]+" ":"")+this._name.toString()+(this._optional?"?":"")+t.toString()).join(`
-`);return this._decorators.map(t=>"@"+t.name).join(`
-`)+e}};var z=class{get type(){return this._type.type}constructor(e){this.name=new R(e.name),this._type=new y(e.type),this._decorators=Object.freeze((e.decorators||[]).map(t=>new b(t))),this.metadata=e,this.accessModifier=Y(e.flags),this.accessor=Xe(e.flags),this.optional=(e.flags&1)!==0,this.readonly=(e.flags&2)!==0;}getDecorators(){return this._decorators}toString(){return this.getDecorators().map(e=>"@"+e.name).join(" ")+(this.accessor?C[this.accessor]+" ":"")+(this.accessModifier?S[this.accessModifier]+" ":"")+(this.readonly?"readonly ":"")+`${this.name.toString()}${this.optional?"?":""}: ${this.type.displayName}`}};function K(n){return Object.freeze((n.signatures||[]).map(e=>new I(e)))}function ze(n){return Object.freeze((n.properties||[]).map(e=>new z(e)))}function Ke(n){return Object.freeze((n.methods||[]).map(e=>new Z(e)))}function et(n){return Object.freeze((n.indexes||[]).map(e=>new X(e)))}var M=class extends i{constructor(e){super(e),this._properties=ze(e),this._methods=Ke(e),this._indexes=et(e),this._isIterable=this._properties?.some(t=>t.name.isSymbol()&&t.name.name===Symbol.iterator)||this._methods?.some(t=>t.name.isSymbol()&&t.name.name===Symbol.iterator);}getProperties(){return this._properties}getProperty(e){return this._properties.find(t=>t.name.name===e)}getIndexes(){return this._indexes}getMethods(){return this._methods}getMethod(e){return this._methods.find(t=>t.name.name===e)}getPropsToStringify(){return [...this._properties.map(e=>e.toString()),...this._methods.map(e=>e.toString())]}};var v=class extends M{get extends(){return this._extendsRef?.type}get implements(){return this._implementsRef.types}get abstract(){return this._abstract}constructor(e){super(e),this._ctor=e.ctor??(()=>this.module.import().then(t=>t?.[e.name])),this._implementsRef=new T(e.implements||[]),this._extendsRef=e.extends===void 0?void 0:new y(e.extends),this._constructors=Object.freeze((e.constructors??[]).map(t=>new I(t))),this._decorators=Object.freeze((e.decorators??[]).map(t=>new b(t))),this._abstract=e.abstract??false;}getCtor(){return this._ctor()}getConstructors(){return this._constructors}getDecorators(){return this._decorators}isSubclassOf(e){return e.isClass()&&(this.extends!==void 0&&(this.extends.is(e)||this.extends.isClass()&&this.extends.isSubclassOf(e)||this.extends.isGenericType()&&this.extends.genericTypeDefinition.isClass()&&this.extends.genericTypeDefinition.isSubclassOf(e))||this.isGenericType()&&(this.genericTypeDefinition.is(e)||this.genericTypeDefinition?.isClass()&&this.genericTypeDefinition.isSubclassOf(e)))}isDerivedFrom(e){return this.is(e)||this.extends?.isDerivedFrom(e)||this.implements.some(t=>t.isInterface()?t.isDerivedFrom(e):t.is(e))||false}};var ee=class extends i{get extends(){return this._extendsRef.type}get trueType(){return this._trueTypeRef.type}get falseType(){return this._falseTypeRef.type}constructor(e){super(e),this._extendsRef=new y(e.extends),this._trueTypeRef=new y(e.trueType),this._falseTypeRef=new y(e.falseType);}};var te=class extends i{constructor(e){super(e),this._entries=Object.entries(e.entries||{}).map(([t,a])=>Object.freeze([t,a]));}getEnumerators(){return this.getEntries().map(e=>e[0])}getValues(){return this.getEntries().map(e=>e[1])}getEntries(){return this._entries.slice()}};var D=class extends i{constructor(e){super(e),this._signatures=K(e);}getSignatures(){return this._signatures}};var re=class extends i{constructor(e){super(e),this._signatures=K(e);}getSignatures(){return this._signatures}};var ne=class extends M{get extends(){return this._extendsRef.types}constructor(e){super(e),this._extendsRef=new T(e.extends||[]);}isDerivedFrom(e){return this.is(e)||this.extends.some(t=>t.isInterface()?t.isDerivedFrom(e):t.is(e))||false}};var k=class extends i{get types(){return this._types.types}constructor(e){super(e),this._types=new T(e.types||[]);}toString(){return `${this.types.map(e=>e.toString()).join(this.operatorSymbol)}`}};var w=class extends k{constructor(t){super(t);this.operatorSymbol=" & ";}};var A=class extends i{constructor(e){super(e),this.value=this.parseValue(e.value);}isStringLiteral(){return this._kind===76}isNumberLiteral(){return this._kind===74}isBooleanLiteral(){return this._kind===10||this._kind===9}isBigIntLiteral(){return this._kind===75}isRegExpLiteral(){return this._kind===79}isTrue(){return this.kind===10}isFalse(){return this.kind===9}parseValue(e){switch(this._kind){case 76:return e+"";case 74:return Number(e);case 9:case 10:return e==="true"||e===true;case 75:return BigInt(e[e.length-1]==="n"?e.slice(0,-1):e);case 79:return new RegExp(e)}return e}toString(){return `${u[this._kind]}(${this.value})`}};var ae=class extends M{constructor(e){super(e);}};var ie=class extends i{constructor(e){super(e),this.head=e.head,this.templateSpans=e.templateSpans;}};var oe=class extends i{get constraint(){return this._constraint?.type}get default(){return this._default?.type}constructor(e){super(e),this._constraint=e.constraint?new y(e.constraint):void 0,this._default=e.default?new y(e.default):void 0;}};var E=class extends k{constructor(t){super(t);this.operatorSymbol=" | ";}};var se=class extends i{get key(){return this._key}get symbol(){return this._symbol}constructor(e){super(e),this._key=e.key,this._symbol=Symbol[e.key];}toString(){return "@@"+this._key}};var pe=class extends i{get key(){return this._key}get symbol(){return this._symbol}constructor(e){super(e),this._key=e.key,e.key!==void 0&&(this._symbol=Symbol.for(e.key));}hasKey(){return this._key!==void 0}};var ye=class extends i{get target(){return this._target.type}constructor(e){super(e),this._target=new y(e.target);}getPropsToStringify(){return [`target: ${this._target.type.id}`]}};var de=class extends i{get objectType(){return this._objectTypeRef.type}get indexType(){return this._indexTypeRef.type}constructor(e){super(e),this._objectTypeRef=new y(e.objectType),this._indexTypeRef=new y(e.indexType);}};var le=class extends i{constructor(e){super(e),this.value=this.parseValue(e.value),this.enumRef=new y(e.enum);}isStringLiteral(){return this._kind===76}isNumberLiteral(){return this._kind===74}parseValue(e){switch(this._kind){case 76:return e+"";case 74:return Number(e)}return e}};var h=class extends i{get genericTypeDefinition(){return this._definitionRef.type}constructor(e,t){t.genericTypeDefinition=e,super(t);}getTypeArguments(){return this._typeArgumentsRef.types}};var P=class extends h{constructor(e){super(distExports.TypeIds.PromiseDefinition,e);}},ce=class extends h{constructor(e){super(distExports.TypeIds.ArrayDefinition,e);}},me=class extends h{constructor(e){super(distExports.TypeIds.ReadonlyArrayDefinition,e);}},fe=class extends h{constructor(e){super(distExports.TypeIds.SetDefinition,e);}},ue=class extends h{constructor(e){super(distExports.TypeIds.WeakSetDefinition,e);}},Te=class extends h{constructor(e){super(distExports.TypeIds.MapDefinition,e);}},he=class extends h{constructor(e){super(distExports.TypeIds.WeakMapDefinition,e);}},be=class extends h{constructor(e){super(distExports.TypeIds.TupleDefinition,e);}};var ge=class extends i{};var Ae=class extends i{};var ct=1,Ie=class{static create(e,t,a){return new v({kind:64,id:`${ct++}#${e}`,name:t.name,typeArguments:a.map(p=>p.id),module:t.module.id,properties:t.getProperties().map(p=>p.metadata),indexes:t.getIndexes().map(p=>p.metadata),methods:t.getMethods().map(p=>p.metadata),constructors:t.getConstructors().map(p=>p.metadata),decorators:t.getDecorators(),ctor:t.getCtor,extends:t.extends?.id,exported:t.exported,implements:t.implements.map(p=>p.id),nullable:t.nullable,isGenericTypeDefinition:false,genericTypeDefinition:t.id,abstract:t.abstract})}};function mt(n){switch(n.kind){case 74:case 75:case 76:case 79:return new A(n);case 77:return new ie(n);case 81:return new pe(n);case 82:return new se(n);case 62:return new ae(n);case 63:return new ne(n);case 64:return new v(n);case 69:return new oe(n);case 70:return new ye(n);case 67:return new ee(n);case 68:return new de(n);case 60:return new Ae(n);case 61:return new ge(n);case 65:return new E(n);case 66:return new w(n);case 72:return new D(n);case 73:return new re(n);case 80:return new te(n);case 78:return new le(n);case 83:return new P(n)}return console.warn("Creating Type of unknown TypeKind.",n),new i(n)}var Me=class{static create(e){return mt(e)}};var xe=class n{constructor(e){this.metadataLibrary=e;this.createdTypes={};}getGenericClass(e,t){let a=this.metadataLibrary.getType(e);if(!a.isClass())return console.error("GenericTypeRegister.getGenericClass called for type which is not a ClassType."),class{};let o=n.getId(a,t),p=this.createdTypes[o];if(!p){let g=`${e.name}{${t.map(d=>d.name).join(",")}}`;this.createdTypes[o]=p={[g]:class extends e{}}[g];let f=qe().create(o,a,t);this.metadataLibrary.addType(f),p.prototype[distExports.PROTOTYPE_TYPE_INSTANCE_PROPERTY]=f,p.prototype[distExports.PROTOTYPE_TYPE_PROPERTY]=f.id;}return p}static getId(e,t){return `${e.id}{${t.map(a=>a.id).join(",")}}`}};var tt=false,Ce,rt,nt={},l={};function F(){return tt||(Ce=new i({kind:63,name:"Array",id:`#Array{${distExports.TypeIds.Any}}`,module:distExports.ModuleIds.Native,genericTypeDefinition:"#Array",typeArguments:[distExports.TypeIds.Any]}),rt=new D({kind:72,name:"Function",id:"#Function:unknown",module:distExports.ModuleIds.Native,signatures:[{parameters:[{name:"x",flags:2,type:Ce.id}],returnType:distExports.TypeIds.Unknown}]}),l={ArrayDefinition:s("Array","ArrayDefinition"),ReadonlyArrayDefinition:s("ReadonlyArray","ReadonlyArrayDefinition"),TupleDefinition:s("Tuple","TupleDefinition"),MapDefinition:s("Map","MapDefinition"),WeakMapDefinition:s("WeakMap","WeakMapDefinition"),SetDefinition:s("Set","SetDefinition"),WeakSetDefinition:s("WeakSet","WeakSetDefinition"),PromiseDefinition:s("Promise","PromiseDefinition"),GeneratorDefinition:s("Generator","GeneratorDefinition"),AsyncGeneratorDefinition:s("AsyncGenerator","AsyncGeneratorDefinition"),IteratorDefinition:s("Iterator","IteratorDefinition"),IterableDefinition:s("Iterable","IterableDefinition"),IterableIteratorDefinition:s("IterableIterator","IterableIteratorDefinition"),AsyncIteratorDefinition:s("AsyncIterator","AsyncIteratorDefinition"),AsyncIterableDefinition:s("AsyncIterable","AsyncIterableDefinition"),AsyncIterableIteratorDefinition:s("AsyncIterableIterator","AsyncIterableIteratorDefinition")},nt={Invalid:s("Invalid","Invalid",distExports.ModuleIds.Invalid),NonPrimitiveObject:s("object","NonPrimitiveObject"),Any:s("any","Any"),Unknown:s("unknown","Unknown"),Void:s("void","Void"),Never:s("never","Never"),Null:s("null","Null"),Undefined:s("undefined","Undefined"),Intrinsic:s("intrinsic","Intrinsic"),String:s("String","String"),Number:s("Number","Number"),BigInt:s("BigInt","BigInt"),Boolean:s("Boolean","Boolean"),True:new A({id:distExports.TypeIds.True,kind:10,name:"true",module:distExports.ModuleIds.Native,value:true}),False:new A({id:distExports.TypeIds.False,kind:9,name:"false",module:distExports.ModuleIds.Native,value:false}),Date:s("Date","Date"),Error:s("Error","Error"),Symbol:s("Symbol","Symbol"),UniqueSymbol:s("UniqueSymbol","UniqueSymbol"),RegExp:s("RegExp","RegExp"),Int8Array:s("Int8Array","Int8Array"),Uint8Array:s("Uint8Array","Uint8Array"),Uint8ClampedArray:s("Uint8ClampedArray","Uint8ClampedArray"),Int16Array:s("Int16Array","Int16Array"),Uint16Array:s("Uint16Array","Uint16Array"),Int32Array:s("Int32Array","Int32Array"),Uint32Array:s("Uint32Array","Uint32Array"),Float32Array:s("Float32Array","Float32Array"),Float64Array:s("Float64Array","Float64Array"),BigInt64Array:s("BigInt64Array","BigInt64Array"),BigUint64Array:s("BigUint64Array","BigUint64Array"),ArrayBuffer:s("ArrayBuffer","ArrayBuffer"),SharedArrayBuffer:s("SharedArrayBuffer","SharedArrayBuffer"),Atomics:s("Atomics","Atomics"),DataView:s("DataView","DataView"),ArrayDefinition:l.ArrayDefinition,ReadonlyArrayDefinition:l.ReadonlyArrayDefinition,TupleDefinition:l.TupleDefinition,MapDefinition:l.MapDefinition,WeakMapDefinition:l.WeakMapDefinition,SetDefinition:l.SetDefinition,WeakSetDefinition:l.WeakSetDefinition,PromiseDefinition:l.PromiseDefinition,GeneratorDefinition:l.GeneratorDefinition,AsyncGeneratorDefinition:l.AsyncGeneratorDefinition,IteratorDefinition:l.IteratorDefinition,IterableDefinition:l.IterableDefinition,IterableIteratorDefinition:l.IterableIteratorDefinition,AsyncIteratorDefinition:l.AsyncIteratorDefinition,AsyncIterableDefinition:l.AsyncIterableDefinition,AsyncIterableIteratorDefinition:l.AsyncIterableIteratorDefinition},tt=true),{AnyArray:Ce,UnknownFunction:rt,nativeTypes:nt,nativeGenericTypeDefinitions:l}}function s(n,e,t=distExports.ModuleIds.Native){let a=u[e],o=distExports.TypeIds[e],p=e.endsWith("Definition");if(o===void 0||a===void 0)throw new Error(`Invalid prop name. kind = ${a}, id = ${o}`);return new i({kind:a,name:n,id:o,module:t,isGenericTypeDefinition:p})}function it(n,e){if(n===void 0)return i.Undefined;if(n===null)return i.Null;if(typeof n=="string")return i.String;if(typeof n=="symbol")return i.Symbol;if(typeof n=="number")return i.Number;if(typeof n=="boolean")return i.Boolean;if(typeof n=="bigint")return i.BigInt;if(n instanceof Date)return i.Date;if(n instanceof Error)return i.Error;if(n instanceof RegExp)return i.RegExp;if(n instanceof Int8Array)return i.Int8Array;if(n instanceof Uint8Array)return i.Uint8Array;if(n instanceof Uint8ClampedArray)return i.Uint8ClampedArray;if(n instanceof Int16Array)return i.Int16Array;if(n instanceof Uint16Array)return i.Uint16Array;if(n instanceof Int32Array)return i.Int32Array;if(n instanceof Uint32Array)return i.Uint32Array;if(n instanceof Float32Array)return i.Float32Array;if(n instanceof Float64Array)return i.Float64Array;if(n instanceof BigInt64Array)return i.BigInt64Array;if(n instanceof BigUint64Array)return i.BigUint64Array;if(G(n))return i.Type;if($(n))return i.Module;if(n.constructor===void 0)return i.Unknown;if(n.constructor===Object)return i.NonPrimitiveObject;if(Array.isArray(n))return F().AnyArray;let t=n.prototype?.[distExports.PROTOTYPE_TYPE_INSTANCE_PROPERTY]||n.constructor.prototype[distExports.PROTOTYPE_TYPE_INSTANCE_PROPERTY];if(t!==void 0)return t;let a=n.prototype?.[distExports.PROTOTYPE_TYPE_PROPERTY]||n.constructor.prototype[distExports.PROTOTYPE_TYPE_PROPERTY]||n[distExports.PROTOTYPE_TYPE_PROPERTY]||void 0;return a!==void 0?e.resolveType(a):typeof n=="function"?F().UnknownFunction:i.Unknown}var Be="reflect-gettype-error-disable",Tt=/^([#@][^,|&]+?)\{(.+?)}(\?)?$/,ht=new Map([["#Promise",P],["#Array",ce],["#ReadonlyArray",me],["#Set",fe],["#WeakSet",ue],["#Map",Te],["#WeakMap",he],["#Tuple",be]]),_e=class{constructor(e,t,a){this.configuration=e;this.name=t;this.parentLibrary=a;this.modules=new Map;this.types=new Map;this.genericTypeRegister=new xe(this);this.aliases=new Map;if(!a&&new.target!==U)throw new Error("Cannot instantiate new MetadataLibrary without parent.");this.isGlobalMetadataLibrary=new.target===U,this.getType=this.getType.bind(this),this.resolveType=this.resolveType.bind(this),this.getGenericClass=this.getGenericClass.bind(this),this.constructGeneric=this.constructGeneric.bind(this);}asExpandable(){return this}toString(){return `${this.name} (${this.modules.size} modules, ${this.types.size} types) ${JSON.stringify(this.configuration,void 0,4)}`}[Symbol.for("nodejs.util.inspect.custom")](){return this.toString()}getGenericClass(e,...t){if(t.length===0){let a=distExports.getCallsiteTypeArguments(this.getGenericClass);if(a?.[0]!==void 0){let o=this.resolveType(a[0]);return this.genericTypeRegister.getGenericClass(e,o.isGenericType()?o.getTypeArguments():[])}}return this.genericTypeRegister.getGenericClass(e,t)}constructGeneric(e,t,a,o){let p=this.getGenericClass(e,...t.map(g=>G(g)?g:this.resolveType(g)));return o!==void 0&&(o=this.inheritNewTarget(o,p)),Reflect.construct(p,a,o??p)}inheritNewTarget(e,t){let a=e.name!==void 0?`${e.name}{}`:t.name,o={[a]:class{}}[a];return Object.setPrototypeOf(o.prototype,e.prototype),o.prototype[distExports.PROTOTYPE_TYPE_PROPERTY]=t.prototype[distExports.PROTOTYPE_TYPE_PROPERTY],o}findType(e){for(let[t,a]of this.types)if(e(a))return a;if(this.parentLibrary!==void 0)return this.parentLibrary.findType(e)}getTypes(){return Array.from(this.types.values()).concat(this.parentLibrary?.getTypes()??[])}findModule(e){for(let[t,a]of this.modules)if(e(a))return a;if(this.parentLibrary!==void 0)return this.parentLibrary.findModule(e)}getModules(){return Array.from(this.modules.values()).concat(this.parentLibrary?.getModules()??[])}resolveType(e){if(!e)throw new Error("Invalid type reference.");let t=this.types.get(e)??this.parentLibrary?.types.get(e);if(t!==void 0)return t;let a=this.handleAdhocType(e);return a||i.Invalid}resolveModule(e){if(!e)throw new Error("Invalid module reference.");return this.modules.get(e)??this.parentLibrary?.modules.get(e)??c.Invalid}addMetadata(e,t){if(this.parentLibrary){this.parentLibrary.addMetadata(e,t);return}m.doWithScope(this,()=>{let a=new c(e);this.addModule(a);});}clearMetadata(e){let t=`${e}/`;for(let a of this.types.keys())a.startsWith(t)&&(this.types.delete(a),this.parentLibrary?.types.delete(a));for(let a of this.modules.keys())a.startsWith(t)&&(this.modules.delete(a),this.parentLibrary?.modules.delete(a));}addModule(...e){if(this.parentLibrary){this.parentLibrary.addModule(...e);return}for(let t of e){if(!$(t))throw new Error("Given module is not an instance of the Module class.");if(t.id!==distExports.ModuleIds.Native&&t.id!==distExports.ModuleIds.Invalid&&this.modules.has(t.id))throw new Error(`Module with id '${t.id}' already exists.`);this.modules.set(t.id,t),this.addType(...t.getTypes());}}addType(...e){if(this.parentLibrary){this.parentLibrary.addType(...e);return}for(let t of e){if(!G(t))throw new Error("Given type is not an instance of the Type class.");if(!t.id)throw new Error("Given type has invalid id.");if(this.types.has(t.id)){if(t.id.slice(0,distExports.ModuleIds.Native.length)===distExports.ModuleIds.Native)continue;return}this.types.set(t.id,t);}}addAliases(e){if(this.parentLibrary){this.parentLibrary.addAliases(e);return}for(let[t,a]of Object.entries(e))this.aliases.set(t,a);}getType(...e){if(e.length)return it(e[0],this);let t=distExports.getCallsiteTypeArguments(this.getType);return t!==void 0?t.length===0||t[0]===void 0?i.Invalid:this.resolveType(t[0]):(V()[Be]||console.debug("[ERR] RTTIST: You are calling `getType()` function directly. More information at https://github.com/rttist/rttist/issues/17. To suppress this message, create field '"+Be+"' in global object (window | global | globalThis) eg. `window['"+Be+"'] = true;`"),i.Invalid)}createLiteralType(e){let t=e.slice(3,-1),a=t[t.length-1]==="n"?75:t[0]==="'"?76:t==="true"?10:t==="false"?9:t[0]==="/"?79:74;return new A({id:e,value:a===76?t.slice(1,-1):t,kind:a,module:distExports.ModuleIds.Native,name:t})}getTypeIdInfo(e){let t=e.match(Tt);if(t)return {type:t[1],arguments:t[2].split(","),nullable:t[3]==="?"}}handleAdhocType(e){if(e.slice(0,3)==="#L("){let o=this.createLiteralType(e);return this.addType(o),o}let t=this.getTypeIdInfo(e);if(!t)return;if(t.type==="#|"||t.type==="#&"){let o=new(t.type==="#|"?E:w)({id:e,module:distExports.ModuleIds.Native,name:t.type,kind:65,types:t.arguments,nullable:t.nullable});return this.addType(o),o}let a=ht.get(t.type);if(a){let o=new a({id:e,module:distExports.ModuleIds.Native,name:`${t.type.slice(1)}<'${t.arguments.length}>`,kind:93,typeArguments:t.arguments.map(p=>p)});return this.addType(o),o}if(t.type[0]==="@"){let o=new i({id:e,module:distExports.ModuleIds.Native,name:`${t.type.slice(1)}<'${t.arguments.length}>`,kind:93,typeArguments:t.arguments.map(p=>p),genericTypeDefinition:t.type});return this.addType(o),o}}},U=class extends _e{constructor(e){super(e,"Global metadata library");}};var B=J("rttist/Metadata",()=>new U({nullability:false}));We(Me);Ye(Ie);m.setScope(B);var{nativeTypes:pt,nativeGenericTypeDefinitions:Mt,AnyArray:xt,UnknownFunction:_t}=F();for(let[n,e]of Object.entries(pt).concat(Object.entries(Mt)))i[n]=e;c.Invalid=new c({id:distExports.ModuleIds.Invalid,name:"invalid",path:""});c.Dynamic=new c({id:distExports.ModuleIds.Dynamic,name:"dynamic",path:""});c.Native=new c({id:distExports.ModuleIds.Native,name:"native",path:""});B.addType(...Object.values(pt));B.addType(xt,_t);B.addModule(c.Native,c.Invalid,c.Dynamic);
-
-// Copyright 2024-2025 Golem Cloud
-//
-// Licensed under the Golem Source License v1.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://license.golem.cloud/LICENSE
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-const PackageName = '@golemcloud/golem-ts-sdk';
-const Metadata = new _e({
-    nullability: false,
-}, PackageName, B);
-const TypeMetadata = {
-    update(metadata) {
-        Metadata.clearMetadata(PackageName);
-        metadata.forEach((mod) => mod.add(Metadata, false));
-    },
-    lookupClassMetadata(className) {
-        const types = Metadata.getTypes().filter((type) => type.isClass() && type.name === className.toString());
-        if (types.length === 0) {
-            return none();
+function buildTree(node, nodes) {
+    switch (node.tag) {
+        case 'record-value':
+            return {
+                kind: 'record',
+                value: node.val.map((idx) => buildTree(nodes[idx], nodes)),
+            };
+        case 'variant-value': {
+            const [caseIdx, maybeIndex] = node.val;
+            if (maybeIndex !== undefined) {
+                return {
+                    kind: 'variant',
+                    caseIdx,
+                    caseValue: buildTree(nodes[maybeIndex], nodes),
+                };
+            }
+            else {
+                return {
+                    kind: 'variant',
+                    caseIdx,
+                    caseValue: undefined,
+                };
+            }
         }
-        return some(types[0]);
-    },
-};
-
-/**
- * @since 2.0.0
- */
-/**
- * Constructs a new `Either` holding a `Right` value. This usually represents a successful value due to the right bias
- * of this structure.
- *
- * @category constructors
- * @since 2.0.0
- */
-const right = right$1;
-/**
- * Constructs a new `Either` holding a `Left` value. This usually represents a failure, due to the right-bias of this
- * structure.
- *
- * @category constructors
- * @since 2.0.0
- */
-const left = left$1;
-/**
- * Determine if a `Either` is a `Left`.
- *
- * @example
- * ```ts
- * import * as assert from "node:assert"
- * import { Either } from "effect"
- *
- * assert.deepStrictEqual(Either.isLeft(Either.right(1)), false)
- * assert.deepStrictEqual(Either.isLeft(Either.left("a")), true)
- * ```
- *
- * @category guards
- * @since 2.0.0
- */
-const isLeft = isLeft$1;
-/**
- * Determine if a `Either` is a `Right`.
- *
- * @example
- * ```ts
- * import * as assert from "node:assert"
- * import { Either } from "effect"
- *
- * assert.deepStrictEqual(Either.isRight(Either.right(1)), true)
- * assert.deepStrictEqual(Either.isRight(Either.left("a")), false)
- * ```
- *
- * @category guards
- * @since 2.0.0
- */
-const isRight = isRight$1;
-/**
- * Converts a `Either` to an `Option` discarding the value.
- *
- * @example
- * ```ts
- * import * as assert from "node:assert"
- * import { Either, Option } from "effect"
- *
- * assert.deepStrictEqual(Either.getLeft(Either.right('ok')), Option.none())
- * assert.deepStrictEqual(Either.getLeft(Either.left('err')), Option.some('err'))
- * ```
- *
- * @category getters
- * @since 2.0.0
- */
-const getLeft = getLeft$1;
-/**
- * Maps the `Right` side of an `Either` value to a new `Either` value.
- *
- * @category mapping
- * @since 2.0.0
- */
-const map = /*#__PURE__*/dual(2, (self, f) => isRight(self) ? right(f(self.right)) : left(self.left));
-/**
- * Returns the wrapped value if it's a `Right` or a default value if is a `Left`.
- *
- * @example
- * ```ts
- * import * as assert from "node:assert"
- * import { Either } from "effect"
- *
- * assert.deepStrictEqual(Either.getOrElse(Either.right(1), (error) => error + "!"), 1)
- * assert.deepStrictEqual(Either.getOrElse(Either.left("not a number"), (error) => error + "!"), "not a number!")
- * ```
- *
- * @category getters
- * @since 2.0.0
- */
-const getOrElse = /*#__PURE__*/dual(2, (self, onLeft) => isLeft(self) ? onLeft(self.left) : self.right);
-/**
- * @category sequencing
- * @since 2.0.0
- */
-const flatMap = /*#__PURE__*/dual(2, (self, f) => isLeft(self) ? left(self.left) : f(self.right));
-/**
- * @category zipping
- * @since 2.0.0
- */
-const zipWith = /*#__PURE__*/dual(3, (self, that, f) => flatMap(self, r => map(that, r2 => f(r, r2))));
-/**
- * Takes a structure of `Either`s and returns an `Either` of values with the same structure.
- *
- * - If a tuple is supplied, then the returned `Either` will contain a tuple with the same length.
- * - If a struct is supplied, then the returned `Either` will contain a struct with the same keys.
- * - If an iterable is supplied, then the returned `Either` will contain an array.
- *
- * @example
- * ```ts
- * import * as assert from "node:assert"
- * import { Either } from "effect"
- *
- * assert.deepStrictEqual(Either.all([Either.right(1), Either.right(2)]), Either.right([1, 2]))
- * assert.deepStrictEqual(Either.all({ right: Either.right(1), b: Either.right("hello") }), Either.right({ right: 1, b: "hello" }))
- * assert.deepStrictEqual(Either.all({ right: Either.right(1), b: Either.left("error") }), Either.left("error"))
- * ```
- *
- * @category combining
- * @since 2.0.0
- */
-// @ts-expect-error
-const all = input => {
-  if (Symbol.iterator in input) {
-    const out = [];
-    for (const e of input) {
-      if (isLeft(e)) {
-        return e;
-      }
-      out.push(e.right);
+        case 'enum-value':
+            return { kind: 'enum', value: node.val };
+        case 'flags-value':
+            return { kind: 'flags', value: node.val };
+        case 'tuple-value':
+            return {
+                kind: 'tuple',
+                value: node.val.map((idx) => buildTree(nodes[idx], nodes)),
+            };
+        case 'list-value':
+            return {
+                kind: 'list',
+                value: node.val.map((idx) => buildTree(nodes[idx], nodes)),
+            };
+        case 'option-value':
+            if (node.val === undefined) {
+                return { kind: 'option', value: undefined };
+            }
+            return {
+                kind: 'option',
+                value: buildTree(nodes[node.val], nodes),
+            };
+        case 'result-value': {
+            const res = node.val;
+            if (res.tag === 'ok') {
+                return {
+                    kind: 'result',
+                    value: {
+                        ok: res.val !== undefined
+                            ? buildTree(nodes[res.val], nodes)
+                            : undefined,
+                    },
+                };
+            }
+            else {
+                return {
+                    kind: 'result',
+                    value: {
+                        err: res.val !== undefined
+                            ? buildTree(nodes[res.val], nodes)
+                            : undefined,
+                    },
+                };
+            }
+        }
+        case 'prim-u8':
+            return { kind: 'u8', value: node.val };
+        case 'prim-u16':
+            return { kind: 'u16', value: node.val };
+        case 'prim-u32':
+            return { kind: 'u32', value: node.val };
+        case 'prim-u64':
+            return { kind: 'u64', value: node.val };
+        case 'prim-s8':
+            return { kind: 's8', value: node.val };
+        case 'prim-s16':
+            return { kind: 's16', value: node.val };
+        case 'prim-s32':
+            return { kind: 's32', value: node.val };
+        case 'prim-s64':
+            return { kind: 's64', value: node.val };
+        case 'prim-float32':
+            return { kind: 'f32', value: node.val };
+        case 'prim-float64':
+            return { kind: 'f64', value: node.val };
+        case 'prim-char':
+            return { kind: 'char', value: node.val };
+        case 'prim-bool':
+            return { kind: 'bool', value: node.val };
+        case 'prim-string':
+            return { kind: 'string', value: node.val };
+        case 'handle': {
+            const [uri, resourceId] = node.val;
+            return {
+                kind: 'handle',
+                uri: uri.value,
+                resourceId,
+            };
+        }
+        default:
+            throw new Error(`Unhandled tag: ${node.tag}`);
     }
-    return right(out);
-  }
-  const out = {};
-  for (const key of Object.keys(input)) {
-    const e = input[key];
-    if (isLeft(e)) {
-      return e;
-    }
-    out[key] = e.right;
-  }
-  return right(out);
-};
-
-function isInBuiltResult(type) {
-    return type.name.startsWith("@golemcloud/golem-ts-sdk") &&
-        type.name.endsWith('Either<\'2>');
 }
-
-// Copyright 2024-2025 Golem Cloud
-//
-// Licensed under the Golem Source License v1.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://license.golem.cloud/LICENSE
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-function constructWitValueFromTsValue(tsValue, tsType) {
-    return map(constructValueFromTsValue(tsValue, tsType), constructWitValueFromValue);
+function toWitValue(value) {
+    const nodes = [];
+    buildNodes(value, nodes);
+    return { nodes: nodes };
+}
+function buildNodes(value, nodes) {
+    const push = (node) => {
+        nodes.push(node);
+        return nodes.length - 1;
+    };
+    switch (value.kind) {
+        case 'record':
+            const recordIndices = value.value.map((v) => buildNodes(v, nodes));
+            return push({ tag: 'record-value', val: recordIndices });
+        case 'variant':
+            return push({
+                tag: 'variant-value',
+                val: value.caseValue !== undefined
+                    ? [value.caseIdx, buildNodes(value.caseValue, nodes)]
+                    : [value.caseIdx, undefined],
+            });
+        case 'enum':
+            return push({ tag: 'enum-value', val: value.value });
+        case 'flags':
+            return push({ tag: 'flags-value', val: value.value });
+        case 'tuple':
+            const tupleIndices = value.value.map((v) => buildNodes(v, nodes));
+            return push({ tag: 'tuple-value', val: tupleIndices });
+        case 'list':
+            const listIndices = value.value.map((v) => buildNodes(v, nodes));
+            return push({ tag: 'list-value', val: listIndices });
+        case 'option':
+            return push({
+                tag: 'option-value',
+                val: value.value !== undefined
+                    ? buildNodes(value.value, nodes)
+                    : undefined,
+            });
+        case 'result':
+            if ('ok' in value.value) {
+                return push({
+                    tag: 'result-value',
+                    val: {
+                        tag: 'ok',
+                        val: value.value.ok !== undefined
+                            ? buildNodes(value.value.ok, nodes)
+                            : undefined,
+                    },
+                });
+            }
+            else {
+                return push({
+                    tag: 'result-value',
+                    val: {
+                        tag: 'err',
+                        val: value.value.err !== undefined
+                            ? buildNodes(value.value.err, nodes)
+                            : undefined,
+                    },
+                });
+            }
+        case 'u8':
+            return push({ tag: 'prim-u8', val: value.value });
+        case 'u16':
+            return push({ tag: 'prim-u16', val: value.value });
+        case 'u32':
+            return push({ tag: 'prim-u32', val: value.value });
+        case 'u64':
+            return push({ tag: 'prim-u64', val: value.value });
+        case 's8':
+            return push({ tag: 'prim-s8', val: value.value });
+        case 's16':
+            return push({ tag: 'prim-s16', val: value.value });
+        case 's32':
+            return push({ tag: 'prim-s32', val: value.value });
+        case 's64':
+            return push({ tag: 'prim-s64', val: value.value });
+        case 'f32':
+            return push({ tag: 'prim-float32', val: value.value });
+        case 'f64':
+            return push({ tag: 'prim-float64', val: value.value });
+        case 'char':
+            return push({ tag: 'prim-char', val: value.value });
+        case 'bool':
+            return push({ tag: 'prim-bool', val: value.value });
+        case 'string':
+            return push({ tag: 'prim-string', val: value.value });
+        case 'handle':
+            return push({
+                tag: 'handle',
+                val: [{ value: value.uri }, value.resourceId],
+            });
+        default:
+            throw new Error(`Unhandled kind: ${value.kind}`);
+    }
 }
 // Note that we take `type: Type` instead of `type: AnalysedType`(because at this point `AnalysedType` of the `tsValue` is also available)
 // as `Type` holds more information, and can be used to determine the error messages for wrong `tsValue` more accurately.
-function constructValueFromTsValue(tsValue, type) {
+function fromTsValue$1(tsValue, type) {
     switch (type.kind) {
         case u.Null:
             return right({ kind: 'tuple', value: [] });
@@ -1915,7 +1653,7 @@ function constructValueFromTsValue(tsValue, type) {
         case u.PromiseDefinition:
             const promiseDefType = type;
             const promiseDefArgType = promiseDefType.getTypeArguments()[0];
-            return constructValueFromTsValue(tsValue, promiseDefArgType);
+            return fromTsValue$1(tsValue, promiseDefArgType);
         case u.Interface:
             return handleObject(tsValue, type);
         case u.Union: {
@@ -1924,11 +1662,11 @@ function constructValueFromTsValue(tsValue, type) {
         case u.Alias:
             const aliasType = type;
             const targetType = aliasType.target;
-            return constructValueFromTsValue(tsValue, targetType);
+            return fromTsValue$1(tsValue, targetType);
         case u.Promise:
             const promiseType = type;
             const argument = promiseType.getTypeArguments()[0];
-            return constructValueFromTsValue(tsValue, argument);
+            return fromTsValue$1(tsValue, argument);
         case u.Type:
             return handleGeneralType(tsValue, type);
         case u.ObjectType:
@@ -2081,14 +1819,14 @@ function handleArrayType(tsValue, type) {
     if (!Array.isArray(tsValue)) {
         return left(invalidTypeError(tsValue, 'array'));
     }
-    return map(all(tsValue.map((item) => constructValueFromTsValue(item, typeArg))), (values) => ({ kind: 'list', value: values }));
+    return map$1(all$1(tsValue.map((item) => fromTsValue$1(item, typeArg))), (values) => ({ kind: 'list', value: values }));
 }
 function handleTupleType(tsValue, type) {
     const typeArgs = type.getTypeArguments?.();
     if (!Array.isArray(tsValue)) {
         return left(invalidTypeError(tsValue, 'tuple'));
     }
-    return map(all(tsValue.map((item, idx) => constructValueFromTsValue(item, typeArgs[idx]))), (values) => ({ kind: 'tuple', value: values }));
+    return map$1(all$1(tsValue.map((item, idx) => fromTsValue$1(item, typeArgs[idx]))), (values) => ({ kind: 'tuple', value: values }));
 }
 function handleOtherComplexTypes(tsValue, type) {
     const genericType = type;
@@ -2107,7 +1845,7 @@ function handlePromiseType(tsValue, type) {
         return left(unexpectedTypeError(tsValue, type, some(`${type.name} must have one type argument`)));
     }
     const innerType = typeArgs[0];
-    return constructValueFromTsValue(tsValue, innerType);
+    return fromTsValue$1(tsValue, innerType);
 }
 function handleResultType(tsValue, okType, errorType) {
     if (typeof tsValue === 'object' &&
@@ -2116,8 +1854,8 @@ function handleResultType(tsValue, okType, errorType) {
         'val' in tsValue) {
         if (tsValue.tag === 'ok') {
             const okTsVal = tsValue.val;
-            const okValue = constructValueFromTsValue(okTsVal, okType);
-            return map(okValue, (okValue) => {
+            const okValue = fromTsValue$1(okTsVal, okType);
+            return map$1(okValue, (okValue) => {
                 return {
                     kind: 'result',
                     value: {
@@ -2128,8 +1866,8 @@ function handleResultType(tsValue, okType, errorType) {
         }
         else if (tsValue.tag === 'err') {
             const errTsVal = tsValue.val;
-            const errValue = constructValueFromTsValue(errTsVal, errorType);
-            return map(errValue, (errValue) => {
+            const errValue = fromTsValue$1(errTsVal, errorType);
+            return map$1(errValue, (errValue) => {
                 return {
                     kind: 'result',
                     value: {
@@ -2166,8 +1904,8 @@ function handleKeyValuePairs(tsValue, type) {
     if (!keyType || !valueType) {
         return left(unexpectedTypeError(tsValue, type, some('unable to infer key or value type')));
     }
-    const values = all(Array.from(tsValue.entries()).map(([key, value]) => zipWith(constructValueFromTsValue(key, keyType), constructValueFromTsValue(value, valueType), (k, v) => ({ kind: 'tuple', value: [k, v] }))));
-    return map(values, (value) => ({ kind: 'list', value }));
+    const values = all$1(Array.from(tsValue.entries()).map(([key, value]) => zipWith(fromTsValue$1(key, keyType), fromTsValue$1(value, valueType), (k, v) => ({ kind: 'tuple', value: [k, v] }))));
+    return map$1(values, (value) => ({ kind: 'list', value }));
 }
 function handleObject(tsValue, type) {
     if (typeof tsValue !== 'object' || tsValue === null) {
@@ -2196,7 +1934,7 @@ function handleObject(tsValue, type) {
             }
             continue;
         }
-        const fieldVal = constructValueFromTsValue(tsValue[key], prop.type);
+        const fieldVal = fromTsValue$1(tsValue[key], prop.type);
         if (isLeft(fieldVal)) {
             return left(fieldVal.left);
         }
@@ -2213,7 +1951,7 @@ function handleUnion(tsValue, type) {
     }
     else {
         const innerType = typeWithIndex[0];
-        return map(constructValueFromTsValue(tsValue, innerType), (result) => {
+        return map$1(fromTsValue$1(tsValue, innerType), (result) => {
             return {
                 kind: 'variant',
                 caseIdx: typeWithIndex[1],
@@ -2361,29 +2099,7 @@ function unexpectedTypeError(tsValue, expectedType, message) {
     const error = `Value ${JSON.stringify(tsValue)} cannot be handled. Type of this value is inferred to be ${expectedType.name}`;
     return error + (isSome(message) ? ` Reason: ${message.value}` : '');
 }
-
-// Copyright 2024-2025 Golem Cloud
-//
-// Licensed under the Golem Source License v1.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://license.golem.cloud/LICENSE
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// Note that we take `expectedType: Type` instead of `expectedType: AnalysedType`(because at this point `AnalysedType` of the `witValue`
-// is also available) as `Type` holds more information, and help us have fine-grained control over the type conversion.
-// Hence, we need to use `Type` instead of `AnalysedType`. Note that the output of this function is a real ts-value,
-// and we need to ensure it is compatible with the `expectedType: Type`.
-function constructTsValueFromWitValue(witValue, expectedType) {
-    const value = constructValueFromWitValue(witValue);
-    return constructTsValueFromValue(value, expectedType);
-}
-function constructTsValueFromValue(value, expectedType) {
+function toTsValue$1(value, expectedType) {
     if (value === undefined) {
         return null;
     }
@@ -2393,7 +2109,7 @@ function constructTsValueFromValue(value, expectedType) {
             return null;
         }
         else {
-            return constructTsValueFromValue(value.value, expectedType);
+            return toTsValue$1(value.value, expectedType);
         }
     }
     switch (expectedType.kind) {
@@ -2456,7 +2172,7 @@ function constructTsValueFromValue(value, expectedType) {
                 return expectedTypeFields.reduce((acc, field, idx) => {
                     const name = field.name.toString();
                     const expectedFieldType = field.type;
-                    acc[name] = constructTsValueFromValue(fieldValues[idx], expectedFieldType);
+                    acc[name] = toTsValue$1(fieldValues[idx], expectedFieldType);
                     return acc;
                 }, {});
             }
@@ -2470,7 +2186,7 @@ function constructTsValueFromValue(value, expectedType) {
                 return expectedTypeFields.reduce((acc, field, idx) => {
                     const name = field.name.toString();
                     const expectedFieldType = field.type;
-                    acc[name] = constructTsValueFromValue(fieldValues[idx], expectedFieldType);
+                    acc[name] = toTsValue$1(fieldValues[idx], expectedFieldType);
                     return acc;
                 }, {});
             }
@@ -2510,77 +2226,77 @@ function constructTsValueFromValue(value, expectedType) {
             }
         case u.Int8Array:
             if (value.kind === 'list') {
-                return new Int8Array(value.value.map((v) => constructTsValueFromValue(v, i.Number)));
+                return new Int8Array(value.value.map((v) => toTsValue$1(v, i.Number)));
             }
             else {
                 throw new Error(`Expected Int8Array, obtained value ${value}`);
             }
         case u.Uint8Array:
             if (value.kind === 'list') {
-                return new Uint8Array(value.value.map((v) => constructTsValueFromValue(v, i.Number)));
+                return new Uint8Array(value.value.map((v) => toTsValue$1(v, i.Number)));
             }
             else {
                 throw new Error(`Expected Uint8Array, obtained value ${value}`);
             }
         case u.Uint8ClampedArray:
             if (value.kind === 'list') {
-                return new Uint8ClampedArray(value.value.map((v) => constructTsValueFromValue(v, i.Number)));
+                return new Uint8ClampedArray(value.value.map((v) => toTsValue$1(v, i.Number)));
             }
             else {
                 throw new Error(`Expected Uint8ClampedArray, obtained value ${value}`);
             }
         case u.Int16Array:
             if (value.kind === 'list') {
-                return new Int16Array(value.value.map((v) => constructTsValueFromValue(v, i.Number)));
+                return new Int16Array(value.value.map((v) => toTsValue$1(v, i.Number)));
             }
             else {
                 throw new Error(`Expected Int16Array, obtained value ${value}`);
             }
         case u.Uint16Array:
             if (value.kind === 'list') {
-                return new Uint16Array(value.value.map((v) => constructTsValueFromValue(v, i.Number)));
+                return new Uint16Array(value.value.map((v) => toTsValue$1(v, i.Number)));
             }
             else {
                 throw new Error(`Expected Uint16Array, obtained value ${value}`);
             }
         case u.Int32Array:
             if (value.kind === 'list') {
-                return new Int32Array(value.value.map((v) => constructTsValueFromValue(v, i.Number)));
+                return new Int32Array(value.value.map((v) => toTsValue$1(v, i.Number)));
             }
             else {
                 throw new Error(`Expected Int32Array, obtained value ${value}`);
             }
         case u.Uint32Array:
             if (value.kind === 'list') {
-                return new Uint32Array(value.value.map((v) => constructTsValueFromValue(v, i.Number)));
+                return new Uint32Array(value.value.map((v) => toTsValue$1(v, i.Number)));
             }
             else {
                 throw new Error(`Expected Uint32Array, obtained value ${value}`);
             }
         case u.Float32Array:
             if (value.kind === 'list') {
-                return new Float32Array(value.value.map((v) => constructTsValueFromValue(v, i.Number)));
+                return new Float32Array(value.value.map((v) => toTsValue$1(v, i.Number)));
             }
             else {
                 throw new Error(`Expected Float32Array, obtained value ${value}`);
             }
         case u.Float64Array:
             if (value.kind === 'list') {
-                return new Float64Array(value.value.map((v) => constructTsValueFromValue(v, i.Number)));
+                return new Float64Array(value.value.map((v) => toTsValue$1(v, i.Number)));
             }
             else {
                 throw new Error(`Expected Float64Array, obtained value ${value}`);
             }
         case u.BigInt64Array:
             if (value.kind === 'list') {
-                return new BigInt64Array(value.value.map((v) => constructTsValueFromValue(v, i.BigInt)));
+                return new BigInt64Array(value.value.map((v) => toTsValue$1(v, i.BigInt)));
             }
             else {
                 throw new Error(`Expected BigInt64Array, obtained value ${value}`);
             }
         case u.BigUint64Array:
             if (value.kind === 'list') {
-                return new BigUint64Array(value.value.map((v) => constructTsValueFromValue(v, i.BigInt)));
+                return new BigUint64Array(value.value.map((v) => toTsValue$1(v, i.BigInt)));
             }
             else {
                 throw new Error(`Expected BigUint64Array, obtained value ${value}`);
@@ -2588,7 +2304,7 @@ function constructTsValueFromValue(value, expectedType) {
         case u.ArrayBuffer:
             if (value.kind === 'list') {
                 const byteArray = value.value.map((v) => {
-                    const convertedValue = constructTsValueFromValue(v, i.Number);
+                    const convertedValue = toTsValue$1(v, i.Number);
                     if (typeof convertedValue !== 'number') {
                         throw new Error(`Expected number, obtained value ${convertedValue}`);
                     }
@@ -2602,7 +2318,7 @@ function constructTsValueFromValue(value, expectedType) {
         case u.SharedArrayBuffer:
             if (value.kind === 'list') {
                 const byteArray = value.value.map((v) => {
-                    const convertedValue = constructTsValueFromValue(v, i.Number);
+                    const convertedValue = toTsValue$1(v, i.Number);
                     if (typeof convertedValue !== 'number') {
                         throw new Error(`Expected number, obtained value ${convertedValue}`);
                     }
@@ -2616,7 +2332,7 @@ function constructTsValueFromValue(value, expectedType) {
         case u.DataView:
             if (value.kind === 'list') {
                 const byteArray = value.value.map((v) => {
-                    const convertedValue = constructTsValueFromValue(v, i.Number);
+                    const convertedValue = toTsValue$1(v, i.Number);
                     if (typeof convertedValue !== 'number') {
                         throw new Error(`Expected number, obtained value ${convertedValue}`);
                     }
@@ -2634,7 +2350,7 @@ function constructTsValueFromValue(value, expectedType) {
                 return expectedTypeFields.reduce((acc, field, idx) => {
                     const name = field.name.toString();
                     const expectedFieldType = field.type;
-                    const tsValue = constructTsValueFromValue(fieldValues[idx], expectedFieldType);
+                    const tsValue = toTsValue$1(fieldValues[idx], expectedFieldType);
                     if (field.optional && (tsValue === undefined || tsValue === null)) {
                         return acc;
                     }
@@ -2654,7 +2370,7 @@ function constructTsValueFromValue(value, expectedType) {
                 return expectedTypeFields.reduce((acc, field, idx) => {
                     const name = field.name.toString();
                     const expectedFieldType = field.type;
-                    const tsValue = constructTsValueFromValue(fieldValues[idx], expectedFieldType);
+                    const tsValue = toTsValue$1(fieldValues[idx], expectedFieldType);
                     if (field.optional && (tsValue === undefined || tsValue === null)) {
                         return acc;
                     }
@@ -2677,7 +2393,7 @@ function constructTsValueFromValue(value, expectedType) {
                 }
                 const unionTypes = expectedType.types;
                 const matchingType = unionTypes[value.caseIdx];
-                return constructTsValueFromValue(caseValue, matchingType);
+                return toTsValue$1(caseValue, matchingType);
             }
             else {
                 throw new Error(`Expected union, obtained value ${value}`);
@@ -2685,7 +2401,7 @@ function constructTsValueFromValue(value, expectedType) {
         case u.Alias:
             const aliasType = expectedType;
             const targetType = aliasType.target;
-            return constructTsValueFromValue(value, targetType);
+            return toTsValue$1(value, targetType);
         case u.StringLiteral:
             if (value.kind === 'string') {
                 return value.value;
@@ -2695,11 +2411,11 @@ function constructTsValueFromValue(value, expectedType) {
             }
         case u.Promise:
             const innerType = expectedType.getTypeArguments()[0];
-            return constructTsValueFromValue(value, innerType);
+            return toTsValue$1(value, innerType);
         case u.Type:
             if (expectedType.isArray()) {
                 if (value.kind === 'list') {
-                    return value.value.map((item) => constructTsValueFromValue(item, expectedType.getTypeArguments?.()[0]));
+                    return value.value.map((item) => toTsValue$1(item, expectedType.getTypeArguments?.()[0]));
                 }
                 else {
                     throw new Error(`Expected array, obtained value ${value}`);
@@ -2708,7 +2424,7 @@ function constructTsValueFromValue(value, expectedType) {
             else if (expectedType.isTuple()) {
                 const typeArg = expectedType.getTypeArguments?.();
                 if (value.kind === 'tuple') {
-                    return value.value.map((item, idx) => constructTsValueFromValue(item, typeArg[idx]));
+                    return value.value.map((item, idx) => toTsValue$1(item, typeArg[idx]));
                 }
                 else {
                     throw new Error(`Expected tuple, obtained value ${value}`);
@@ -2728,8 +2444,8 @@ function constructTsValueFromValue(value, expectedType) {
                                 throw new Error(`Expected tuple of two items, obtained value ${item}`);
                             }
                             return [
-                                constructTsValueFromValue(item.value[0], typeArgs[0]),
-                                constructTsValueFromValue(item.value[1], typeArgs[1]),
+                                toTsValue$1(item.value[0], typeArgs[0]),
+                                toTsValue$1(item.value[1], typeArgs[1]),
                             ];
                         });
                         return new Map(entries);
@@ -2748,7 +2464,7 @@ function constructTsValueFromValue(value, expectedType) {
                         if (resultValue.ok !== undefined) {
                             const okType = typeArgs[0];
                             const resulValue = resultValue.ok;
-                            const tsValue = constructTsValueFromValue(resulValue, okType);
+                            const tsValue = toTsValue$1(resulValue, okType);
                             return {
                                 tag: 'ok',
                                 val: tsValue,
@@ -2757,7 +2473,7 @@ function constructTsValueFromValue(value, expectedType) {
                         else if (resultValue.err !== undefined) {
                             const errType = typeArgs[1];
                             const resulValue = resultValue.err;
-                            const tsValue = constructTsValueFromValue(resulValue, errType);
+                            const tsValue = toTsValue$1(resulValue, errType);
                             return {
                                 tag: 'err',
                                 val: tsValue,
@@ -2773,7 +2489,7 @@ function constructTsValueFromValue(value, expectedType) {
                     if (!typeArgs || typeArgs.length !== 1) {
                         throw new Error('Promise type must have one type argument');
                     }
-                    return constructTsValueFromValue(value, typeArgs[0]);
+                    return toTsValue$1(value, typeArgs[0]);
                 }
                 else {
                     throw new Error(`Generic type ${genericTypeDefinition.name} not supported`);
@@ -2784,7 +2500,7 @@ function constructTsValueFromValue(value, expectedType) {
                 if (!arg) {
                     throw new Error('Type must have a type argument');
                 }
-                return constructTsValueFromValue(value, arg);
+                return toTsValue$1(value, arg);
             }
         default:
             throw new Error(`'${expectedType.displayName} with kind ${expectedType.kind} not supported'`);
@@ -2804,18 +2520,340 @@ function constructTsValueFromValue(value, expectedType) {
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+function createCustomError(error) {
+    return {
+        tag: 'custom-error',
+        val: {
+            value: toWitValue({
+                kind: 'string',
+                value: error,
+            }),
+            typ: {
+                nodes: [
+                    {
+                        name: undefined,
+                        owner: undefined,
+                        type: { tag: 'prim-string-type' },
+                    },
+                ],
+            },
+        },
+    };
+}
+
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+const agentTypeRegistry = new Map();
+const AgentTypeRegistry = {
+    register(agentClassName, agentType) {
+        agentTypeRegistry.set(agentClassName, agentType);
+    },
+    entries() {
+        return agentTypeRegistry.entries();
+    },
+    getRegisteredAgents() {
+        return Array.from(agentTypeRegistry.values());
+    },
+    lookup(agentClassName) {
+        return fromNullable(agentTypeRegistry.get(agentClassName));
+    },
+    exists(agentClassName) {
+        return agentTypeRegistry.has(agentClassName);
+    },
+};
+
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+const fromString$1 = (name) => {
+    return name;
+};
+const fromAgentClassName = (agentClassName) => {
+    const name = agentClassName.toString();
+    return name;
+};
+
+var AgentName = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  fromAgentClassName: fromAgentClassName,
+  fromString: fromString$1
+});
+
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// Note that agentRegistry is in index.ts
+const agentInitiators = new Map();
+const AgentInitiatorRegistry = {
+    register(agentName, agentInitiator) {
+        agentInitiators.set(agentName, agentInitiator);
+    },
+    lookup(agentName) {
+        return fromNullable(agentInitiators.get(agentName));
+    },
+    has(agentName) {
+        return agentInitiators.has(agentName);
+    },
+    entries() {
+        return agentInitiators.entries();
+    },
+};
+
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+const fromString = (name) => {
+    return name;
+};
+
+var AgentClassName = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  fromString: fromString
+});
+
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+/**
+ * BaseAgent is the foundational class for defining agent implementations.
+ *
+ * All agents must extend this class and **must** be decorated with the `@Agent()` decorator.
+ * Do **not** need to override the methods and manually implement them in this class.
+ * The `@Agent()` decorator handles all runtime wiring (e.g., `getId()`, `createRemote()`, etc.).
+ *
+ * Example usage:
+ *
+ * ```ts
+ * @Agent()
+ * class AssistantAgent extends BaseAgent {
+ *   @Prompt("Ask your question")
+ *   @Description("This method allows the agent to answer your question")
+ *   async ask(name: string): Promise<string> {
+ *      return `Hello ${name}, I'm the assistant agent (${this.getId()})!`;
+ *   }
+ * }
+ * ```
+ */
+class BaseAgent {
+    /**
+     * Returns the unique `AgentId` for this agent instance.
+     *
+     * This is automatically populated by the `@Agent()` decorator at runtime.
+     *
+     * @throws Will throw if accessed before the agent is initialized.
+     */
+    getId() {
+        throw new Error('An agent ID will be created at runtime');
+    }
+    /**
+     * Returns the `AgentType` metadata registered for this agent.
+     *
+     * This information is retrieved from the runtime agent registry and reflects
+     * metadata defined via decorators like `@Agent()`, `@Prompt()`, etc.
+     *
+     * @throws Will throw if metadata is missing or the agent is not properly registered.
+     */
+    getAgentType() {
+        const agentClassName = fromString(this.constructor.name);
+        const agentType = AgentTypeRegistry.lookup(agentClassName);
+        if (isNone(agentType)) {
+            throw new Error(`Failed to find agent type for ${this.constructor.name}. Ensure it is decorated with @Agent() and registered properly.`);
+        }
+        return agentType.value;
+    }
+    /**
+     * Creates a remote client instance of this agent type.
+     *
+     * This remote client will communicate with an agent instance running
+     * in a separate container, effectively offloading computation to that remote context.
+     *
+     * @param args - Constructor arguments for the agent
+     * @returns A remote proxy instance of the agent
+     *
+     * @example
+     * const remoteClient = MyAgent.createRemote("arg1", "arg2") where `arg1`, `arg2` are the constructor arguments
+     * validated at compile time.
+     */
+    static createRemote(...args) {
+        throw new Error('A remote client will be created at runtime');
+    }
+    /**
+     * Creates a local instance of the agent within the current container.
+     *
+     * This method is preferred over directly calling `new MyAgent(arg1, arg2)` as it ensures
+     * correct initialization, agent ID assignment, etc.
+     *
+     * @param args - Constructor arguments for the agent
+     * @returns A locally instantiated agent
+     *
+     * @example
+     * const localClient = MyAgent.createLocal("arg1", "arg2") where `arg1`, `arg2` are the constructor arguments
+     * validated at compile time.;
+     */
+    static createLocal(...args) {
+        throw new Error('A local client will be created at runtime');
+    }
+}
+
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+class ResolvedAgent {
+    constructor(agentClassName, tsAgentInternal, originalInstance) {
+        this.agentClassName = agentClassName;
+        this.agentInternal = tsAgentInternal;
+        this.classInstance = originalInstance;
+    }
+    getId() {
+        return this.agentInternal.getId();
+    }
+    invoke(methodName, args) {
+        return this.agentInternal.invoke(methodName, args);
+    }
+    getDefinition() {
+        return getOrThrowWith(AgentTypeRegistry.lookup(this.agentClassName), () => new Error(`Agent class ${this.agentClassName} is not registered.`));
+    }
+}
+
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+const PackageName = '@golemcloud/golem-ts-sdk';
+const Metadata = new _e({
+    nullability: false,
+}, PackageName, B);
+const TypeMetadata = {
+    update(metadata) {
+        Metadata.clearMetadata(PackageName);
+        metadata.forEach((mod) => mod.add(Metadata, false));
+    },
+    lookupClassMetadata(className) {
+        const types = Metadata.getTypes().filter((type) => type.isClass() && type.name === className.toString());
+        if (types.length === 0) {
+            return none();
+        }
+        return some(types[0]);
+    },
+};
+
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+const fromTsValue = (tsValue, tsType) => {
+    const valueEither = fromTsValue$1(tsValue, tsType);
+    return map$1(valueEither, toWitValue);
+};
+const toTsValue = (witValue, expectedType) => {
+    const value = fromWitValue(witValue);
+    return toTsValue$1(value, expectedType);
+};
+
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 function getLocalClient(ctor) {
     return (...args) => {
-        const agentClassName = AgentClassNameConstructor.fromString(ctor.name);
-        const agentInitiator = getOrThrowWith(AgentInitiatorRegistry.lookup(AgentNameConstructor.fromAgentClassName(agentClassName)), () => {
+        const agentClassName = fromString(ctor.name);
+        const agentInitiator = getOrThrowWith(AgentInitiatorRegistry.lookup(fromAgentClassName(agentClassName)), () => {
         });
         const classMetadata = getOrThrowWith(TypeMetadata.lookupClassMetadata(agentClassName), () => {
         });
         const constructor = classMetadata.getConstructors()[0];
         const parameters = constructor.getParameters();
-        const parameterWitValuesResult = all(args.map((fnArg, index) => {
+        const parameterWitValuesResult = all$1(args.map((fnArg, index) => {
             const typ = parameters[index].type;
-            return constructWitValueFromTsValue(fnArg, typ);
+            return fromTsValue(fnArg, typ);
         }));
         // There is no big advantage of returning a Result here,
         // and gives bad experience to the users:
@@ -2862,9 +2900,6 @@ function getRemoteClient(ctor) {
     return (...args) => {
         const instance = new ctor(...args);
         const metadata = Metadata.getTypes().filter((type) => type.isClass() && type.name === ctor.name)[0];
-        const agentClassName = AgentClassNameConstructor.fromString(ctor.name);
-        getOrThrowWith(AgentRegistry.lookup(agentClassName), () => {
-        });
         // getAgentComponent in code_first branch to be implemented
         // until then using self metadata
         const componentId = getSelfMetadata().workerId.componentId;
@@ -2880,7 +2915,7 @@ function getRemoteClient(ctor) {
                     JSON.stringify(componentId));
             })()
             : result.val;
-        const resourceValue = constructValueFromWitValue(resourceWitValues);
+        const resourceValue = fromWitValue(resourceWitValues);
         const resourceVal = (() => {
             switch (resourceValue.kind) {
                 case 'tuple':
@@ -2890,7 +2925,7 @@ function getRemoteClient(ctor) {
             }
         })();
         const workerId = getWorkerName(resourceVal, componentId);
-        const resourceWitValue = constructWitValueFromValue(resourceVal);
+        const resourceWitValue = toWitValue(resourceVal);
         return new Proxy(instance, {
             get(target, prop) {
                 const val = target[prop];
@@ -2902,9 +2937,9 @@ function getRemoteClient(ctor) {
                     const returnType = signature.returnType;
                     return (...fnArgs) => {
                         const functionName = `golem:simulated-agentic-typescript/simulated-agent.{[method]{${ctor.name}.{${prop.toString()}}`;
-                        const parameterWitValuesResult = all(fnArgs.map((fnArg, index) => {
+                        const parameterWitValuesResult = all$1(fnArgs.map((fnArg, index) => {
                             const typ = paramInfo[index].type;
-                            return constructWitValueFromTsValue(fnArg, typ);
+                            return fromTsValue(fnArg, typ);
                         }));
                         // There is no big advantage of returning a Result here,
                         // and gives bad experience to the users:
@@ -2929,7 +2964,7 @@ function getRemoteClient(ctor) {
                                     JSON.stringify(result.val));
                             })()
                             : result.val;
-                        return constructTsValueFromWitValue(rpcWitValue, returnType);
+                        return toTsValue(rpcWitValue, returnType);
                     };
                 }
                 return val;
@@ -2977,178 +3012,6 @@ function createUniqueAgentId(agentName) {
     const count = agentInstanceSequence.get(agentName);
     const workerName = getSelfMetadata().workerId.workerName;
     return new AgentId(workerName, agentName, count);
-}
-
-// Copyright 2024-2025 Golem Cloud
-//
-// Licensed under the Golem Source License v1.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://license.golem.cloud/LICENSE
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-function getNameFromAnalysedType(typ) {
-    switch (typ.kind) {
-        case 'variant':
-            return typ.value.name;
-        case 'result':
-            return typ.value.name;
-        case 'option':
-            return typ.value.name;
-        case 'enum':
-            return typ.value.name;
-        case 'flags':
-            return typ.value.name;
-        case 'record':
-            return typ.value.name;
-        case 'tuple':
-            return typ.value.name;
-        case 'list':
-            return typ.value.name;
-        case 'handle':
-            return typ.value.name;
-        default:
-            return undefined;
-    }
-}
-const analysedType = {
-    field: (name, typ) => ({ name, typ }),
-    case: (name, typ) => ({ name, typ }),
-    optCase: (name, typ) => ({ name, typ }),
-    unitCase: (name) => ({ name }),
-    bool: () => ({ kind: 'bool' }),
-    str: () => ({ kind: 'string' }),
-    chr: () => ({ kind: 'chr' }),
-    f64: () => ({ kind: 'f64' }),
-    f32: () => ({ kind: 'f32' }),
-    u64: () => ({ kind: 'u64' }),
-    s64: () => ({ kind: 's64' }),
-    u32: () => ({ kind: 'u32' }),
-    s32: () => ({ kind: 's32' }),
-    u16: () => ({ kind: 'u16' }),
-    s16: () => ({ kind: 's16' }),
-    u8: () => ({ kind: 'u8' }),
-    s8: () => ({ kind: 's8' }),
-    list: (inner) => ({ kind: 'list', value: { name: undefined, inner } }),
-    option: (inner) => ({ kind: 'option', value: { name: undefined, inner } }),
-    tuple: (items) => ({ kind: 'tuple', value: { name: undefined, items } }),
-    record: (fields) => ({ kind: 'record', value: { name: undefined, fields } }),
-    flags: (names) => ({ kind: 'flags', value: { name: undefined, names } }),
-    enum: (cases) => ({ kind: 'enum', value: { name: undefined, cases } }),
-    variant: (cases) => ({ kind: 'variant', value: { name: undefined, cases } }),
-    resultOk: (ok) => ({ kind: 'result', value: { name: undefined, ok } }),
-    resultErr: (err) => ({ kind: 'result', value: { name: undefined, err } }),
-    result: (ok, err) => ({ kind: 'result', value: { name: undefined, ok, err } }),
-    handle: (resourceId, mode) => ({ kind: 'handle', value: { name: undefined, resourceId, mode } }),
-};
-
-// Copyright 2024-2025 Golem Cloud
-//
-// Licensed under the Golem Source License v1.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://license.golem.cloud/LICENSE
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-class WitTypeBuilder {
-    constructor() {
-        this.nodes = [];
-        this.mapping = new Map();
-    }
-    add(typ) {
-        const hash = JSON.stringify(typ);
-        if (this.mapping.has(hash)) {
-            return this.mapping.get(hash);
-        }
-        const idx = this.nodes.length;
-        const boolType = { tag: 'prim-bool-type' };
-        this.nodes.push({ name: undefined, type: boolType });
-        const node = this.convert(typ);
-        const name = getNameFromAnalysedType(typ);
-        this.nodes[idx] = { name, type: node };
-        this.mapping.set(hash, idx);
-        return idx;
-    }
-    build() {
-        return { nodes: this.nodes };
-    }
-    convert(typ) {
-        switch (typ.kind) {
-            case 'variant': {
-                const cases = typ.value.cases.map((c) => [c.name, c.typ ? this.add(c.typ) : undefined]);
-                return { tag: 'variant-type', val: cases };
-            }
-            case 'result': {
-                const ok = typ.value.ok ? this.add(typ.value.ok) : undefined;
-                const err = typ.value.err ? this.add(typ.value.err) : undefined;
-                return { tag: 'result-type', val: [ok, err] };
-            }
-            case 'option': {
-                const inner = this.add(typ.value.inner);
-                return { tag: 'option-type', val: inner };
-            }
-            case 'enum':
-                return { tag: 'enum-type', val: typ.value.cases };
-            case 'flags':
-                return { tag: 'flags-type', val: typ.value.names };
-            case 'record': {
-                const fields = typ.value.fields.map((f) => [f.name, this.add(f.typ)]);
-                return { tag: 'record-type', val: fields };
-            }
-            case 'tuple': {
-                const elements = typ.value.items.map((item) => this.add(item));
-                return { tag: 'tuple-type', val: elements };
-            }
-            case 'list': {
-                const inner = this.add(typ.value.inner);
-                return { tag: 'list-type', val: inner };
-            }
-            case 'string':
-                return { tag: 'prim-string-type' };
-            case 'chr':
-                return { tag: 'prim-char-type' };
-            case 'f64':
-                return { tag: 'prim-f64-type' };
-            case 'f32':
-                return { tag: 'prim-f32-type' };
-            case 'u64':
-                return { tag: 'prim-u64-type' };
-            case 's64':
-                return { tag: 'prim-s64-type' };
-            case 'u32':
-                return { tag: 'prim-u32-type' };
-            case 's32':
-                return { tag: 'prim-s32-type' };
-            case 'u16':
-                return { tag: 'prim-u16-type' };
-            case 's16':
-                return { tag: 'prim-s16-type' };
-            case 'u8':
-                return { tag: 'prim-u8-type' };
-            case 's8':
-                return { tag: 'prim-s8-type' };
-            case 'bool':
-                return { tag: 'prim-bool-type' };
-            // FIXME: Why? typ.value.resourceId is a number and the handle-type takes a bigint
-            case 'handle': {
-                const resId = typ.value.resourceId;
-                const mode = typ.value.mode === 'owned' ? 'owned' : 'borrowed';
-                return { tag: 'handle-type', val: [BigInt(resId), mode] };
-            }
-            default:
-                throw new Error(`Unhandled AnalysedType kind: ${typ.kind}`);
-        }
-    }
 }
 
 // Copyright 2024-2025 Golem Cloud
@@ -3255,43 +3118,103 @@ function numberToOrdinalKebab(n) {
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-function constructWitTypeFromTsType(type) {
-    return flatMap(constructAnalysedTypeFromTsType(type), (analysedType) => {
-        const builder = new WitTypeBuilder();
-        builder.add(analysedType);
-        const result = builder.build();
-        return right(result);
-    });
+function getNameFromAnalysedType(typ) {
+    switch (typ.kind) {
+        case 'variant':
+            return typ.value.name;
+        case 'result':
+            return typ.value.name;
+        case 'option':
+            return typ.value.name;
+        case 'enum':
+            return typ.value.name;
+        case 'flags':
+            return typ.value.name;
+        case 'record':
+            return typ.value.name;
+        case 'tuple':
+            return typ.value.name;
+        case 'list':
+            return typ.value.name;
+        case 'handle':
+            return typ.value.name;
+        default:
+            return undefined;
+    }
 }
-function constructAnalysedTypeFromTsType(type) {
+function getOwnerFromAnalysedType(typ) {
+    switch (typ.kind) {
+        case 'variant':
+            return typ.value.owner;
+        case 'result':
+            return typ.value.owner;
+        case 'option':
+            return typ.value.owner;
+        case 'enum':
+            return typ.value.owner;
+        case 'flags':
+            return typ.value.owner;
+        case 'record':
+            return typ.value.owner;
+        case 'tuple':
+            return typ.value.owner;
+        case 'list':
+            return typ.value.owner;
+        case 'handle':
+            return typ.value.owner;
+        default:
+            return undefined;
+    }
+}
+const field = (name, typ) => ({ name, typ });
+const bool = () => ({ kind: 'bool' });
+const str = () => ({ kind: 'string' });
+const f64 = () => ({ kind: 'f64' });
+const f32 = () => ({ kind: 'f32' });
+const u64 = () => ({ kind: 'u64' });
+const s64 = () => ({ kind: 's64' });
+const u32 = () => ({ kind: 'u32' });
+const s32 = () => ({ kind: 's32' });
+const u16 = () => ({ kind: 'u16' });
+const s16 = () => ({ kind: 's16' });
+const u8 = () => ({ kind: 'u8' });
+const s8 = () => ({ kind: 's8' });
+const list = (inner) => ({ kind: 'list', value: { name: undefined, owner: undefined, inner } });
+const option = (inner) => ({ kind: 'option', value: { name: undefined, owner: undefined, inner } });
+const tuple = (items) => ({ kind: 'tuple', value: { name: undefined, owner: undefined, items } });
+const record = (fields) => ({ kind: 'record', value: { name: undefined, owner: undefined, fields } });
+const variant = (cases) => ({ kind: 'variant', value: { name: undefined, owner: undefined, cases } });
+const resultErr = (err) => ({ kind: 'result', value: { name: undefined, owner: undefined, err } });
+const result = (ok, err) => ({ kind: 'result', value: { name: undefined, owner: undefined, ok, err } });
+function fromTsType$1(type) {
     switch (type.kind) {
         case u.Boolean:
-            return right(analysedType.bool());
+            return right(bool());
         case u.False:
-            return right(analysedType.bool());
+            return right(bool());
         case u.True:
-            return right(analysedType.bool());
+            return right(bool());
         case u.DataView:
-            return right(analysedType.list(analysedType.u8()));
+            return right(list(u8()));
         case u.MapDefinition:
             const mapKeyType = type.getTypeArguments?.()[0];
             const mapValueType = type.getTypeArguments?.()[1];
-            const key = constructAnalysedTypeFromTsType(mapKeyType);
-            const value = constructAnalysedTypeFromTsType(mapValueType);
-            return zipWith(key, value, (k, v) => analysedType.list(analysedType.tuple([k, v])));
+            const key = fromTsType$1(mapKeyType);
+            const value = fromTsType$1(mapValueType);
+            return zipWith(key, value, (k, v) => list(tuple([k, v])));
         case u.WeakMapDefinition:
             const weakMapKeyType = type.getTypeArguments?.()[0];
             const weakMapValueType = type.getTypeArguments?.()[1];
-            const weakKey = constructAnalysedTypeFromTsType(weakMapKeyType);
-            const weakValue = constructAnalysedTypeFromTsType(weakMapValueType);
-            return zipWith(weakKey, weakValue, (k, v) => analysedType.list(analysedType.tuple([k, v])));
+            const weakKey = fromTsType$1(weakMapKeyType);
+            const weakValue = fromTsType$1(weakMapValueType);
+            return zipWith(weakKey, weakValue, (k, v) => list(tuple([k, v])));
         case u.IteratorDefinition:
             const iteratorType = type.getTypeArguments?.()[0];
             if (!iteratorType) {
                 return left("Iterator must have a type argument");
             }
             else {
-                return map(constructAnalysedTypeFromTsType(iteratorType), (result) => analysedType.list(result));
+                return map$1(fromTsType$1(iteratorType), (result) => list(result));
             }
         case u.IterableDefinition:
             const iterableType = type.getTypeArguments?.()[0];
@@ -3299,7 +3222,7 @@ function constructAnalysedTypeFromTsType(type) {
                 return left("Iterable must have a type argument");
             }
             else {
-                return map(constructAnalysedTypeFromTsType(iterableType), (result) => analysedType.list(result));
+                return map$1(fromTsType$1(iterableType), (result) => list(result));
             }
         case u.IterableIteratorDefinition:
             const iterableIteratorType = type.getTypeArguments?.()[0];
@@ -3307,7 +3230,7 @@ function constructAnalysedTypeFromTsType(type) {
                 return left("IterableIterator must have a type argument");
             }
             else {
-                return map(constructAnalysedTypeFromTsType(iterableIteratorType), (result) => analysedType.list(result));
+                return map$1(fromTsType$1(iterableIteratorType), (result) => list(result));
             }
         case u.Type: {
             const typeArgs = type.getTypeArguments?.() ?? [];
@@ -3321,16 +3244,16 @@ function constructAnalysedTypeFromTsType(type) {
                 const err = requireArgs(1, msg);
                 if (err)
                     return err;
-                return constructAnalysedTypeFromTsType(typeArgs[0]);
+                return fromTsType$1(typeArgs[0]);
             };
             if (type.isArray()) {
                 const err = requireArgs(1, "Array must have a type argument");
                 if (err)
                     return err;
-                return map(constructAnalysedTypeFromTsType(typeArgs[0]), analysedType.list);
+                return map$1(fromTsType$1(typeArgs[0]), list);
             }
             if (type.isTuple()) {
-                return map(all(typeArgs.map(constructAnalysedTypeFromTsType)), analysedType.tuple);
+                return map$1(all$1(typeArgs.map(fromTsType$1)), tuple);
             }
             if (type.isGenericType()) {
                 const genericType = type;
@@ -3339,13 +3262,13 @@ function constructAnalysedTypeFromTsType(type) {
                     const err = requireArgs(2, "Map must have two type arguments");
                     if (err)
                         return err;
-                    return zipWith(constructAnalysedTypeFromTsType(typeArgs[0]), constructAnalysedTypeFromTsType(typeArgs[1]), (keyType, valueType) => analysedType.list(analysedType.tuple([keyType, valueType])));
+                    return zipWith(fromTsType$1(typeArgs[0]), fromTsType$1(typeArgs[1]), (keyType, valueType) => list(tuple([keyType, valueType])));
                 }
                 if (isInBuiltResult(type)) {
                     const err = requireArgs(2, "Result type must have concrete type arguments");
                     if (err)
                         return err;
-                    return zipWith(constructAnalysedTypeFromTsType(typeArgs[0]), constructAnalysedTypeFromTsType(typeArgs[1]), analysedType.result);
+                    return zipWith(fromTsType$1(typeArgs[0]), fromTsType$1(typeArgs[1]), result);
                 }
                 return handleSingleArg(`The type id is ${genericType.id}.`);
             }
@@ -3357,20 +3280,20 @@ function constructAnalysedTypeFromTsType(type) {
             if (props.length === 0) {
                 return left(`Unsupported type for type ${type}`);
             }
-            const objectFields = all(props.map(prop => map(constructAnalysedTypeFromTsType(prop.type), (propType) => analysedType.field(prop.name.toString(), propType))));
-            return map(objectFields, (fields) => analysedType.record(fields));
+            const objectFields = all$1(props.map(prop => map$1(fromTsType$1(prop.type), (propType) => field(prop.name.toString(), propType))));
+            return map$1(objectFields, (fields) => record(fields));
         case u.Interface:
             const objectInterface = type;
-            const interfaceFields = all(objectInterface.getProperties().map(prop => {
-                const propertyAnalysedType = constructAnalysedTypeFromTsType(prop.type);
+            const interfaceFields = all$1(objectInterface.getProperties().map(prop => {
+                const propertyAnalysedType = fromTsType$1(prop.type);
                 if (prop.optional) {
-                    return map(propertyAnalysedType, (result) => analysedType.field(prop.name.toString(), analysedType.option(result)));
+                    return map$1(propertyAnalysedType, (result) => field(prop.name.toString(), option(result)));
                 }
                 else {
-                    return map(propertyAnalysedType, (result) => analysedType.field(prop.name.toString(), result));
+                    return map$1(propertyAnalysedType, (result) => field(prop.name.toString(), result));
                 }
             }));
-            return map(interfaceFields, (fields) => analysedType.record(fields));
+            return map$1(interfaceFields, (fields) => record(fields));
         case u.Union:
             let fieldIdx = 1;
             const unionType = type;
@@ -3386,125 +3309,279 @@ function constructAnalysedTypeFromTsType(type) {
                         continue;
                     foundBool = true;
                 }
-                map(constructAnalysedTypeFromTsType(t), (result) => {
+                map$1(fromTsType$1(t), (result) => {
                     possibleTypes.push({
                         name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
                         typ: result,
                     });
                 });
             }
-            return right(analysedType.variant(possibleTypes));
+            return right(variant(possibleTypes));
         case u.Alias:
             const typeAlias = type;
-            return constructAnalysedTypeFromTsType(typeAlias.target);
+            return fromTsType$1(typeAlias.target);
         case u.Null:
-            return right(analysedType.tuple([]));
+            return right(tuple([]));
         case u.BigInt:
-            return right(analysedType.u64());
+            return right(u64());
         case u.Float64Array:
-            return right(analysedType.f64());
+            return right(f64());
         case u.Number:
-            return right(analysedType.s32()); // For the same reason - as an example - Rust defaults to i32
+            return right(s32()); // For the same reason - as an example - Rust defaults to i32
         case u.String:
-            return right(analysedType.str());
+            return right(str());
         case u.RegExp:
-            return right(analysedType.str());
+            return right(str());
         case u.Error:
-            return right(analysedType.resultErr(analysedType.str()));
+            return right(resultErr(str()));
         case u.Int8Array:
-            return right(analysedType.list(analysedType.s8()));
+            return right(list(s8()));
         case u.Uint8Array:
-            return right(analysedType.list(analysedType.u8()));
+            return right(list(u8()));
         case u.Uint8ClampedArray:
-            return right(analysedType.list(analysedType.u8()));
+            return right(list(u8()));
         case u.ArrayBuffer:
-            return right(analysedType.list(analysedType.u8()));
+            return right(list(u8()));
         case u.SharedArrayBuffer:
-            return right(analysedType.list(analysedType.u8()));
+            return right(list(u8()));
         case u.Int16Array:
-            return right(analysedType.list(analysedType.s16()));
+            return right(list(s16()));
         case u.Uint16Array:
-            return right(analysedType.list(analysedType.u16()));
+            return right(list(u16()));
         case u.Int32Array:
-            return right(analysedType.list(analysedType.s32()));
+            return right(list(s32()));
         case u.Uint32Array:
-            return right(analysedType.list(analysedType.u32()));
+            return right(list(u32()));
         case u.Float32Array:
-            return right(analysedType.list(analysedType.f32()));
+            return right(list(f32()));
         case u.BigInt64Array:
-            return right(analysedType.list(analysedType.s64()));
+            return right(list(s64()));
         case u.BigUint64Array:
-            return right(analysedType.list(analysedType.u64()));
+            return right(list(u64()));
         case u.NumberLiteral:
-            return right(analysedType.f64());
+            return right(f64());
         case u.BigIntLiteral:
-            return right(analysedType.s64());
+            return right(s64());
         case u.StringLiteral:
-            return right(analysedType.str());
+            return right(str());
         case u.Promise:
             const promiseType = type.getTypeArguments?.()[0];
             if (!promiseType) {
                 return left("Promise must have a type argument");
             }
-            return constructAnalysedTypeFromTsType(promiseType);
+            return fromTsType$1(promiseType);
         case u.PromiseDefinition:
             const promiseDefType = type.getTypeArguments?.()[0];
             if (!promiseDefType) {
                 return left("PromiseDefinition must have a type argument");
             }
-            return map(constructAnalysedTypeFromTsType(promiseDefType), analysedType.option);
+            return map$1(fromTsType$1(promiseDefType), option);
         case u.ObjectType:
             const obj = type;
-            const fields = all(obj.getProperties().map(prop => {
-                return map(constructAnalysedTypeFromTsType(prop.type), (result) => analysedType.field(prop.name.toString(), result));
+            const fields = all$1(obj.getProperties().map(prop => {
+                return map$1(fromTsType$1(prop.type), (result) => field(prop.name.toString(), result));
             }));
-            return map(fields, analysedType.record);
+            return map$1(fields, record);
         case u.TupleDefinition:
-            const tupleTypes = all(type.getTypeArguments?.().map(constructAnalysedTypeFromTsType)) || all([]);
-            return map(tupleTypes, analysedType.tuple);
+            const tupleTypes = all$1(type.getTypeArguments?.().map(fromTsType$1)) || all$1([]);
+            return map$1(tupleTypes, tuple);
         case u.ArrayDefinition:
             const arrayType = type.getTypeArguments?.()[0];
             if (!arrayType) {
                 return left("Array must have a type argument");
             }
-            return map(constructAnalysedTypeFromTsType(arrayType), analysedType.list);
+            return map$1(fromTsType$1(arrayType), list);
         case u.ReadonlyArrayDefinition:
             const elementType = type.getTypeArguments?.()[0];
             if (!elementType) {
                 return left("Array must have a type argument");
             }
-            return map(constructAnalysedTypeFromTsType(elementType), analysedType.list);
+            return map$1(fromTsType$1(elementType), list);
         default:
-            return left(`The following type is not supported as argument or return type in agentic context ${type.displayName}`);
+            return left(`The following type is not supported as argument or return type in agentic context. Type Display Name: ${type.displayName}. Type Name: ${type.name}, Type ID: ${type.id}. Please report this issue to Golem Cloud. \n Additional info: ${type}`);
     }
 }
 
-const methodMetadata = new Map();
-const MethodMetadata = {
-    ensureMeta(agentClassName, method) {
-        if (!methodMetadata.has(agentClassName)) {
-            methodMetadata.set(agentClassName, new Map());
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+class WitTypeBuilder {
+    constructor() {
+        this.nodes = [];
+        this.mapping = new Map();
+    }
+    add(typ) {
+        const hash = JSON.stringify(typ);
+        if (this.mapping.has(hash)) {
+            return this.mapping.get(hash);
         }
-        const classMeta = methodMetadata.get(agentClassName);
+        const idx = this.nodes.length;
+        const boolType = { tag: 'prim-bool-type' };
+        this.nodes.push({ name: undefined, owner: undefined, type: boolType });
+        const node = this.convert(typ);
+        const name = getNameFromAnalysedType(typ);
+        const owner = getOwnerFromAnalysedType(typ);
+        this.nodes[idx] = { name, owner, type: node };
+        this.mapping.set(hash, idx);
+        return idx;
+    }
+    build() {
+        return { nodes: this.nodes };
+    }
+    convert(typ) {
+        switch (typ.kind) {
+            case 'variant': {
+                const cases = typ.value.cases.map((c) => [c.name, c.typ ? this.add(c.typ) : undefined]);
+                return { tag: 'variant-type', val: cases };
+            }
+            case 'result': {
+                const ok = typ.value.ok ? this.add(typ.value.ok) : undefined;
+                const err = typ.value.err ? this.add(typ.value.err) : undefined;
+                return { tag: 'result-type', val: [ok, err] };
+            }
+            case 'option': {
+                const inner = this.add(typ.value.inner);
+                return { tag: 'option-type', val: inner };
+            }
+            case 'enum':
+                return { tag: 'enum-type', val: typ.value.cases };
+            case 'flags':
+                return { tag: 'flags-type', val: typ.value.names };
+            case 'record': {
+                const fields = typ.value.fields.map((f) => [f.name, this.add(f.typ)]);
+                return { tag: 'record-type', val: fields };
+            }
+            case 'tuple': {
+                const elements = typ.value.items.map((item) => this.add(item));
+                return { tag: 'tuple-type', val: elements };
+            }
+            case 'list': {
+                const inner = this.add(typ.value.inner);
+                return { tag: 'list-type', val: inner };
+            }
+            case 'string':
+                return { tag: 'prim-string-type' };
+            case 'chr':
+                return { tag: 'prim-char-type' };
+            case 'f64':
+                return { tag: 'prim-f64-type' };
+            case 'f32':
+                return { tag: 'prim-f32-type' };
+            case 'u64':
+                return { tag: 'prim-u64-type' };
+            case 's64':
+                return { tag: 'prim-s64-type' };
+            case 'u32':
+                return { tag: 'prim-u32-type' };
+            case 's32':
+                return { tag: 'prim-s32-type' };
+            case 'u16':
+                return { tag: 'prim-u16-type' };
+            case 's16':
+                return { tag: 'prim-s16-type' };
+            case 'u8':
+                return { tag: 'prim-u8-type' };
+            case 's8':
+                return { tag: 'prim-s8-type' };
+            case 'bool':
+                return { tag: 'prim-bool-type' };
+            // FIXME: Why? typ.value.resourceId is a number and the handle-type takes a bigint
+            case 'handle': {
+                const resId = typ.value.resourceId;
+                const mode = typ.value.mode === 'owned' ? 'owned' : 'borrowed';
+                return { tag: 'handle-type', val: [BigInt(resId), mode] };
+            }
+            default:
+                throw new Error(`Unhandled AnalysedType kind: ${typ.kind}`);
+        }
+    }
+}
+
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+const fromTsType = (type) => {
+    const analysedTypeEither = fromTsType$1(type);
+    return flatMap(analysedTypeEither, (analysedType) => {
+        const builder = new WitTypeBuilder();
+        builder.add(analysedType);
+        const result = builder.build();
+        return right(result);
+    });
+};
+
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+const agentMethodMetadataRegistry = new Map();
+const AgentMethodMetadataRegistry = {
+    ensureMeta(agentClassName, method) {
+        if (!agentMethodMetadataRegistry.has(agentClassName)) {
+            agentMethodMetadataRegistry.set(agentClassName, new Map());
+        }
+        const classMeta = agentMethodMetadataRegistry.get(agentClassName);
         if (!classMeta.has(method)) {
             classMeta.set(method, {});
         }
     },
     lookup(agentClassName) {
-        return methodMetadata.get(agentClassName);
+        return agentMethodMetadataRegistry.get(agentClassName);
     },
     setPromptName(agentClassName, method, prompt) {
-        MethodMetadata.ensureMeta(agentClassName, method);
-        const classMeta = methodMetadata.get(agentClassName);
+        AgentMethodMetadataRegistry.ensureMeta(agentClassName, method);
+        const classMeta = agentMethodMetadataRegistry.get(agentClassName);
         classMeta.get(method).prompt = prompt;
     },
     setDescription(agentClassName, method, description) {
-        MethodMetadata.ensureMeta(agentClassName, method);
-        const classMeta = methodMetadata.get(agentClassName);
+        AgentMethodMetadataRegistry.ensureMeta(agentClassName, method);
+        const classMeta = agentMethodMetadataRegistry.get(agentClassName);
         classMeta.get(method).description = description;
     },
 };
 
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 function getConstructorDataSchema(classType) {
     const constructorInfos = classType.getConstructors();
     if (constructorInfos.length > 1) {
@@ -3512,8 +3589,8 @@ function getConstructorDataSchema(classType) {
     }
     const constructorSignatureInfo = constructorInfos[0];
     const constructorParamInfos = constructorSignatureInfo.getParameters();
-    const constructorParamTypes = all(constructorParamInfos.map((paramInfo) => constructWitTypeFromTsType(paramInfo.type)));
-    const constructDataSchemaResult = map(constructorParamTypes, (paramType) => {
+    const constructorParamTypes = all$1(constructorParamInfos.map((paramInfo) => fromTsType(paramInfo.type)));
+    const constructDataSchemaResult = map$1(constructorParamTypes, (paramType) => {
         return paramType.map((paramType, idx) => {
             const paramName = constructorParamInfos[idx].name;
             return [
@@ -3525,7 +3602,7 @@ function getConstructorDataSchema(classType) {
             ];
         });
     });
-    return map(constructDataSchemaResult, (nameAndElementSchema) => {
+    return map$1(constructDataSchemaResult, (nameAndElementSchema) => {
         return {
             tag: 'tuple',
             val: nameAndElementSchema,
@@ -3535,12 +3612,13 @@ function getConstructorDataSchema(classType) {
 function getAgentMethodSchema(classType, agentClassName) {
     let filteredType = classType;
     let methodNames = filteredType.getMethods();
-    return all(methodNames.map((methodInfo) => {
+    return all$1(methodNames.map((methodInfo) => {
         const signature = methodInfo.getSignatures()[0];
         const parameters = signature.getParameters();
         const returnType = signature.returnType;
         const methodName = methodInfo.name.toString();
-        const baseMeta = MethodMetadata.lookup(agentClassName)?.get(methodName) ?? {};
+        const baseMeta = AgentMethodMetadataRegistry.lookup(agentClassName)?.get(methodName) ??
+            {};
         const inputSchemaEither = buildInputSchema(parameters);
         if (isLeft(inputSchemaEither)) {
             return left(`Failed to construct input schema for method ${methodName}: ${inputSchemaEither.left}`);
@@ -3561,10 +3639,10 @@ function getAgentMethodSchema(classType, agentClassName) {
     }));
 }
 function buildInputSchema(paramTypes) {
-    const result = all(paramTypes.map((parameterInfo) => map(convertToElementSchema(parameterInfo.type), (result) => {
+    const result = all$1(paramTypes.map((parameterInfo) => map$1(convertToElementSchema(parameterInfo.type), (result) => {
         return [parameterInfo.name, result];
     })));
-    return map(result, (res) => {
+    return map$1(result, (res) => {
         return {
             tag: 'tuple',
             val: res,
@@ -3572,7 +3650,7 @@ function buildInputSchema(paramTypes) {
     });
 }
 function buildOutputSchema(returnType) {
-    return map(convertToElementSchema(returnType), (result) => {
+    return map$1(convertToElementSchema(returnType), (result) => {
         return {
             tag: 'tuple',
             val: [['return-value', result]],
@@ -3580,7 +3658,7 @@ function buildOutputSchema(returnType) {
     });
 }
 function convertToElementSchema(type) {
-    return map(constructWitTypeFromTsType(type), (witType) => {
+    return map$1(fromTsType(type), (witType) => {
         return {
             tag: 'component-model',
             val: witType,
@@ -3685,14 +3763,14 @@ function convertToElementSchema(type) {
  */
 function agent() {
     return function (ctor) {
-        const agentClassName = AgentClassNameConstructor.fromString(ctor.name);
-        if (AgentRegistry.exists(agentClassName)) {
+        const agentClassName = fromString(ctor.name);
+        if (AgentTypeRegistry.exists(agentClassName)) {
             return ctor;
         }
-        let classType = getOrElse$1(TypeMetadata.lookupClassMetadata(agentClassName), () => {
+        let classType = getOrElse(TypeMetadata.lookupClassMetadata(agentClassName), () => {
             throw new Error(`Agent class ${agentClassName} is not registered in TypeMetadata. Please ensure the class is decorated with @agent()`);
         });
-        const constructorDataSchema = getOrElse(getConstructorDataSchema(classType), (err) => {
+        const constructorDataSchema = getOrElse$1(getConstructorDataSchema(classType), (err) => {
             throw new Error('Invalid constructor parameters for the agent: ' + err);
         });
         let filteredType = classType;
@@ -3702,7 +3780,7 @@ function agent() {
             throw new Error(`Failed to get agent method schema for ${agentClassName}: ${methodSchemaEither.left}`);
         }
         const methods = methodSchemaEither.right;
-        const agentName = AgentNameConstructor.fromAgentClassName(agentClassName);
+        const agentName = fromAgentClassName(agentClassName);
         const agentType = {
             typeName: agentName,
             description: agentClassName,
@@ -3715,16 +3793,16 @@ function agent() {
             methods,
             dependencies: [],
         };
-        AgentRegistry.register(agentClassName, agentType);
+        AgentTypeRegistry.register(agentClassName, agentType);
         ctor.createRemote = getRemoteClient(ctor);
         ctor.createLocal = getLocalClient(ctor);
-        AgentInitiatorRegistry.register(AgentNameConstructor.fromAgentClassName(agentClassName), {
+        AgentInitiatorRegistry.register(fromAgentClassName(agentClassName), {
             initiate: (_agentName, constructorParams) => {
                 const constructorInfo = classType.getConstructors()[0];
                 const constructorParamTypes = constructorInfo.getParameters();
                 const constructorParamWitValues = getWitValueFromDataValue(constructorParams);
                 const convertedConstructorArgs = constructorParamWitValues.map((witVal, idx) => {
-                    return constructTsValueFromWitValue(witVal, constructorParamTypes[idx].type);
+                    return toTsValue(witVal, constructorParamTypes[idx].type);
                 });
                 const instance = new ctor(...convertedConstructorArgs);
                 const uniqueAgentId = createUniqueAgentId(agentName);
@@ -3734,13 +3812,17 @@ function agent() {
                         return uniqueAgentId;
                     },
                     getAgentType: () => {
-                        return getOrThrowWith(AgentRegistry.lookup(agentClassName), () => new Error(`Failed to find agent type for ${agentClassName}`));
+                        const agentType = AgentTypeRegistry.lookup(agentClassName);
+                        if (isNone(agentType)) {
+                            throw new Error(`Failed to find agent type for ${agentClassName}. Ensure it is decorated with @agent() and registered properly.`);
+                        }
+                        return agentType.value;
                     },
                     invoke: async (method, args) => {
                         const fn = instance[method];
                         if (!fn)
                             throw new Error(`Method ${method} not found on agent ${agentClassName}`);
-                        const agentTypeOpt = AgentRegistry.lookup(agentClassName);
+                        const agentTypeOpt = AgentTypeRegistry.lookup(agentClassName);
                         if (isNone(agentTypeOpt)) {
                             const error = {
                                 tag: 'invalid-method',
@@ -3758,12 +3840,12 @@ function agent() {
                         const argsWitValues = getWitValueFromDataValue(args);
                         const returnType = methodSignature.returnType;
                         const convertedArgs = argsWitValues.map((witVal, idx) => {
-                            return constructTsValueFromWitValue(witVal, paramTypes[idx].type);
+                            return toTsValue(witVal, paramTypes[idx].type);
                         });
                         const result = await fn.apply(instance, convertedArgs);
                         const methodDef = agentType.methods.find((m) => m.name === method);
                         if (!methodDef) {
-                            const entriesAsStrings = Array.from(AgentRegistry.entries()).map(([key, value]) => `Key: ${key}, Value: ${JSON.stringify(value, null, 2)}`);
+                            const entriesAsStrings = Array.from(AgentTypeRegistry.entries()).map(([key, value]) => `Key: ${key}, Value: ${JSON.stringify(value, null, 2)}`);
                             const error = {
                                 tag: 'invalid-method',
                                 val: `Method ${method} not found in agent type ${agentClassName}. Available methods: ${entriesAsStrings.join(', ')}`,
@@ -3773,7 +3855,7 @@ function agent() {
                                 val: error,
                             };
                         }
-                        const returnValue = constructWitValueFromTsValue(result, returnType);
+                        const returnValue = fromTsValue(result, returnType);
                         if (isLeft(returnValue)) {
                             const agentError = {
                                 tag: 'invalid-method',
@@ -3800,14 +3882,14 @@ function agent() {
 }
 function prompt(prompt) {
     return function (target, propertyKey) {
-        const agentClassName = AgentClassNameConstructor.fromString(target.constructor.name);
-        MethodMetadata.setPromptName(agentClassName, propertyKey, prompt);
+        const agentClassName = fromString(target.constructor.name);
+        AgentMethodMetadataRegistry.setPromptName(agentClassName, propertyKey, prompt);
     };
 }
 function description(desc) {
     return function (target, propertyKey) {
-        const agentClassName = AgentClassNameConstructor.fromString(target.constructor.name);
-        MethodMetadata.setDescription(agentClassName, propertyKey, desc);
+        const agentClassName = fromString(target.constructor.name);
+        AgentMethodMetadataRegistry.setDescription(agentClassName, propertyKey, desc);
     };
 }
 // FIXME: in the next verison, handle all dataValues
@@ -3853,26 +3935,90 @@ function getDataValueFromWitValueReturned(witValues) {
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/// Registry
+/**
+ * Creates a Result with a successful value.
+ * @param val
+ */
+function ok(val) {
+    return { tag: 'ok', val };
+}
+/**
+ * Creates a Result with an error value.
+ * @param val
+ */
+function err(val) {
+    return { tag: 'err', val };
+}
+/**
+ * Maps a Result's value using the provided function if it is an 'ok' Result.
+ * If the Result is an 'err', it returns the Result unchanged.
+ * @param r The Result to map.
+ * @param f The function to apply to the value if it is 'ok'.
+ */
+function map(r, f) {
+    return r.tag === 'ok' ? ok(f(r.val)) : r;
+}
+/**
+ * Maps both the 'ok' and 'err' values of a Result using the provided functions.
+ * If the Result is 'ok', it applies onOk to the value; if 'err', it applies onErr to the error.
+ * @param r The Result to map.
+ * @param onOk The function to apply to the value if it is 'ok'.
+ * @param onErr The function to apply to the error if it is 'err'.
+ */
+function mapBoth(r, onOk, onErr) {
+    return r.tag === 'ok' ? ok(onOk(r.val)) : err(onErr(r.val));
+}
+/**
+ * Combines two Results into one Result containing a tuple of their values.
+ * If either Result is 'err', it returns that error.
+ * @param ra The first Result.
+ * @param rb The second Result.
+ */
+function zipBoth(ra, rb) {
+    if (ra.tag === 'err') {
+        return { tag: 'err', val: ra.val };
+    }
+    if (rb.tag === 'err') {
+        return { tag: 'err', val: rb.val };
+    }
+    return ok([ra.val, rb.val]);
+}
+/**
+ * Combines an array of Results into a single Result containing an array of values.
+ * If any Result is 'err', it returns that error.
+ * @param results An array of Results to combine.
+ */
+function all(results) {
+    const vals = [];
+    for (const r of results) {
+        if (r.tag === 'err')
+            return r;
+        vals.push(r.val);
+    }
+    return ok(vals);
+}
+
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+/// TODO; Try moving Agent registry to the `internal/registry` module
+// Moving `Agent` to other packages resulted in errors at runtime.
+// Need to check this again
 const agents = new Map();
 const UninitiatedAgentErrorMessage = 'Agent is not initialized. Please create an agent first using static function called create';
-const UninitializedAgentError = {
-    tag: 'custom-error',
-    val: {
-        tag: 'tuple',
-        val: [
-            {
-                tag: 'component-model',
-                val: constructWitValueFromValue({
-                    kind: 'string',
-                    value: UninitiatedAgentErrorMessage,
-                }),
-            },
-        ],
-    },
-};
+const UninitializedAgentError = createCustomError(UninitiatedAgentErrorMessage);
 // An error can happen if the user agent is not composed (which will initialize the agent with precompiled wasm)
-function getResolvedAgentOrThrow(resolvedAgent, agentName) {
+function getResolvedAgentOrThrow(resolvedAgent) {
     return getOrThrowWith(resolvedAgent, () => new Error(UninitiatedAgentErrorMessage));
 }
 // Component export
@@ -3881,9 +4027,7 @@ class Agent {
         this.resolvedAgent = none();
     }
     async getId() {
-        return getResolvedAgentOrThrow(this.resolvedAgent)
-            .getId()
-            .toString();
+        return getResolvedAgentOrThrow(this.resolvedAgent).getId().toString();
     }
     async invoke(methodName, input) {
         if (isNone(this.resolvedAgent)) {
@@ -3898,7 +4042,7 @@ class Agent {
         return getResolvedAgentOrThrow(this.resolvedAgent).getDefinition();
     }
     static async create(agentType, input) {
-        const initiator = AgentInitiatorRegistry.lookup(AgentNameConstructor.fromString(agentType));
+        const initiator = AgentInitiatorRegistry.lookup(fromString$1(agentType));
         if (isNone(initiator)) {
             const entries = Array.from(AgentInitiatorRegistry.entries()).map((entry) => entry[0]);
             return {
@@ -3916,12 +4060,10 @@ class Agent {
                 val: agent,
             };
         }
-        else {
-            return {
-                tag: 'err',
-                val: initiateResult.val,
-            };
-        }
+        return {
+            tag: 'err',
+            val: initiateResult.val,
+        };
     }
 }
 async function getAgent(agentType, agentId) {
@@ -3939,14 +4081,19 @@ async function discoverAgents() {
     return Array.from(agents.values());
 }
 async function discoverAgentTypes() {
-    return AgentRegistry.getRegisteredAgents();
+    return AgentTypeRegistry.getRegisteredAgents();
+}
+async function invokeAgent(agentType, agentId, methodName, input) {
+    const agent = await getAgent(agentType, agentId);
+    return agent.invoke(methodName, input);
 }
 const guest = {
     getAgent,
     discoverAgents,
     discoverAgentTypes,
+    invokeAgent,
     Agent,
 };
 
-export { AgentId, BaseAgent, Metadata, agent, agents, description, guest, prompt };
+export { AgentClassName, AgentId, AgentName, BaseAgent, Metadata, TypeMetadata, agent, all, description, err, guest, map, mapBoth, ok, prompt, zipBoth };
 //# sourceMappingURL=index.mjs.map

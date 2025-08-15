@@ -41,23 +41,53 @@ wasi-logger = { version = "0.1.2", default-features = false, optional = true }
 ownership = "owning"
 
 [package.metadata.component.target]
-path = "wit-generated"
 
 [package.metadata.component.target.dependencies]
-"wasi:io" = { path = "wit-generated/deps/io" }
-"wasi:clocks" = { path = "wit-generated/deps/clocks" }
-"golem:rpc" = { path = "wit-generated/deps/golem-rpc" }
-"golem:api" = { path = "wit-generated/deps/golem-1.x" }
-"golem:agent" = { path = "wit-generated/deps/golem-agent" }
-"golem:agent-guest-exports" = { path = "wit-generated/deps/golem_agent-guest-exports" }
-"golem:durability" = { path = "wit-generated/deps/golem-durability" }
-"unused:main" = { path = "wit-generated/deps/all" }
-"wasi:blobstore" = { path = "wit-generated/deps/blobstore" }
-"wasi:filesystem" = { path = "wit-generated/deps/filesystem" }
-"wasi:sockets" = { path = "wit-generated/deps/sockets" }
-"wasi:random" = { path = "wit-generated/deps/random" }
-"wasi:cli" = { path = "wit-generated/deps/cli" }
-"wasi:config" = { path = "wit-generated/deps/config" }
-"wasi:http" = { path = "wit-generated/deps/http" }
-"wasi:keyvalue" = { path = "wit-generated/deps/keyvalue" }
-"wasi:logging" = { path = "wit-generated/deps/logging" }
+
+[package.metadata.component.target.dependencies."wasi:io"]
+path = "wit/deps/io"
+
+[package.metadata.component.target.dependencies."wasi:clocks"]
+path = "wit/deps/clocks"
+
+[package.metadata.component.target.dependencies."golem:rpc"]
+path = "wit/deps/golem-rpc"
+
+[package.metadata.component.target.dependencies."golem:api"]
+path = "wit/deps/golem-1.x"
+
+[package.metadata.component.target.dependencies."golem:agent"]
+path = "wit/deps/golem-agent"
+
+[package.metadata.component.target.dependencies."golem:durability"]
+path = "wit/deps/golem-durability"
+
+[package.metadata.component.target.dependencies."unused:main"]
+path = "wit/deps/all"
+
+[package.metadata.component.target.dependencies."wasi:blobstore"]
+path = "wit/deps/blobstore"
+
+[package.metadata.component.target.dependencies."wasi:filesystem"]
+path = "wit/deps/filesystem"
+
+[package.metadata.component.target.dependencies."wasi:sockets"]
+path = "wit/deps/sockets"
+
+[package.metadata.component.target.dependencies."wasi:random"]
+path = "wit/deps/random"
+
+[package.metadata.component.target.dependencies."wasi:cli"]
+path = "wit/deps/cli"
+
+[package.metadata.component.target.dependencies."wasi:config"]
+path = "wit/deps/config"
+
+[package.metadata.component.target.dependencies."wasi:http"]
+path = "wit/deps/http"
+
+[package.metadata.component.target.dependencies."wasi:keyvalue"]
+path = "wit/deps/keyvalue"
+
+[package.metadata.component.target.dependencies."wasi:logging"]
+path = "wit/deps/logging"

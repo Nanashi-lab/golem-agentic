@@ -417,6 +417,8 @@ for crate::bindings::golem::rpc::types::NamedWitTypeNode {
         let obj = rquickjs::Object::new(ctx.clone())?;
         let name: Option<String> = self.name.map(|v| v);
         obj.set("name", name)?;
+        let owner: Option<String> = self.owner.map(|v| v);
+        obj.set("owner", owner)?;
         let type_: crate::bindings::golem::rpc::types::WitTypeNode = self.type_;
         obj.set("type", type_)?;
         Ok(obj.into_value())
@@ -431,9 +433,11 @@ for crate::bindings::golem::rpc::types::NamedWitTypeNode {
         let obj = rquickjs::Object::from_value(value)?;
         let name: Option<String> = obj.get("name")?;
         let name: Option<String> = name.map(|v| v);
+        let owner: Option<String> = obj.get("owner")?;
+        let owner: Option<String> = owner.map(|v| v);
         let type_: crate::bindings::golem::rpc::types::WitTypeNode = obj.get("type")?;
         let type_: crate::bindings::golem::rpc::types::WitTypeNode = type_;
-        Ok(Self { name, type_ })
+        Ok(Self { name, owner, type_ })
     }
 }
 impl<'js> rquickjs::IntoJs<'js> for crate::bindings::golem::rpc::types::WitType {
@@ -1435,6 +1439,40 @@ impl<'js> rquickjs::FromJs<'js> for crate::bindings::golem::api::host::WorkerEnv
     }
 }
 impl<'js> rquickjs::IntoJs<'js>
+for crate::bindings::golem::api::host::WorkerWasiConfigVarsFilter {
+    fn into_js(
+        self,
+        ctx: &rquickjs::Ctx<'js>,
+    ) -> rquickjs::Result<rquickjs::Value<'js>> {
+        let obj = rquickjs::Object::new(ctx.clone())?;
+        let name: String = self.name;
+        obj.set("name", name)?;
+        let comparator: crate::bindings::golem::api::host::StringFilterComparator = self
+            .comparator;
+        obj.set("comparator", comparator)?;
+        let value: String = self.value;
+        obj.set("value", value)?;
+        Ok(obj.into_value())
+    }
+}
+impl<'js> rquickjs::FromJs<'js>
+for crate::bindings::golem::api::host::WorkerWasiConfigVarsFilter {
+    fn from_js(
+        _ctx: &rquickjs::Ctx<'js>,
+        value: rquickjs::Value<'js>,
+    ) -> rquickjs::Result<Self> {
+        let obj = rquickjs::Object::from_value(value)?;
+        let name: String = obj.get("name")?;
+        let name: String = name;
+        let comparator: crate::bindings::golem::api::host::StringFilterComparator = obj
+            .get("comparator")?;
+        let comparator: crate::bindings::golem::api::host::StringFilterComparator = comparator;
+        let value: String = obj.get("value")?;
+        let value: String = value;
+        Ok(Self { name, comparator, value })
+    }
+}
+impl<'js> rquickjs::IntoJs<'js>
 for crate::bindings::golem::api::host::WorkerPropertyFilter {
     fn into_js(
         self,
@@ -1467,6 +1505,13 @@ for crate::bindings::golem::api::host::WorkerPropertyFilter {
             crate::bindings::golem::api::host::WorkerPropertyFilter::Env(inner) => {
                 obj.set(crate::wrappers::TAG, "env")?;
                 let case_value: crate::bindings::golem::api::host::WorkerEnvFilter = inner;
+                obj.set(crate::wrappers::VALUE, case_value)?;
+            }
+            crate::bindings::golem::api::host::WorkerPropertyFilter::WasiConfigVars(
+                inner,
+            ) => {
+                obj.set(crate::wrappers::TAG, "wasi-config-vars")?;
+                let case_value: crate::bindings::golem::api::host::WorkerWasiConfigVarsFilter = inner;
                 obj.set(crate::wrappers::VALUE, case_value)?;
             }
         }
@@ -1518,6 +1563,15 @@ for crate::bindings::golem::api::host::WorkerPropertyFilter {
                 let inner: crate::bindings::golem::api::host::WorkerEnvFilter = obj
                     .get(crate::wrappers::VALUE)?;
                 Ok(crate::bindings::golem::api::host::WorkerPropertyFilter::Env(inner))
+            }
+            "wasi-config-vars" => {
+                let inner: crate::bindings::golem::api::host::WorkerWasiConfigVarsFilter = obj
+                    .get(crate::wrappers::VALUE)?;
+                Ok(
+                    crate::bindings::golem::api::host::WorkerPropertyFilter::WasiConfigVars(
+                        inner,
+                    ),
+                )
             }
             _ => {
                 Err(
@@ -1607,6 +1661,12 @@ impl<'js> rquickjs::IntoJs<'js> for crate::bindings::golem::api::host::WorkerMet
             .map(|v| rquickjs::convert::List((v.0, v.1)))
             .collect::<Vec<_>>();
         obj.set("env", env)?;
+        let wasi_config_vars: Vec<rquickjs::convert::List<(String, String)>> = self
+            .wasi_config_vars
+            .into_iter()
+            .map(|v| rquickjs::convert::List((v.0, v.1)))
+            .collect::<Vec<_>>();
+        obj.set("wasiConfigVars", wasi_config_vars)?;
         let status: crate::bindings::golem::api::host::WorkerStatus = self.status;
         obj.set("status", status)?;
         let component_version: crate::internal::BigIntWrapper<u64> = crate::internal::BigIntWrapper(
@@ -1636,6 +1696,12 @@ impl<'js> rquickjs::FromJs<'js> for crate::bindings::golem::api::host::WorkerMet
             .into_iter()
             .map(|v| (v.0.0, v.0.1))
             .collect::<Vec<_>>();
+        let wasi_config_vars: Vec<rquickjs::convert::List<(String, String)>> = obj
+            .get("wasiConfigVars")?;
+        let wasi_config_vars: Vec<(String, String)> = wasi_config_vars
+            .into_iter()
+            .map(|v| (v.0.0, v.0.1))
+            .collect::<Vec<_>>();
         let status: crate::bindings::golem::api::host::WorkerStatus = obj.get("status")?;
         let status: crate::bindings::golem::api::host::WorkerStatus = status;
         let component_version: crate::internal::BigIntWrapper<u64> = obj
@@ -1647,6 +1713,7 @@ impl<'js> rquickjs::FromJs<'js> for crate::bindings::golem::api::host::WorkerMet
             worker_id,
             args,
             env,
+            wasi_config_vars,
             status,
             component_version,
             retry_count,
@@ -2574,7 +2641,7 @@ impl<'js> rquickjs::IntoJs<'js> for crate::bindings::golem::agent::common::Agent
             }
             crate::bindings::golem::agent::common::AgentError::CustomError(inner) => {
                 obj.set(crate::wrappers::TAG, "custom-error")?;
-                let case_value: crate::bindings::golem::agent::common::DataValue = inner;
+                let case_value: crate::bindings::golem::rpc::types::ValueAndType = inner;
                 obj.set(crate::wrappers::VALUE, case_value)?;
             }
         }
@@ -2618,7 +2685,7 @@ impl<'js> rquickjs::FromJs<'js> for crate::bindings::golem::agent::common::Agent
                 )
             }
             "custom-error" => {
-                let inner: crate::bindings::golem::agent::common::DataValue = obj
+                let inner: crate::bindings::golem::rpc::types::ValueAndType = obj
                     .get(crate::wrappers::VALUE)?;
                 Ok(crate::bindings::golem::agent::common::AgentError::CustomError(inner))
             }

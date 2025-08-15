@@ -501,6 +501,7 @@ export function fromTsType(type: TsType): Either.Either<AnalysedType, string> {
       return Either.map(fromTsType(elementType), list)
 
     default:
-      return Either.left(`The following type is not supported as argument or return type in agentic context ${type.displayName}`);
+      return Either.left(`The following type is not supported as argument or return type in agentic context. Type Display Name: ${type.displayName}. Type Name: ${type.name}, Type ID: ${type.id}. Please report this issue to Golem Cloud. \n Additional info: ${type}`);
+
   }
 }

@@ -185,6 +185,28 @@ impl crate::bindings::exports::golem::agent::guest::Guest for Component {
             result
         })
     }
+    fn invoke_agent(
+        agent_type: String,
+        agent_id: String,
+        method_name: String,
+        input: crate::bindings::exports::golem::agent::guest::DataValue,
+    ) -> Result<
+        crate::bindings::exports::golem::agent::guest::DataValue,
+        crate::bindings::exports::golem::agent::guest::AgentError,
+    > {
+        crate::internal::async_exported_function(async move {
+            let result: crate::wrappers::JsResult<
+                crate::bindings::golem::agent::common::DataValue,
+                crate::bindings::golem::agent::common::AgentError,
+            > = crate::internal::call_js_export(
+                    "golem:agent",
+                    &["guest", "invokeAgent"],
+                    crate::wrappers::JsArgs((agent_type, agent_id, method_name, input)),
+                )
+                .await;
+            result.0
+        })
+    }
     fn discover_agents() -> Vec<crate::bindings::exports::golem::agent::guest::Agent> {
         crate::internal::async_exported_function(async move {
             let result: Vec<crate::bindings::exports::golem::agent::guest::Agent> = crate::internal::call_js_export(

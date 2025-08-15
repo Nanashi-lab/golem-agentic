@@ -3,9 +3,8 @@ import {
     agent,
     prompt,
     description,
+    Either, AgentId,
 } from '@golemcloud/golem-ts-sdk';
-
-import * as Either from '@golemcloud/golem-ts-sdk';
 
 type Question = {
     text: string
@@ -20,7 +19,7 @@ type Loc = Location | LocationName;
 class AssistantAgent extends BaseAgent {
     @prompt("Ask your question")
     @description("This method allows the agent to answer your question")
-    async ask(question: Question): Promise<string> {
+    async ask(question: Question, agentId: Either<string, string>): Promise<string> {
         console.log(question);
 
         const location: Loc = { lat: 12.34, long: 56.78 };
@@ -31,10 +30,7 @@ class AssistantAgent extends BaseAgent {
         const localWeatherClient = WeatherAgent.createLocal("afsal");
         const localWeather = await localWeatherClient.getWeather(location);
 
-        return (
-            `Remote agent result: ${remoteWeather}\n` +
-            `Local agent result: ${localWeather}\n`
-        );
+        throw new Error(localWeather);
     }
 }
 
@@ -49,12 +45,9 @@ class WeatherAgent extends BaseAgent {
 
     @prompt("Get weather")
     @description("Weather forecast weather for you")
-    async getWeather(location: Location): Promise<Either.Either<string, string>> {
+    async getWeather(location: Location): Promise<string> {
         return Promise.resolve(
-            Either.ok(
-                `Hi ${this.userName} ! Weather in ${location} is sunny. ` +
-                `Reported by weather-agent ${this.getId()}. `
-            )
+            `Weather for ${location.lat}, ${location.long} is sunny!`
         );
     }
 }

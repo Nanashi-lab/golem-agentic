@@ -1,6 +1,6 @@
 import { Metadata, prompt, description, agent, BaseAgent } from '@golemcloud/golem-ts-sdk';
 
-function add(library, stripInternals) { library.addMetadata({ name: "", id: "@ts-user/src/index", children: ["@@golemcloud/golem-ts-sdk", "@@golemcloud/golem-ts-sdk", "@@golemcloud/golem-ts-sdk", "@@golemcloud/golem-ts-sdk", "@@golemcloud/golem-ts-sdk"], types: [{ kind: 62, name: "__type", properties: [{ name: "a", type: "#String", flags: 0 }, { name: "b", type: "#Number", flags: 0 }], methods: [], indexes: [], id: "@ts-user/src/index:$129" }, { name: "AliasedType", kind: 70, target: "@ts-user/src/index:$129", id: "@ts-user/src/index:AliasedType" }, { kind: 64, name: "AssistantAgent", methods: [{ name: "ask", signatures: [{ parameters: [{ name: "name", type: "#String", flags: 0 }, { name: "b", type: "@@golemcloud/golem-ts-sdk:Either{#String,#Number}", flags: 0 }], returnType: "#Promise{#String}" }], decorators: [{ id: "@@golemcloud/golem-ts-sdk:prompt", name: "prompt", args: ["Ask your question"] }, { id: "@@golemcloud/golem-ts-sdk:description", name: "description", args: ["This method allows the agent to answer your question"] }], flags: 0 }], indexes: [], constructors: [{ returnType: "#void" }], extends: "@@golemcloud/golem-ts-sdk:BaseAgent", decorators: [{ id: "@@golemcloud/golem-ts-sdk:agent", name: "agent", args: [] }], id: "@ts-user/src/index:AssistantAgent" }, { kind: 64, name: "WeatherAgent", properties: [{ name: "userName", type: "#String", flags: 8 }], methods: [{ name: "getWeather", signatures: [{ parameters: [{ name: "name", type: "#String", flags: 0 }, { name: "param2", type: "@ts-user/src/index:CustomData", flags: 0 }], returnType: "#Promise{#String}" }], decorators: [{ id: "@@golemcloud/golem-ts-sdk:prompt", name: "prompt", args: ["Get weather"] }, { id: "@@golemcloud/golem-ts-sdk:description", name: "description", args: ["Weather forecast weather for you"] }], flags: 0 }], indexes: [], constructors: [{ returnType: "#void", parameters: [{ name: "username", type: "#String", flags: 0 }] }], extends: "@@golemcloud/golem-ts-sdk:BaseAgent", decorators: [{ id: "@@golemcloud/golem-ts-sdk:agent", name: "agent", args: [] }], id: "@ts-user/src/index:WeatherAgent" }, { kind: 63, name: "CustomData", properties: [{ name: "data", type: "#String", flags: 0 }, { name: "value", type: "#Number", flags: 0 }], methods: [], indexes: [], id: "@ts-user/src/index:CustomData" }] }, stripInternals); }
+function add(library, stripInternals) { library.addMetadata({ name: "", id: "@ts-user/src/index", children: ["@@golemcloud/golem-ts-sdk", "@@golemcloud/golem-ts-sdk", "@@golemcloud/golem-ts-sdk", "@@golemcloud/golem-ts-sdk", "@@golemcloud/golem-ts-sdk", "@@golemcloud/golem-ts-sdk"], types: [{ kind: 62, name: "__type", properties: [{ name: "text", type: "#String", flags: 0 }], methods: [], indexes: [], id: "@ts-user/src/index:$136" }, { name: "Question", kind: 70, target: "@ts-user/src/index:$136", id: "@ts-user/src/index:Question" }, { kind: 62, name: "__type", properties: [{ name: "lat", type: "#Number", flags: 0 }, { name: "long", type: "#Number", flags: 0 }], methods: [], indexes: [], id: "@ts-user/src/index:$174" }, { kind: 62, name: "Location", properties: [{ name: "lat", type: "#Number", flags: 0 }, { name: "long", type: "#Number", flags: 0 }], methods: [], indexes: [], id: "@ts-user/src/index:Location" }, { name: "LocationName", kind: 70, target: "#String", id: "@ts-user/src/index:LocationName" }, { kind: 65, types: ["#String", "@ts-user/src/index:Location"], id: "#|{@ts-user/src/index:Location,@ts-user/src/index:LocationName}" }, { name: "Loc", kind: 70, target: "#|{@ts-user/src/index:Location,@ts-user/src/index:LocationName}", id: "@ts-user/src/index:Loc" }, { kind: 64, name: "AssistantAgent", methods: [{ name: "ask", signatures: [{ parameters: [{ name: "question", type: "@ts-user/src/index:Question", flags: 0 }, { name: "agentId", type: "@@golemcloud/golem-ts-sdk:Either{#String,#String}", flags: 0 }], returnType: "#Promise{#String}" }], decorators: [{ id: "@@golemcloud/golem-ts-sdk:prompt", name: "prompt", args: ["Ask your question"] }, { id: "@@golemcloud/golem-ts-sdk:description", name: "description", args: ["This method allows the agent to answer your question"] }], flags: 0 }], indexes: [], constructors: [{ returnType: "#void" }], extends: "@@golemcloud/golem-ts-sdk:BaseAgent", decorators: [{ id: "@@golemcloud/golem-ts-sdk:agent", name: "agent", args: [] }], id: "@ts-user/src/index:AssistantAgent" }, { kind: 64, name: "WeatherAgent", properties: [{ name: "userName", type: "#String", flags: 8 }], methods: [{ name: "getWeather", signatures: [{ parameters: [{ name: "location", type: "@ts-user/src/index:Location", flags: 0 }], returnType: "#Promise{#String}" }], decorators: [{ id: "@@golemcloud/golem-ts-sdk:prompt", name: "prompt", args: ["Get weather"] }, { id: "@@golemcloud/golem-ts-sdk:description", name: "description", args: ["Weather forecast weather for you"] }], flags: 0 }], indexes: [], constructors: [{ returnType: "#void", parameters: [{ name: "username", type: "#String", flags: 0 }] }], extends: "@@golemcloud/golem-ts-sdk:BaseAgent", decorators: [{ id: "@@golemcloud/golem-ts-sdk:agent", name: "agent", args: [] }], id: "@ts-user/src/index:WeatherAgent" }] }, stripInternals); }
 
 var $0 = /*#__PURE__*/Object.freeze({
     __proto__: null,
@@ -54,23 +54,21 @@ typeof SuppressedError === "function" ? SuppressedError : function (error, suppr
 };
 
 let AssistantAgent = class AssistantAgent extends BaseAgent {
-    async ask(name, b) {
-        const customData = { data: "Sample data", value: 42 };
-        // Can be used after solving https://github.com/golemcloud/wasm-rquickjs/issues/2
-        // const remoteWeatherClient = WeatherAgent.createRemote("");
-        // const remoteWeather = await remoteWeatherClient.getWeather(name, customData);
+    async ask(question, agentId) {
+        console.log(question);
+        const location = { lat: 12.34, long: 56.78 };
+        const remoteWeatherClient = WeatherAgent.createRemote("afsal");
+        await remoteWeatherClient.getWeather(location);
         const localWeatherClient = WeatherAgent.createLocal("afsal");
-        const localWeather = await localWeatherClient.getWeather(name, customData);
-        return (`Hello! I'm the assistant agent (${this.getId()}) reporting on the weather in ${name}. ` +
-            `Here’s what the weather agent says: "\n${localWeather}\n". ` +
-            `Info retrieved using weather agent (${localWeatherClient.getId()}).`);
+        const localWeather = await localWeatherClient.getWeather(location);
+        throw new Error(localWeather);
     }
 };
 __decorate([
     prompt("Ask your question"),
     description("This method allows the agent to answer your question"),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AssistantAgent.prototype, "ask", null);
 AssistantAgent = __decorate([
@@ -81,16 +79,15 @@ let WeatherAgent = class WeatherAgent extends BaseAgent {
         super();
         this.userName = username;
     }
-    async getWeather(name, param2) {
-        return Promise.resolve(`Hi ${this.userName} Weather in ${name} is sunny. Params passed: ${name} ${JSON.stringify(param2)}. ` +
-            `Computed by weather-agent ${this.getId()}. `);
+    async getWeather(location) {
+        return Promise.resolve(`Weather for ${location.lat}, ${location.long} is sunny!`);
     }
 };
 __decorate([
     prompt("Get weather"),
     description("Weather forecast weather for you"),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], WeatherAgent.prototype, "getWeather", null);
 WeatherAgent = __decorate([

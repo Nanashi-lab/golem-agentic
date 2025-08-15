@@ -26,8 +26,6 @@ class AssistantAgent extends BaseAgent {
     @description("This method allows the agent to answer your question")
     async ask(question: Question): Promise<string> {
         
-        console.log(question);
-        
         const location: Loc = { lat: 12.34, long: 56.78 };
 
         const remoteWeatherClient = WeatherAgent.createRemote("afsal");
