@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Either } from '../src/newTypes/Either';
+import { Either } from '../src/newTypes/either';
 
 // DO NOT RENAME INTERFACES OR PROPERTIES.
 // These names are introspected using RTTIST metadata reflection
