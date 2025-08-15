@@ -107,7 +107,7 @@ export function zipBoth<A, B, E>(
  * If any Result is 'err', it returns that error.
  * @param results An array of Results to combine.
  */
-export function allResults<T, E>(results: Either<T, E>[]): Either<T[], E> {
+export function all<T, E>(results: Either<T, E>[]): Either<T[], E> {
   const vals: T[] = [];
   for (const r of results) {
     if (r.tag === 'err') return r;

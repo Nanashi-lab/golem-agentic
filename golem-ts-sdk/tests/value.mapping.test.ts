@@ -41,7 +41,7 @@ import {
 import * as fc from 'fast-check';
 import { Type } from 'rttist';
 import * as EffectEither from 'effect/Either';
-import * as Either from '../src/newTypes/Either';
+import { Either, ok } from '../src/newTypes/either';
 import * as WitValue from '../src/internal/mapping/values/WitValue';
 
 describe('typescript value to wit value round-trip conversions', () => {
@@ -213,7 +213,7 @@ describe('typescript value to wit value round-trip conversions', () => {
         i: ['', 0, { a: '', b: 0, c: false }],
         j: new Map<string, number>(),
         k: { n: 0 },
-        l: Either.ok(1),
+        l: ok(1),
       },
     };
 
@@ -257,7 +257,7 @@ describe('typescript value to wit value round-trip conversions', () => {
         i: ['', 0, { a: '', b: 0, c: false }],
         j: new Map<string, number>(),
         k: { n: 0 },
-        l: Either.ok(1),
+        l: ok(1),
       },
     };
 
