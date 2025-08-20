@@ -54,6 +54,16 @@ async function initialize(
   agentType: string,
   input: DataValue,
 ): Promise<Result<void, AgentError>> {
+  // There shouldn't be a need to re-initialize an agent in a container.
+  // If the input (DataValue) differs in a re-initialization, then that shouldn't be a routed
+  // to this already-initialized container too.
+  if (Option.isSome(resolvedAgent)) {
+    return {
+      tag: 'err',
+      val: createCustomError(`Agent is already initialized in this container`),
+    };
+  }
+
   const initiator = AgentInitiatorRegistry.lookup(
     AgentName.fromString(agentType),
   );

@@ -16,7 +16,9 @@ import { AgentName } from '../../newTypes/AgentName';
 import * as Option from 'effect/Option';
 import { AgentInitiator } from '../agentInitiator';
 
-// Note that agentRegistry is in index.ts
+// Although only 1 agent can exist max in a container,
+// the container still keeps track of initiators of all agent classes
+// in the user code
 const agentInitiators = new Map<AgentName, AgentInitiator>();
 
 export const AgentInitiatorRegistry = {
@@ -26,10 +28,6 @@ export const AgentInitiatorRegistry = {
 
   lookup(agentName: AgentName): Option.Option<AgentInitiator> {
     return Option.fromNullable(agentInitiators.get(agentName));
-  },
-
-  has(agentName: AgentName): boolean {
-    return agentInitiators.has(agentName);
   },
 
   entries(): IterableIterator<[AgentName, AgentInitiator]> {
