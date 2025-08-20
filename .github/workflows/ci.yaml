@@ -28,6 +28,14 @@ jobs:
         run: |
           npm install
 
+      - name: WIT update code quality
+        working-directory: ./golem-ts-sdk
+        run: |
+          npm run wit-update || (
+            echo "Failed to update WIT"
+            exit 1
+          )          
+
       - name: Check code quality
         working-directory: ./golem-ts-sdk
         run: |
