@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { TypeMetadata } from '../typeMetadata';
-import { ClassType } from 'rttist';
+import { ClassType, Type } from 'rttist';
 import { WasmRpc, WorkerId } from 'golem:rpc/types@0.2.2';
 import { ComponentId, getSelfMetadata } from 'golem:api/host@1.1.7';
 import * as Either from 'effect/Either';
@@ -45,104 +45,122 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
 
     const metadata = metadataOpt.value;
 
-    const workerId = getWorkerId(agentTypeName, args);
-
-    // WasmRPC invoke
-    const rpc = new WasmRpc(workerId);
-
-    const signature = (metadata as ClassType).getConstructors()[0];
-
-    const constructorParamInfo = signature.getParameters();
-    const constructorParamTypes = constructorParamInfo.map(
-      (param) => param.type,
-    );
-
-    const constructorParamWitValuesResult = Either.all(
-      args.map((arg, index) => {
-        const typ = constructorParamTypes[index];
-        return WitValue.fromTsValue(arg, typ);
-      }),
-    );
-
-    if (Either.isLeft(constructorParamWitValuesResult)) {
-      throw new Error(
-        'Failed to create remote agent: ' +
-          JSON.stringify(constructorParamWitValuesResult.left),
-      );
-    }
-
-    const agentTypeNameValue: Value.Value = {
-      kind: 'string',
-      value: agentTypeName,
-    };
-
-    let witValues = [
-      Value.toWitValue(agentTypeNameValue),
-      ...constructorParamWitValuesResult.right,
-    ];
-
-    const initResult = rpc.invokeAndAwait(`agent.{initialize}`, witValues);
-
-    if (initResult.tag === 'err') {
-      throw new Error(
-        'Failed to initialize remote agent: ' + JSON.stringify(initResult.val),
-      );
-    }
+    const workerId = initializeClient(agentClassName, args, metadata);
 
     return new Proxy(instance, {
       get(target, prop) {
         const val = target[prop];
 
         if (typeof val === 'function') {
-          const signature = (metadata as ClassType)
-            .getMethod(prop)
-            ?.getSignatures()[0]!;
-
-          const paramInfo = signature.getParameters();
-          const returnType = signature.returnType;
-
-          return (...fnArgs: any[]) => {
-            const functionName = `${agentTypeName}.{${prop.toString()}}`;
-
-            const parameterWitValuesEither = Either.all(
-              fnArgs.map((fnArg, index) => {
-                const typ = paramInfo[index].type;
-                return WitValue.fromTsValue(fnArg, typ);
-              }),
-            );
-
-            const parameterWitValues = Either.isLeft(parameterWitValuesEither)
-              ? (() => {
-                  throw new Error(
-                    'Failed to create remote agent: ' +
-                      JSON.stringify(parameterWitValuesEither.left),
-                  );
-                })()
-              : parameterWitValuesEither.right;
-
-            const rpcForInvokeMethod = new WasmRpc(workerId);
-
-            const rpcResult = rpcForInvokeMethod.invokeAndAwait(
-              functionName,
-              parameterWitValues,
-            );
-
-            const rpcWitValue =
-              rpcResult.tag === 'err'
-                ? (() => {
-                    throw new Error(
-                      'Failed to invoke function: ' +
-                        JSON.stringify(rpcResult.val),
-                    );
-                  })()
-                : rpcResult.val;
-
-            return WitValue.toTsValue(rpcWitValue, returnType);
-          };
+          return getMethodProxy(metadata, prop, agentTypeName, workerId);
         }
         return val;
       },
     });
+  };
+}
+
+// Initialize client simply does a rpc-invoke on the initialize function of the remote agent
+function initializeClient(
+  agentClassName: AgentClassName.AgentClassName,
+  constructorArgs: any[],
+  classMetadata: Type,
+): WorkerId {
+  const agentTypeName = AgentTypeName.fromAgentClassName(agentClassName);
+
+  const workerId = getWorkerId(agentTypeName, constructorArgs);
+
+  const rpc = new WasmRpc(workerId);
+
+  const signature = (classMetadata as ClassType).getConstructors()[0];
+
+  const constructorParamInfo = signature.getParameters();
+  const constructorParamTypes = constructorParamInfo.map((param) => param.type);
+
+  const constructorParamWitValuesResult = Either.all(
+    constructorArgs.map((arg, index) => {
+      const typ = constructorParamTypes[index];
+      return WitValue.fromTsValue(arg, typ);
+    }),
+  );
+
+  if (Either.isLeft(constructorParamWitValuesResult)) {
+    throw new Error(
+      'Failed to create remote agent: ' +
+        JSON.stringify(constructorParamWitValuesResult.left),
+    );
+  }
+
+  const agentTypeNameValue: Value.Value = {
+    kind: 'string',
+    value: agentTypeName,
+  };
+
+  let witValues = [
+    Value.toWitValue(agentTypeNameValue),
+    ...constructorParamWitValuesResult.right,
+  ];
+
+  const initResult = rpc.invokeAndAwait(`agent.{initialize}`, witValues);
+
+  if (initResult.tag === 'err') {
+    throw new Error(
+      'Failed to initialize remote agent: ' + JSON.stringify(initResult.val),
+    );
+  }
+
+  return workerId;
+}
+
+function getMethodProxy(
+  classMetadata: Type,
+  prop: string | symbol,
+  agentTypeName: AgentTypeName.AgentTypeName,
+  workerId: WorkerId,
+) {
+  const methodSignature = (classMetadata as ClassType)
+    .getMethod(prop)
+    ?.getSignatures()[0]!;
+
+  const paramInfo = methodSignature.getParameters();
+  const returnType = methodSignature.returnType;
+
+  return (...fnArgs: any[]) => {
+    const functionName = `${agentTypeName}.{${prop.toString()}}`;
+
+    const parameterWitValuesEither = Either.all(
+      fnArgs.map((fnArg, index) => {
+        const typ = paramInfo[index].type;
+        return WitValue.fromTsValue(fnArg, typ);
+      }),
+    );
+
+    const parameterWitValues = Either.isLeft(parameterWitValuesEither)
+      ? (() => {
+          throw new Error(
+            'Failed to create remote agent: ' +
+              JSON.stringify(parameterWitValuesEither.left),
+          );
+        })()
+      : parameterWitValuesEither.right;
+
+    const rpcForInvokeMethod = new WasmRpc(workerId);
+
+    const rpcResult = rpcForInvokeMethod.invokeAndAwait(
+      functionName,
+      parameterWitValues,
+    );
+
+    const rpcWitValue =
+      rpcResult.tag === 'err'
+        ? (() => {
+            throw new Error(
+              'Failed to invoke function: ' + JSON.stringify(rpcResult.val),
+            );
+          })()
+        : rpcResult.val;
+
+    return WitValue.toTsValue(rpcWitValue, returnType);
   };
 }
 
