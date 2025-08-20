@@ -19,7 +19,6 @@ import { TypeMetadata } from './typeMetadata';
 import { ClassType, ParameterInfo, Type } from 'rttist';
 import { getRemoteClient } from './internal/clientGeneration';
 import { BaseAgent } from './baseAgent';
-import { createUniqueAgentId } from './internal/agentInstanceSequence';
 import { AgentTypeRegistry } from './internal/registry/agentTypeRegistry';
 import * as WitValue from './internal/mapping/values/WitValue';
 import * as Either from 'effect/Either';
@@ -32,6 +31,9 @@ import { AgentMethodMetadataRegistry } from './internal/registry/agentMethodMeta
 import * as AgentClassName from './newTypes/AgentClassName';
 import * as AgentName from './newTypes/AgentName';
 import { AgentInitiatorRegistry } from './internal/registry/agentInitiatorRegistry';
+import { getSelfMetadata } from 'golem:api/host@1.1.7';
+import { AgentId } from './agentId';
+import { createCustomError } from './internal/agentError';
 
 /**
  * Marks a class as an Agent and registers it in the global agent registry.
@@ -177,7 +179,7 @@ export function agent() {
     AgentInitiatorRegistry.register(
       AgentName.fromAgentClassName(agentClassName),
       {
-        initiate: (_agentName: string, constructorParams: DataValue) => {
+        initiate: (agentName: string, constructorParams: DataValue) => {
           const constructorInfo = (classType as ClassType).getConstructors()[0];
 
           const constructorParamTypes: readonly ParameterInfo[] =
@@ -197,7 +199,24 @@ export function agent() {
 
           const instance = new ctor(...convertedConstructorArgs);
 
-          const uniqueAgentId = createUniqueAgentId(agentName);
+          const containerName = getSelfMetadata().workerId.workerName;
+
+          if (!containerName.startsWith(agentName)) {
+            const error = createCustomError(
+              `Expected the container name in which the agent is initiated to start with "${agentName}", but got "${containerName}"`,
+            );
+
+            return {
+              tag: 'err',
+              val: error,
+            };
+          }
+
+          // When an agent is initiated using an initializer,
+          // it runs in a worker, and the name of the worker is in-fact the agent-id
+          // Example: weather-agent-{"US", celsius}
+          const uniqueAgentId = new AgentId(containerName);
+
           (instance as BaseAgent).getId = () => uniqueAgentId;
 
           const agentInternal: AgentInternal = {

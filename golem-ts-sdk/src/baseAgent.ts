@@ -23,12 +23,12 @@ import * as AgentClassName from './newTypes/AgentClassName';
  *
  * All agents must extend this class and **must** be decorated with the `@Agent()` decorator.
  * Do **not** need to override the methods and manually implement them in this class.
- * The `@Agent()` decorator handles all runtime wiring (e.g., `getId()`, `createRemote()`, etc.).
+ * The `@agent()` decorator handles all runtime wiring (e.g., `getId()`, `createRemote()`, etc.).
  *
  * Example usage:
  *
  * ```ts
- * @Agent()
+ * @agent()
  * class AssistantAgent extends BaseAgent {
  *   @Prompt("Ask your question")
  *   @Description("This method allows the agent to answer your question")
@@ -42,7 +42,7 @@ export class BaseAgent {
   /**
    * Returns the unique `AgentId` for this agent instance.
    *
-   * This is automatically populated by the `@Agent()` decorator at runtime.
+   * This is automatically populated by the `@agent()` decorator at runtime.
    *
    * @throws Will throw if accessed before the agent is initialized.
    */
