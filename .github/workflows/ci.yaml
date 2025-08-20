@@ -31,7 +31,7 @@ jobs:
         run: |
           npm install
 
-      - name: WIT update code quality
+      - name: Run WIT update
         working-directory: ./golem-ts-sdk
         run: |
           npm run wit-update || (
