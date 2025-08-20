@@ -12,100 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Metadata, TypeMetadata } from '../typeMetadata';
+import { Metadata } from '../typeMetadata';
 import { ClassType } from 'rttist';
 import { WasmRpc, WorkerId } from 'golem:rpc/types@0.2.2';
 import { ComponentId, getSelfMetadata } from 'golem:api/host@1.1.7';
-import { DataValue } from 'golem:agent/common';
 import * as Either from 'effect/Either';
-import * as Option from 'effect/Option';
-import * as AgentClassName from '../newTypes/AgentClassName';
-import * as AgentName from '../newTypes/AgentName';
 import * as Value from './mapping/values/Value';
-import { AgentInitiatorRegistry } from './registry/agentInitiatorRegistry';
 import * as WitValue from './mapping/values/WitValue';
-
-export function getLocalClient<T extends new (...args: any[]) => any>(ctor: T) {
-  return (...args: any[]) => {
-    const agentClassName = AgentClassName.fromString(ctor.name);
-
-    const agentInitiator = Option.getOrThrowWith(
-      AgentInitiatorRegistry.lookup(
-        AgentName.fromAgentClassName(agentClassName),
-      ),
-      () => {
-        new Error(
-          `Failed to find agent initiator for agent class: ${agentClassName}`,
-        );
-      },
-    );
-
-    const classMetadata = Option.getOrThrowWith(
-      TypeMetadata.lookupClassMetadata(agentClassName),
-      () => {
-        new Error(`Failed to find metadata for agent class: ${agentClassName}`);
-      },
-    );
-
-    const constructor = (classMetadata as ClassType).getConstructors()[0];
-
-    const parameters = constructor.getParameters();
-
-    const parameterWitValuesResult = Either.all(
-      args.map((fnArg, index) => {
-        const typ = parameters[index].type;
-        return WitValue.fromTsValue(fnArg, typ);
-      }),
-    );
-
-    // There is no big advantage of returning a Result here,
-    // and gives bad experience to the users:
-    // `MyAgent.createLocal` should just give a normal error.
-    // If they want to handle errors, they can use `Either` or `Result` or try-catch.
-    const parameterWitValues = Either.isLeft(parameterWitValuesResult)
-      ? (() => {
-          throw new Error(
-            'Failed to create a local agent' +
-              JSON.stringify(parameterWitValuesResult.left),
-          );
-        })()
-      : parameterWitValuesResult.right;
-
-    // Currently handling only wit value
-    const dataValue: DataValue = {
-      tag: 'tuple',
-      val: parameterWitValues.map((param) => {
-        return {
-          tag: 'component-model',
-          val: param,
-        };
-      }),
-    };
-
-    // We ensure to create every agent using agentInitiator
-    const resolvedAgent = agentInitiator.initiate(agentClassName, dataValue);
-
-    if (resolvedAgent.tag === 'err') {
-      throw new Error(
-        'Failed to create agent: ' + JSON.stringify(resolvedAgent.val),
-      );
-    } else {
-      const instance = resolvedAgent.val.classInstance;
-
-      return new Proxy(instance, {
-        get(target, prop) {
-          const val = target[prop];
-          if (typeof val === 'function') {
-            return (...fnArgs: any[]) => {
-              return val.apply(target, fnArgs);
-            };
-          }
-          return val;
-        },
-      });
-    }
-  };
-}
 
 export function getRemoteClient<T extends new (...args: any[]) => any>(
   ctor: T,
@@ -117,7 +30,7 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
     )[0];
 
     // getAgentComponent in code_first branch to be implemented
-    // until then using self metadata
+    // until then using self-metadata
     const componentId: ComponentId = getSelfMetadata().workerId.componentId;
 
     const rpc = WasmRpc.ephemeral(componentId);

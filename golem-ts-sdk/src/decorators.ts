@@ -17,7 +17,7 @@ import { AgentInternal } from './internal/agentInternal';
 import { ResolvedAgent } from './internal/resolvedAgent';
 import { TypeMetadata } from './typeMetadata';
 import { ClassType, ParameterInfo, Type } from 'rttist';
-import { getLocalClient, getRemoteClient } from './internal/clientGeneration';
+import { getRemoteClient } from './internal/clientGeneration';
 import { BaseAgent } from './baseAgent';
 import { createUniqueAgentId } from './internal/agentInstanceSequence';
 import { AgentTypeRegistry } from './internal/registry/agentTypeRegistry';
@@ -173,7 +173,6 @@ export function agent() {
     AgentTypeRegistry.register(agentClassName, agentType);
 
     (ctor as any).createRemote = getRemoteClient(ctor);
-    (ctor as any).createLocal = getLocalClient(ctor);
 
     AgentInitiatorRegistry.register(
       AgentName.fromAgentClassName(agentClassName),

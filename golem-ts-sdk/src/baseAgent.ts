@@ -91,24 +91,4 @@ export class BaseAgent {
   ): InstanceType<T> {
     throw new Error('A remote client will be created at runtime');
   }
-
-  /**
-   * Creates a local instance of the agent within the current container.
-   *
-   * This method is preferred over directly calling `new MyAgent(arg1, arg2)` as it ensures
-   * correct initialization, agent ID assignment, etc.
-   *
-   * @param args - Constructor arguments for the agent
-   * @returns A locally instantiated agent
-   *
-   * @example
-   * const localClient = MyAgent.createLocal("arg1", "arg2") where `arg1`, `arg2` are the constructor arguments
-   * validated at compile time.;
-   */
-  static createLocal<T extends new (...args: any[]) => BaseAgent>(
-    this: T,
-    ...args: ConstructorParameters<T>
-  ): InstanceType<T> {
-    throw new Error('A local client will be created at runtime');
-  }
 }
