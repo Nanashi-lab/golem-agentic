@@ -14,7 +14,6 @@
 
 import type * as bindings from 'agent-guest';
 import { ResolvedAgent } from './internal/resolvedAgent';
-import { AgentId } from './agentId';
 import { Result } from 'golem:rpc/types@0.2.2';
 import { AgentError, AgentType, DataValue } from 'golem:agent/common';
 import { createCustomError } from './internal/agentError';
@@ -32,10 +31,7 @@ export { TextInput } from './newTypes/textInput';
 export * as AgentName from './newTypes/AgentName';
 export * as AgentClassName from './newTypes/AgentClassName';
 
-/// TODO; Try moving Agent registry to the `internal/registry` module
-// Moving `Agent` to other packages resulted in errors at runtime.
-// Need to check this again
-const agents = new Map<AgentId, Agent>();
+let resolvedAgent: Option.Option<ResolvedAgent> = Option.none();
 
 const UninitiatedAgentErrorMessage: string =
   'Agent is not initialized. Please create an agent first using static function called create';
@@ -54,114 +50,68 @@ function getResolvedAgentOrThrow(
   );
 }
 
-// Component export
-class Agent {
-  resolvedAgent: Option.Option<ResolvedAgent> = Option.none();
+async function initialize(
+  agentType: string,
+  input: DataValue,
+): Promise<Result<void, AgentError>> {
+  const initiator = AgentInitiatorRegistry.lookup(
+    AgentName.fromString(agentType),
+  );
 
-  async getId(): Promise<string> {
-    return getResolvedAgentOrThrow(this.resolvedAgent).getId().toString();
-  }
-
-  async invoke(
-    methodName: string,
-    input: DataValue,
-  ): Promise<Result<DataValue, AgentError>> {
-    if (Option.isNone(this.resolvedAgent)) {
-      return {
-        tag: 'err',
-        val: UninitializedAgentError,
-      };
-    }
-
-    return this.resolvedAgent.value.invoke(methodName, input);
-  }
-
-  async getDefinition(): Promise<AgentType> {
-    return getResolvedAgentOrThrow(this.resolvedAgent).getDefinition();
-  }
-
-  static async create(
-    agentType: string,
-    input: DataValue,
-  ): Promise<Result<Agent, AgentError>> {
-    const initiator = AgentInitiatorRegistry.lookup(
-      AgentName.fromString(agentType),
+  if (Option.isNone(initiator)) {
+    const entries = Array.from(AgentInitiatorRegistry.entries()).map(
+      (entry) => entry[0],
     );
-
-    if (Option.isNone(initiator)) {
-      const entries = Array.from(AgentInitiatorRegistry.entries()).map(
-        (entry) => entry[0],
-      );
-
-      return {
-        tag: 'err',
-        val: createCustomError(
-          `No implementation found for agent: ${agentType}. Valid entries are ${entries.join(', ')}`,
-        ),
-      };
-    }
-
-    const initiateResult = initiator.value.initiate(agentType, input);
-
-    if (initiateResult.tag === 'ok') {
-      const agent = new Agent();
-      agent.resolvedAgent = Option.some(initiateResult.val);
-
-      agents.set(initiateResult.val.getId(), agent);
-
-      return {
-        tag: 'ok',
-        val: agent,
-      };
-    }
 
     return {
       tag: 'err',
-      val: initiateResult.val,
+      val: createCustomError(
+        `No implementation found for agent: ${agentType}. Valid entries are ${entries.join(', ')}`,
+      ),
     };
   }
-}
 
-async function getAgent(agentType: string, agentId: string): Promise<Agent> {
-  const typedAgentId = AgentId.fromString(agentId);
+  const initiateResult = initiator.value.initiate(agentType, input);
 
-  if (typedAgentId.agentName.toString() !== agentType) {
-    throw new Error(
-      `Agent ID ${agentId} does not match the expected type ${agentType}`,
-    );
+  if (initiateResult.tag === 'ok') {
+    resolvedAgent = Option.some(initiateResult.val);
+
+    return {
+      tag: 'ok',
+      val: undefined,
+    };
   }
 
-  const agent = agents.get(typedAgentId);
-
-  if (!agent) {
-    throw new Error(`Agent with ID ${agentId} not found`);
-  }
-
-  return agent;
+  return {
+    tag: 'err',
+    val: initiateResult.val,
+  };
 }
 
-async function discoverAgents(): Promise<Agent[]> {
-  return Array.from(agents.values());
+async function invoke(
+  methodName: string,
+  input: DataValue,
+): Promise<Result<DataValue, AgentError>> {
+  if (Option.isNone(resolvedAgent)) {
+    return {
+      tag: 'err',
+      val: UninitializedAgentError,
+    };
+  }
+  return resolvedAgent.value.invoke(methodName, input);
 }
 
 async function discoverAgentTypes(): Promise<bindings.guest.AgentType[]> {
   return AgentTypeRegistry.getRegisteredAgents();
 }
 
-async function invokeAgent(
-  agentType: string,
-  agentId: string,
-  methodName: string,
-  input: DataValue,
-): Promise<Result<DataValue, AgentError>> {
-  const agent = await getAgent(agentType, agentId);
-  return agent.invoke(methodName, input);
+async function getDefinition(): Promise<AgentType> {
+  return getResolvedAgentOrThrow(resolvedAgent).getDefinition();
 }
 
 export const guest: typeof bindings.guest = {
-  getAgent,
-  discoverAgents,
+  initialize,
   discoverAgentTypes,
-  invokeAgent,
-  Agent,
+  invoke,
+  getDefinition,
 };
