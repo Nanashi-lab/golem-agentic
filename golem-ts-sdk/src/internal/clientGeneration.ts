@@ -12,62 +12,82 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Metadata } from '../typeMetadata';
+import { TypeMetadata } from '../typeMetadata';
 import { ClassType } from 'rttist';
 import { WasmRpc, WorkerId } from 'golem:rpc/types@0.2.2';
 import { ComponentId, getSelfMetadata } from 'golem:api/host@1.1.7';
 import * as Either from 'effect/Either';
 import * as Value from './mapping/values/Value';
 import * as WitValue from './mapping/values/WitValue';
+import { AgentId } from '../agentId';
+import * as AgentClassName from '../newTypes/AgentClassName';
+import * as AgentTypeName from '../newTypes/AgentTypeName';
+import * as Option from 'effect/Option';
 
 export function getRemoteClient<T extends new (...args: any[]) => any>(
   ctor: T,
 ) {
   return (...args: any[]) => {
     const instance = new ctor(...args);
-    const metadata = Metadata.getTypes().filter(
-      (type) => type.isClass() && type.name === ctor.name,
-    )[0];
 
-    // getAgentComponent in code_first branch to be implemented
-    // until then using self-metadata
-    const componentId: ComponentId = getSelfMetadata().workerId.componentId;
+    const agentClassName = AgentClassName.fromString(ctor.name);
+    const agentTypeName = AgentTypeName.fromAgentClassName(agentClassName);
 
-    const rpc = WasmRpc.ephemeral(componentId);
-
-    const result = rpc.invokeAndAwait(
-      'golem:simulated-agentic-typescript/simulated-agent-ts.{weather-agent.new}',
-      [],
+    const metadataOpt = TypeMetadata.lookupClassMetadata(
+      AgentClassName.fromString(ctor.name),
     );
 
-    const resourceWitValues =
-      result.tag === 'err'
-        ? (() => {
-            throw new Error(
-              'Failed to create resource: ' +
-                JSON.stringify(result.val) +
-                ' ' +
-                JSON.stringify(componentId) +
-                ' should be the same as ' +
-                JSON.stringify(componentId),
-            );
-          })()
-        : result.val;
+    if (Option.isNone(metadataOpt)) {
+      throw new Error(
+        `Metadata for agent class ${ctor.name} not found. Make sure this agent class extends BaseAgent and is registered using @agent decorator`,
+      );
+    }
 
-    const resourceValue = Value.fromWitValue(resourceWitValues);
+    const metadata = metadataOpt.value;
 
-    const resourceVal = (() => {
-      switch (resourceValue.kind) {
-        case 'tuple':
-          return resourceValue.value[0];
-        default:
-          throw new Error('Unsupported kind: ' + resourceValue.kind);
-      }
-    })();
+    const workerId = getWorkerId(agentTypeName, args);
 
-    const workerId = getWorkerName(resourceVal, componentId);
+    // WasmRPC invoke
+    const rpc = new WasmRpc(workerId);
 
-    const resourceWitValue = Value.toWitValue(resourceVal);
+    const signature = (metadata as ClassType).getConstructors()[0];
+
+    const constructorParamInfo = signature.getParameters();
+    const constructorParamTypes = constructorParamInfo.map(
+      (param) => param.type,
+    );
+
+    const constructorParamWitValuesResult = Either.all(
+      args.map((arg, index) => {
+        const typ = constructorParamTypes[index];
+        return WitValue.fromTsValue(arg, typ);
+      }),
+    );
+
+    if (Either.isLeft(constructorParamWitValuesResult)) {
+      throw new Error(
+        'Failed to create remote agent: ' +
+          JSON.stringify(constructorParamWitValuesResult.left),
+      );
+    }
+
+    const agentTypeNameValue: Value.Value = {
+      kind: 'string',
+      value: agentTypeName,
+    };
+
+    let witValues = [
+      Value.toWitValue(agentTypeNameValue),
+      ...constructorParamWitValuesResult.right,
+    ];
+
+    const initResult = rpc.invokeAndAwait(`agent.{initialize}`, witValues);
+
+    if (initResult.tag === 'err') {
+      throw new Error(
+        'Failed to initialize remote agent: ' + JSON.stringify(initResult.val),
+      );
+    }
 
     return new Proxy(instance, {
       get(target, prop) {
@@ -82,44 +102,40 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
           const returnType = signature.returnType;
 
           return (...fnArgs: any[]) => {
-            const functionName = `golem:simulated-agentic-typescript/simulated-agent.{[method]{${ctor.name}.{${prop.toString()}}`;
+            const functionName = `${agentTypeName}.{${prop.toString()}}`;
 
-            const parameterWitValuesResult = Either.all(
+            const parameterWitValuesEither = Either.all(
               fnArgs.map((fnArg, index) => {
                 const typ = paramInfo[index].type;
                 return WitValue.fromTsValue(fnArg, typ);
               }),
             );
 
-            // There is no big advantage of returning a Result here,
-            // and gives bad experience to the users:
-            // `MyAgent.createRemote` should just give a normal error.
-            // If they want to handle errors, they can use `Either` or `Result`
-            // or try-catch.
-            const parameterWitValues = Either.isLeft(parameterWitValuesResult)
+            const parameterWitValues = Either.isLeft(parameterWitValuesEither)
               ? (() => {
                   throw new Error(
                     'Failed to create remote agent: ' +
-                      JSON.stringify(parameterWitValuesResult.left),
+                      JSON.stringify(parameterWitValuesEither.left),
                   );
                 })()
-              : parameterWitValuesResult.right;
+              : parameterWitValuesEither.right;
 
-            const inputArgs: WitValue.WitValue[] = [
-              resourceWitValue,
-              ...parameterWitValues,
-            ];
-            const invokeRpc = new WasmRpc(workerId);
-            const rpcResult = invokeRpc.invokeAndAwait(functionName, inputArgs);
+            const rpcForInvokeMethod = new WasmRpc(workerId);
+
+            const rpcResult = rpcForInvokeMethod.invokeAndAwait(
+              functionName,
+              parameterWitValues,
+            );
+
             const rpcWitValue =
               rpcResult.tag === 'err'
                 ? (() => {
                     throw new Error(
                       'Failed to invoke function: ' +
-                        JSON.stringify(result.val),
+                        JSON.stringify(rpcResult.val),
                     );
                   })()
-                : result.val;
+                : rpcResult.val;
 
             return WitValue.toTsValue(rpcWitValue, returnType);
           };
@@ -127,6 +143,37 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
         return val;
       },
     });
+  };
+}
+
+// constructorArgs is an array of any, we can have more control depending on its types
+// Probably this implementation is going to exist in various forms in Golem. Not sure if there
+// would be a way to reuse - may be a host function that retrieves the worker-id
+// given value in JSON format, and the wit-type of each value and agent-type name?
+function getWorkerId(
+  agentTypeName: AgentTypeName.AgentTypeName,
+  constructorArgs: any[],
+): WorkerId {
+  // PlaceHolder implementation that finds the container-id corresponding to the agentType!
+  // We need a host function - given an agent-type, it should return a component-id as proved in the prototype.
+  // But we don't have that functionality yet, hence just retrieving the current
+  // component-id (for now)
+  const componentId: ComponentId = getSelfMetadata().workerId.componentId;
+
+  // AgentId is basically the container-name aka worker name, if the concept of "a container can have only one agent"
+  const agentId = AgentId.fromAgentTypeAndParams(
+    agentTypeName,
+    constructorArgs,
+  );
+
+  const workerId: WorkerId = {
+    componentId,
+    workerName: agentId.value,
+  };
+
+  return {
+    componentId,
+    workerName: agentId.value,
   };
 }
 
