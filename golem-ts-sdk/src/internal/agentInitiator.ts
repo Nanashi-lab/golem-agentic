@@ -15,7 +15,7 @@
 import { ResolvedAgent } from './resolvedAgent';
 import { Result } from 'golem:rpc/types@0.2.2';
 import { AgentError, DataValue } from 'golem:agent/common';
-import { AgentName } from '../newTypes/AgentName';
+import { AgentTypeName } from '../newTypes/AgentTypeName';
 import * as Option from 'effect/Option';
 
 /**

@@ -12,25 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { AgentName } from '../../newTypes/AgentName';
+import { AgentTypeName } from '../../newTypes/AgentTypeName';
 import * as Option from 'effect/Option';
 import { AgentInitiator } from '../agentInitiator';
 
 // Although only 1 agent can exist max in a container,
 // the container still keeps track of initiators of all agent classes
 // in the user code
-const agentInitiators = new Map<AgentName, AgentInitiator>();
+const agentInitiators = new Map<AgentTypeName, AgentInitiator>();
 
 export const AgentInitiatorRegistry = {
-  register(agentName: AgentName, agentInitiator: AgentInitiator): void {
+  register(agentName: AgentTypeName, agentInitiator: AgentInitiator): void {
     agentInitiators.set(agentName, agentInitiator);
   },
 
-  lookup(agentName: AgentName): Option.Option<AgentInitiator> {
+  lookup(agentName: AgentTypeName): Option.Option<AgentInitiator> {
     return Option.fromNullable(agentInitiators.get(agentName));
   },
 
-  entries(): IterableIterator<[AgentName, AgentInitiator]> {
+  entries(): IterableIterator<[AgentTypeName, AgentInitiator]> {
     return agentInitiators.entries();
   },
 };

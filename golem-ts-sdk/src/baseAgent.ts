@@ -73,7 +73,7 @@ export class BaseAgent {
   }
 
   /**
-   * Creates a remote client instance of this agent type.
+   * Gets a remote client instance of this agent type.
    *
    * This remote client will communicate with an agent instance running
    * in a separate container, effectively offloading computation to that remote context.
@@ -85,7 +85,7 @@ export class BaseAgent {
    * const remoteClient = MyAgent.createRemote("arg1", "arg2") where `arg1`, `arg2` are the constructor arguments
    * validated at compile time.
    */
-  static createRemote<T extends new (...args: any[]) => BaseAgent>(
+  static get<T extends new (...args: any[]) => BaseAgent>(
     this: T,
     ...args: ConstructorParameters<T>
   ): InstanceType<T> {

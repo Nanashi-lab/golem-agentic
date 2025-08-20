@@ -19,7 +19,7 @@ import { AgentError, AgentType, DataValue } from 'golem:agent/common';
 import { createCustomError } from './internal/agentError';
 import { AgentTypeRegistry } from './internal/registry/agentTypeRegistry';
 import * as Option from 'effect/Option';
-import * as AgentName from './newTypes/AgentName';
+import * as AgentName from './newTypes/AgentTypeName';
 import { AgentInitiatorRegistry } from './internal/registry/agentInitiatorRegistry';
 
 export { BaseAgent } from './baseAgent';
@@ -28,7 +28,7 @@ export { prompt, description, agent } from './decorators';
 export { Metadata, TypeMetadata } from './typeMetadata';
 export * from './newTypes/either';
 export { TextInput } from './newTypes/textInput';
-export * as AgentName from './newTypes/AgentName';
+export * as AgentName from './newTypes/AgentTypeName';
 export * as AgentClassName from './newTypes/AgentClassName';
 
 let resolvedAgent: Option.Option<ResolvedAgent> = Option.none();

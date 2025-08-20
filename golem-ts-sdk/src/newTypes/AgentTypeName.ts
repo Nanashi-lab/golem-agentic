@@ -15,15 +15,15 @@
 import { Branded } from '../internal/branding';
 import { AgentClassName } from './AgentClassName';
 
-export type AgentName = Branded<string, 'AgentName'>;
+export type AgentTypeName = Branded<string, 'AgentName'>;
 
-export const fromString = (name: string): AgentName => {
-  return name as AgentName;
+export const fromString = (name: string): AgentTypeName => {
+  return name as AgentTypeName;
 };
 
 export const fromAgentClassName = (
   agentClassName: AgentClassName,
-): AgentName => {
-  const name: string = agentClassName.toString();
-  return name as AgentName;
+): AgentTypeName => {
+  const name: string = agentClassName.toString(); // To be converted to kebab case
+  return name as AgentTypeName;
 };
