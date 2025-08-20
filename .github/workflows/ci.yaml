@@ -19,6 +19,9 @@ jobs:
 
       - name: Setup Rust
         run: rustup update stable --no-self-update && rustup default stable
+
+      - name: Install wit-deps-cli
+        run: cargo install wit-deps-cli
      
       - name: Install wasm-rquickjs
         run: cargo install wasm-rquickjs-cli   
@@ -27,6 +30,14 @@ jobs:
         working-directory: ./golem-ts-sdk
         run: |
           npm install
+
+      - name: Run WIT update
+        working-directory: ./golem-ts-sdk
+        run: |
+          npm run wit-update || (
+            echo "Failed to update WIT"
+            exit 1
+          )          
 
       - name: Check code quality
         working-directory: ./golem-ts-sdk

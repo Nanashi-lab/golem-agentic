@@ -28,6 +28,7 @@
     }
   },
   "scripts": {
+    "wit-update": "wit-deps -d ../wit/deps -m ../wit/deps.toml -l ../wit/deps.lock",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write \"src/**/*\" \"tests/**/*\"",
