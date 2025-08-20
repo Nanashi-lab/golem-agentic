@@ -39,11 +39,11 @@ export class AgentId {
       param.toString(),
     );
 
-    if (paramsConcatenated.length == 0) {
-      return new AgentId(agentType.toString());
-    } else {
-      const param = paramsConcatenated.join(',');
-      return new AgentId(`${agentType.toString()}-{${param}}`);
-    }
+    const param = paramsConcatenated.join(',');
+    return new AgentId(
+      paramsConcatenated.length === 0
+        ? agentType.toString()
+        : `${agentType.toString()}-{${param}}`,
+    );
   }
 }
