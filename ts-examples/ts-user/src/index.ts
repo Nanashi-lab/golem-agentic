@@ -3,7 +3,7 @@ import {
     agent,
     prompt,
     description,
-    Either, AgentId,
+    Either,
 } from '@golemcloud/golem-ts-sdk';
 
 type Question = {
@@ -24,13 +24,10 @@ class AssistantAgent extends BaseAgent {
 
         const location: Loc = { lat: 12.34, long: 56.78 };
 
-        const remoteWeatherClient = WeatherAgent.createRemote("afsal");
+        const remoteWeatherClient = WeatherAgent.get("afsal");
         const remoteWeather = await remoteWeatherClient.getWeather(location);
 
-        const localWeatherClient = WeatherAgent.createLocal("afsal");
-        const localWeather = await localWeatherClient.getWeather(location);
-
-        throw new Error(localWeather);
+        return "The weather is: " + remoteWeather;
     }
 }
 
