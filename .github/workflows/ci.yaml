@@ -19,6 +19,9 @@ jobs:
 
       - name: Setup Rust
         run: rustup update stable --no-self-update && rustup default stable
+
+      - name: Install wit-deps-cli
+        run: cargo install wit-deps-cli
      
       - name: Install wasm-rquickjs
         run: cargo install wasm-rquickjs-cli   
