@@ -1,5 +1,5 @@
 [all]
-url = "https://github.com/golemcloud/golem/archive/2062234020cc802ac425d6249a3028afd2b65796.tar.gz"
+url = "https://github.com/golemcloud/golem/archive/main.tar.gz"
 sha256 = "339f05aef6d47587329a5803958372285d9ce3935134d985d4e7a3307d8c01ee"
 sha512 = "842f3f6e743e05c59deb0a488c2f772ee80d3a89bce0052162b2972b139d5be384a9b368fe3016ed4900ec32aee536dc222f275b527d64327f25d49de40c8f30"
 deps = ["blobstore", "cli", "clocks", "config", "filesystem", "golem-1.x", "golem-agent", "golem-durability", "golem-rdbms", "golem-rpc", "http", "io", "keyvalue", "logging", "random", "sockets"]
