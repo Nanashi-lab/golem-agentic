@@ -174,7 +174,7 @@ export function agent() {
 
     AgentTypeRegistry.register(agentClassName, agentType);
 
-    (ctor as any).createRemote = getRemoteClient(ctor);
+    (ctor as any).get = getRemoteClient(ctor);
 
     AgentInitiatorRegistry.register(
       AgentName.fromAgentClassName(agentClassName),
