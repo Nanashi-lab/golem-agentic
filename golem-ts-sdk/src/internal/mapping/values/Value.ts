@@ -505,10 +505,7 @@ function handleTypedArray<
     | BigInt64Array
     | Float32Array
     | Float64Array,
->(
-  tsValue: unknown,
-  ctor: { new (length: number): A },
-): Either.Either<A, string> {
+>(tsValue: unknown, ctor: { new (_: number): A }): Either.Either<A, string> {
   return tsValue instanceof ctor
     ? Either.right(tsValue)
     : Either.left(invalidTypeError(tsValue, ctor.name));
@@ -1015,7 +1012,7 @@ export function toTsValue(value: Value, expectedType: Type): any {
         throw new Error(`Expected number, obtained value ${value}`);
       }
     case TypeKind.BigInt:
-      if (value.kind === 'u64' || value.kind == 's64') {
+      if (value.kind === 'u64' || value.kind === 's64') {
         return value.value;
       } else {
         throw new Error(`Expected bigint, obtained value ${value}`);
