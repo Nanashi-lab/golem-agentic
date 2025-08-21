@@ -9,7 +9,8 @@ const external = [
     'agent-guest',
     'golem:api/host@1.1.7',
     'golem:rpc/types@0.2.2',
-    'golem:agent/common'
+    'golem:agent/common',
+    'golem:agent/host'
 ];
 
 export default defineConfig([

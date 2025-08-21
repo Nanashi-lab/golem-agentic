@@ -31,13 +31,12 @@ jobs:
         run: |
           npm install
 
-      - name: Run WIT update
-        working-directory: ./golem-ts-sdk
+      - name: Run WIT deps update
         run: |
-          npm run wit-update || (
-            echo "Failed to update WIT"
+          wit-deps update || (
+            echo "Failed to update WIT dependencies"
             exit 1
-          )          
+          )
 
       - name: Check code quality
         working-directory: ./golem-ts-sdk
