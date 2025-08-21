@@ -133,6 +133,8 @@ export const baseArb = fc.record({
   int16ArrayProp: fc.int16Array({ minLength: 0, maxLength: 10 }),
   int32ArrayProp: fc.int32Array({ minLength: 0, maxLength: 10 }),
   int64ArrayProp: fc.bigInt64Array({ minLength: 0, maxLength: 10 }),
+  float32ArrayProp: fc.float32Array({ minLength: 0, maxLength: 10 }),
+  float64ArrayProp: fc.float64Array({ minLength: 0, maxLength: 10 }),
 });
 
 const optionalPropArb = fc

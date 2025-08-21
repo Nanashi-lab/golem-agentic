@@ -41,7 +41,7 @@ import {
 import * as fc from 'fast-check';
 import { Type } from 'rttist';
 import * as EffectEither from 'effect/Either';
-import { Either, ok } from '../src/newTypes/either';
+import { ok } from '../src/newTypes/either';
 import * as WitValue from '../src/internal/mapping/values/WitValue';
 
 describe('typescript value to wit value round-trip conversions', () => {
@@ -179,6 +179,8 @@ describe('typescript value to wit value round-trip conversions', () => {
       int16ArrayProp: new Int16Array([1, 2, 3]),
       int32ArrayProp: new Int32Array([1, 2, 3]),
       int64ArrayProp: new BigInt64Array([1n, 2n, 3n]),
+      float32ArrayProp: new Float32Array([1.1, 2.2, 3.3]),
+      float64ArrayProp: new Float64Array([1.1, 2.2, 3.3]),
     };
 
     const type = getTestInterfaceType();
@@ -213,6 +215,8 @@ describe('typescript value to wit value round-trip conversions', () => {
       int16ArrayProp: new Int16Array([1, 2, 3]),
       int32ArrayProp: new Int32Array([1, 2, 3]),
       int64ArrayProp: new BigInt64Array([1n, 2n, 3n]),
+      float32ArrayProp: new Float32Array([1.1, 2.2, 3.3]),
+      float64ArrayProp: new Float64Array([1.1, 2.2, 3.3]),
       objectComplexProp: {
         a: '',
         b: 0,
@@ -265,6 +269,8 @@ describe('typescript value to wit value round-trip conversions', () => {
       int16ArrayProp: new Int16Array([1, 2, 3]),
       int32ArrayProp: new Int32Array([1, 2, 3]),
       int64ArrayProp: new BigInt64Array([1n, 2n, 3n]),
+      float32ArrayProp: new Float32Array([1.1, 2.2, 3.3]),
+      float64ArrayProp: new Float64Array([1.1, 2.2, 3.3]),
       objectComplexProp: {
         a: '',
         b: 0,

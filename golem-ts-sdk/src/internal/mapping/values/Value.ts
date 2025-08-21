@@ -458,29 +458,26 @@ export function fromTsValue(
       }));
 
     case TypeKind.Float32Array:
-      if (
-        Array.isArray(tsValue) &&
-        tsValue.every((item) => typeof item === 'number')
-      ) {
-        return Either.right({
-          kind: 'list',
-          value: tsValue.map((item) => ({ kind: 'f32', value: item })),
-        });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'Float32Array'));
-      }
+      const float32Array = handleTypedArray(tsValue, Float32Array);
+
+      return Either.map(float32Array, (arr) => ({
+        kind: 'list' as const,
+        value: Array.from(arr).map((item) => ({
+          kind: 'f32',
+          value: item,
+        })),
+      }));
+
     case TypeKind.Float64Array:
-      if (
-        Array.isArray(tsValue) &&
-        tsValue.every((item) => typeof item === 'number')
-      ) {
-        return Either.right({
-          kind: 'list',
-          value: tsValue.map((item) => ({ kind: 'f64', value: item })),
-        });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'Float64Array'));
-      }
+      const float64Array = handleTypedArray(tsValue, Float64Array);
+
+      return Either.map(float64Array, (arr) => ({
+        kind: 'list' as const,
+        value: Array.from(arr).map((item) => ({
+          kind: 'f32',
+          value: item,
+        })),
+      }));
 
     case TypeKind.Object:
       return handleObject(tsValue, type);
@@ -505,7 +502,9 @@ function handleTypedArray<
     | Int8Array
     | Int16Array
     | Int32Array
-    | BigInt64Array,
+    | BigInt64Array
+    | Float32Array
+    | Float64Array,
 >(
   tsValue: unknown,
   ctor: { new (length: number): A },
@@ -1008,7 +1007,8 @@ export function toTsValue(value: Value, expectedType: Type): any {
         value.kind === 's8' ||
         value.kind === 's16' ||
         value.kind === 's32' ||
-        value.kind === 's64'
+        value.kind === 's64' ||
+        value.kind === 'f32'
       ) {
         return value.value;
       } else {
