@@ -15,11 +15,15 @@
 import { AgentTypeName } from './newTypes/AgentTypeName';
 
 /**
- * An AgentId as such is the identifier of the container
- * in which the agent runs.
+ * Globally unique ID of an `agent`.
  *
- * An AgentId is usually formed by concatenation of agent-type and the constructor param values.
- * This is, in fact, the container in which the agent runs.
+ * An AgentId can also be considered as the container-id in which the agent runs.
+ * This is because an AgentId must be distinguished in terms of string representation
+ * of an agent-type and its constructor parameters.
+ *
+ * TODO: Once the host exports a canonical way of constructing the worker-name (or container-name)
+ * we should use it form the agent-id
+ *
  */
 export class AgentId {
   readonly value: string;

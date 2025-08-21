@@ -15,8 +15,6 @@
 import { ResolvedAgent } from './resolvedAgent';
 import { Result } from 'golem:rpc/types@0.2.2';
 import { AgentError, DataValue } from 'golem:agent/common';
-import { AgentTypeName } from '../newTypes/AgentTypeName';
-import * as Option from 'effect/Option';
 
 /**
  * AgentInitiator is the canonical interface for instantiating agents.

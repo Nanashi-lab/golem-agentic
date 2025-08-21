@@ -15,7 +15,6 @@
 import { TypeMetadata } from '../typeMetadata';
 import { ClassType, Type } from 'rttist';
 import { WasmRpc, WorkerId } from 'golem:rpc/types@0.2.2';
-import { ComponentId, getSelfMetadata } from 'golem:api/host@1.1.7';
 import * as Either from 'effect/Either';
 import * as Value from './mapping/values/Value';
 import * as WitValue from './mapping/values/WitValue';
@@ -90,6 +89,7 @@ function initializeClient(
   const signature = (classMetadata as ClassType).getConstructors()[0];
 
   const constructorParamInfo = signature.getParameters();
+
   const constructorParamTypes = constructorParamInfo.map((param) => param.type);
 
   const constructorParamWitValuesResult = Either.all(
@@ -202,7 +202,7 @@ function getWorkerId(
   const registeredAgentType: RegisteredAgentType =
     optionalRegisteredAgentType.value;
 
-  // AgentId is basically the container-name aka worker name, if the concept of "a container can have only one agent"
+  // AgentId is basically the container-name aka worker name if the concept of "a container can have only one agent"
   const agentId = AgentId.fromAgentTypeAndParams(
     agentTypeName,
     constructorArgs,
@@ -212,19 +212,4 @@ function getWorkerId(
     componentId: registeredAgentType.implementedBy,
     workerName: agentId.value,
   });
-}
-
-function getWorkerName(value: Value.Value, componentId: ComponentId): WorkerId {
-  if (value.kind === 'handle') {
-    const parts = value.uri.split('/');
-    const workerName = parts[parts.length - 1];
-    if (!workerName) {
-      throw new Error('Worker name not found in URI');
-    }
-    return { componentId, workerName };
-  }
-
-  throw new Error(
-    `Expected value to be a handle, but got: ${JSON.stringify(value)}`,
-  );
 }
