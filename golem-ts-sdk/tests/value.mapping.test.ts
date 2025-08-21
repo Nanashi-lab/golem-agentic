@@ -171,6 +171,10 @@ describe('typescript value to wit value round-trip conversions', () => {
       tupleObjectProp: ['', 0, { a: '', b: 0, c: false }],
       tupleProp: ['', 0, false],
       unionProp: 1,
+      uint8ArrayProp: new Uint8Array([1, 2, 3]),
+      uint16ArrayProp: new Uint16Array([1, 2, 3]),
+      uint32ArrayProp: new Uint32Array([1, 2, 3]),
+      uint64ArrayProp: new BigUint64Array([1n, 2n, 3n]),
     };
 
     const type = getTestInterfaceType();
@@ -197,6 +201,10 @@ describe('typescript value to wit value round-trip conversions', () => {
       unionProp: 1,
       optionalProp: 2,
       unionComplexProp: 1,
+      uint8ArrayProp: new Uint8Array([1, 2, 3]),
+      uint16ArrayProp: new Uint16Array([1, 2, 3]),
+      uint32ArrayProp: new Uint32Array([1, 2, 3]),
+      uint64ArrayProp: new BigUint64Array([1n, 2n, 3n]),
       objectComplexProp: {
         a: '',
         b: 0,
@@ -241,6 +249,10 @@ describe('typescript value to wit value round-trip conversions', () => {
       unionProp: { a: 'test', b: 42, c: true }, // Using an object as a union type
       optionalProp: 2,
       unionComplexProp: 1,
+      uint8ArrayProp: new Uint8Array([1, 2, 3]),
+      uint16ArrayProp: new Uint16Array([1, 2, 3]),
+      uint32ArrayProp: new Uint32Array([1, 2, 3]),
+      uint64ArrayProp: new BigUint64Array([1n, 2n, 3n]),
       objectComplexProp: {
         a: '',
         b: 0,

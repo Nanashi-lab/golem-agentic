@@ -125,6 +125,10 @@ export const baseArb = fc.record({
   tupleProp: tupleArb,
   unionProp: unionArb,
   unionComplexProp: unionComplexArb,
+  uint8ArrayProp: fc.uint8Array({ minLength: 0, maxLength: 10 }),
+  uint16ArrayProp: fc.uint16Array({ minLength: 0, maxLength: 10 }),
+  uint32ArrayProp: fc.uint32Array({ minLength: 0, maxLength: 10 }),
+  uint64ArrayProp: fc.bigUint64Array({ minLength: 0, maxLength: 10 }),
 });
 
 const optionalPropArb = fc
