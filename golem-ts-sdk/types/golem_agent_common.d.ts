@@ -75,7 +75,7 @@ declare module 'golem:agent/common' {
     dependencies: AgentDependency[];
   };
   export type BinarySource = {
-    data: number[];
+    data: Uint8Array;
     binaryType: BinaryType;
   };
   export type BinaryReference = {

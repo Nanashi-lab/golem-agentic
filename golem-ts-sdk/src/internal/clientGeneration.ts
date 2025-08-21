@@ -23,6 +23,7 @@ import { AgentId } from '../agentId';
 import * as AgentClassName from '../newTypes/AgentClassName';
 import * as AgentTypeName from '../newTypes/AgentTypeName';
 import * as Option from 'effect/Option';
+import { getAgentType, RegisteredAgentType } from 'golem:agent/host';
 
 export function getRemoteClient<T extends new (...args: any[]) => any>(
   ctor: T,
@@ -45,7 +46,15 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
 
     const metadata = metadataOpt.value;
 
-    const workerId = initializeClient(agentClassName, args, metadata);
+    const workerIdEither = initializeClient(agentClassName, args, metadata);
+
+    if (Either.isLeft(workerIdEither)) {
+      throw new Error(
+        `Failed to initialize remote agent: ${workerIdEither.left}`,
+      );
+    }
+
+    const workerId = workerIdEither.right;
 
     return new Proxy(instance, {
       get(target, prop) {
@@ -65,10 +74,16 @@ function initializeClient(
   agentClassName: AgentClassName.AgentClassName,
   constructorArgs: any[],
   classMetadata: Type,
-): WorkerId {
+): Either.Either<WorkerId, string> {
   const agentTypeName = AgentTypeName.fromAgentClassName(agentClassName);
 
-  const workerId = getWorkerId(agentTypeName, constructorArgs);
+  const workerIdEither = getWorkerId(agentTypeName, constructorArgs);
+
+  if (Either.isLeft(workerIdEither)) {
+    return Either.left(workerIdEither.left);
+  }
+
+  const workerId = workerIdEither.right;
 
   const rpc = new WasmRpc(workerId);
 
@@ -109,7 +124,7 @@ function initializeClient(
     );
   }
 
-  return workerId;
+  return Either.right(workerId);
 }
 
 function getMethodProxy(
@@ -171,12 +186,21 @@ function getMethodProxy(
 function getWorkerId(
   agentTypeName: AgentTypeName.AgentTypeName,
   constructorArgs: any[],
-): WorkerId {
+): Either.Either<WorkerId, string> {
   // PlaceHolder implementation that finds the container-id corresponding to the agentType!
   // We need a host function - given an agent-type, it should return a component-id as proved in the prototype.
   // But we don't have that functionality yet, hence just retrieving the current
   // component-id (for now)
-  const componentId: ComponentId = getSelfMetadata().workerId.componentId;
+  const optionalRegisteredAgentType = Option.fromNullable(
+    getAgentType(agentTypeName),
+  );
+
+  if (Option.isNone(optionalRegisteredAgentType)) {
+    return Either.left(`There are no components implementing ${agentTypeName}`);
+  }
+
+  const registeredAgentType: RegisteredAgentType =
+    optionalRegisteredAgentType.value;
 
   // AgentId is basically the container-name aka worker name, if the concept of "a container can have only one agent"
   const agentId = AgentId.fromAgentTypeAndParams(
@@ -184,15 +208,10 @@ function getWorkerId(
     constructorArgs,
   );
 
-  const workerId: WorkerId = {
-    componentId,
+  return Either.right({
+    componentId: registeredAgentType.implementedBy,
     workerName: agentId.value,
-  };
-
-  return {
-    componentId,
-    workerName: agentId.value,
-  };
+  });
 }
 
 function getWorkerName(value: Value.Value, componentId: ComponentId): WorkerId {

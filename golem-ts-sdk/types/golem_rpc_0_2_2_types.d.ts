@@ -1,7 +1,13 @@
 declare module 'golem:rpc/types@0.2.2' {
   import * as wasiClocks023WallClock from 'wasi:clocks/wall-clock@0.2.3';
   import * as wasiIo023Poll from 'wasi:io/poll@0.2.3';
+  /**
+   * Parses a UUID from a string
+   */
   export function parseUuid(uuid: string): Result<Uuid, string>;
+  /**
+   * Converts a UUID to a string
+   */
   export function uuidToString(uuid: Uuid): string;
   export function extractValue(vnt: ValueAndType): WitValue;
   export function extractType(vnt: ValueAndType): WitType;
@@ -11,7 +17,13 @@ declare module 'golem:rpc/types@0.2.2' {
     invokeAndAwait(functionName: string, functionParams: WitValue[]): Result<WitValue, RpcError>;
     invoke(functionName: string, functionParams: WitValue[]): Result<void, RpcError>;
     asyncInvokeAndAwait(functionName: string, functionParams: WitValue[]): FutureInvokeResult;
+    /**
+     * Schedule invocation for later
+     */
     scheduleInvocation(scheduledTime: Datetime, functionName: string, functionParams: WitValue[]): void;
+    /**
+     * Schedule invocation for later. Call cancel on the returned resource to cancel the invocation before the scheduled time.
+     */
     scheduleCancelableInvocation(scheduledTime: Datetime, functionName: string, functionParams: WitValue[]): CancellationToken;
   }
   export class FutureInvokeResult {
@@ -23,13 +35,22 @@ declare module 'golem:rpc/types@0.2.2' {
   }
   export type Datetime = wasiClocks023WallClock.Datetime;
   export type Pollable = wasiIo023Poll.Pollable;
+  /**
+   * UUID
+   */
   export type Uuid = {
     highBits: bigint;
     lowBits: bigint;
   };
+  /**
+   * Represents a Golem component
+   */
   export type ComponentId = {
     uuid: Uuid;
   };
+  /**
+   * Represents a Golem worker
+   */
   export type WorkerId = {
     componentId: ComponentId;
     workerName: string;
