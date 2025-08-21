@@ -24,6 +24,9 @@
       ],
       "golem:agent/common": [
         "types/golem_agent_common.d.ts"
+      ],
+      "golem:agent/host": [
+        "types/golem_agent_host.d.ts"
       ]
     }
   },
