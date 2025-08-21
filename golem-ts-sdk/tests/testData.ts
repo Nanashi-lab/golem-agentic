@@ -103,6 +103,16 @@ export interface TestInterfaceType {
   tupleProp: TupleType;
   tupleObjectProp: TupleComplexType;
   mapProp: MapType;
+  uint8ArrayProp: Uint8Array;
+  uint16ArrayProp: Uint16Array;
+  uint32ArrayProp: Uint32Array;
+  uint64ArrayProp: BigUint64Array;
+  int8ArrayProp: Int8Array;
+  int16ArrayProp: Int16Array;
+  int32ArrayProp: Int32Array;
+  int64ArrayProp: BigInt64Array;
+  float32ArrayProp: Float32Array;
+  float64ArrayProp: Float64Array;
   // FIXME, `RTTIST` bug or not supported yet
   // mapAlternativeProp: MapTypeAlternative,
   // unionPropInlined: string | number;

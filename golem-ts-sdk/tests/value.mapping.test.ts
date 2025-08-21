@@ -41,7 +41,7 @@ import {
 import * as fc from 'fast-check';
 import { Type } from 'rttist';
 import * as EffectEither from 'effect/Either';
-import { Either, ok } from '../src/newTypes/either';
+import { ok } from '../src/newTypes/either';
 import * as WitValue from '../src/internal/mapping/values/WitValue';
 
 describe('typescript value to wit value round-trip conversions', () => {
@@ -171,6 +171,16 @@ describe('typescript value to wit value round-trip conversions', () => {
       tupleObjectProp: ['', 0, { a: '', b: 0, c: false }],
       tupleProp: ['', 0, false],
       unionProp: 1,
+      uint8ArrayProp: new Uint8Array([1, 2, 3]),
+      uint16ArrayProp: new Uint16Array([1, 2, 3]),
+      uint32ArrayProp: new Uint32Array([1, 2, 3]),
+      uint64ArrayProp: new BigUint64Array([1n, 2n, 3n]),
+      int8ArrayProp: new Int8Array([1, 2, 3]),
+      int16ArrayProp: new Int16Array([1, 2, 3]),
+      int32ArrayProp: new Int32Array([1, 2, 3]),
+      int64ArrayProp: new BigInt64Array([1n, 2n, 3n]),
+      float32ArrayProp: new Float32Array([1.1, 2.2, 3.3]),
+      float64ArrayProp: new Float64Array([1.1, 2.2, 3.3]),
     };
 
     const type = getTestInterfaceType();
@@ -197,6 +207,16 @@ describe('typescript value to wit value round-trip conversions', () => {
       unionProp: 1,
       optionalProp: 2,
       unionComplexProp: 1,
+      uint8ArrayProp: new Uint8Array([1, 2, 3]),
+      uint16ArrayProp: new Uint16Array([1, 2, 3]),
+      uint32ArrayProp: new Uint32Array([1, 2, 3]),
+      uint64ArrayProp: new BigUint64Array([1n, 2n, 3n]),
+      int8ArrayProp: new Int8Array([1, 2, 3]),
+      int16ArrayProp: new Int16Array([1, 2, 3]),
+      int32ArrayProp: new Int32Array([1, 2, 3]),
+      int64ArrayProp: new BigInt64Array([1n, 2n, 3n]),
+      float32ArrayProp: new Float32Array([1.1, 2.2, 3.3]),
+      float64ArrayProp: new Float64Array([1.1, 2.2, 3.3]),
       objectComplexProp: {
         a: '',
         b: 0,
@@ -241,6 +261,16 @@ describe('typescript value to wit value round-trip conversions', () => {
       unionProp: { a: 'test', b: 42, c: true }, // Using an object as a union type
       optionalProp: 2,
       unionComplexProp: 1,
+      uint8ArrayProp: new Uint8Array([1, 2, 3]),
+      uint16ArrayProp: new Uint16Array([1, 2, 3]),
+      uint32ArrayProp: new Uint32Array([1, 2, 3]),
+      uint64ArrayProp: new BigUint64Array([1n, 2n, 3n]),
+      int8ArrayProp: new Int8Array([1, 2, 3]),
+      int16ArrayProp: new Int16Array([1, 2, 3]),
+      int32ArrayProp: new Int32Array([1, 2, 3]),
+      int64ArrayProp: new BigInt64Array([1n, 2n, 3n]),
+      float32ArrayProp: new Float32Array([1.1, 2.2, 3.3]),
+      float64ArrayProp: new Float64Array([1.1, 2.2, 3.3]),
       objectComplexProp: {
         a: '',
         b: 0,

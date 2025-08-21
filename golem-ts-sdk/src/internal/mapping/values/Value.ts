@@ -356,18 +356,6 @@ export function fromTsValue(
     case TypeKind.ObjectType:
       return handleObject(tsValue, type);
 
-    case TypeKind.Uint8Array:
-      if (
-        Array.isArray(tsValue) &&
-        tsValue.every((item) => typeof item === 'number')
-      ) {
-        return Either.right({
-          kind: 'list',
-          value: tsValue.map((item) => ({ kind: 'u8', value: item })),
-        });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'Uint8Array'));
-      }
     case TypeKind.Uint8ClampedArray:
       if (
         Array.isArray(tsValue) &&
@@ -380,102 +368,117 @@ export function fromTsValue(
       } else {
         return Either.left(invalidTypeError(tsValue, 'Uint8ClampedArray'));
       }
+
+    case TypeKind.Int8Array:
+      const int8Array = handleTypedArray(tsValue, Int8Array);
+
+      return Either.map(int8Array, (arr) => ({
+        kind: 'list' as const,
+        value: Array.from(arr).map((item) => ({
+          kind: 's8',
+          value: item,
+        })),
+      }));
+
     case TypeKind.Int16Array:
-      if (
-        Array.isArray(tsValue) &&
-        tsValue.every((item) => typeof item === 'number')
-      ) {
-        return Either.right({
-          kind: 'list',
-          value: tsValue.map((item) => ({ kind: 's16', value: item })),
-        });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'Int16Array'));
-      }
-    case TypeKind.Uint16Array:
-      if (
-        Array.isArray(tsValue) &&
-        tsValue.every((item) => typeof item === 'number')
-      ) {
-        return Either.right({
-          kind: 'list',
-          value: tsValue.map((item) => ({ kind: 'u16', value: item })),
-        });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'Uint16Array'));
-      }
+      const int16Array = handleTypedArray(tsValue, Int16Array);
+
+      return Either.map(int16Array, (arr) => ({
+        kind: 'list' as const,
+        value: Array.from(arr).map((item) => ({
+          kind: 's16',
+          value: item,
+        })),
+      }));
+
     case TypeKind.Int32Array:
-      if (
-        Array.isArray(tsValue) &&
-        tsValue.every((item) => typeof item === 'number')
-      ) {
-        return Either.right({
-          kind: 'list',
-          value: tsValue.map((item) => ({ kind: 's32', value: item })),
-        });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'Int32Array'));
-      }
-    case TypeKind.Uint32Array:
-      if (
-        Array.isArray(tsValue) &&
-        tsValue.every((item) => typeof item === 'number')
-      ) {
-        return Either.right({
-          kind: 'list',
-          value: tsValue.map((item) => ({ kind: 'u32', value: item })),
-        });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'Uint32Array'));
-      }
-    case TypeKind.Float32Array:
-      if (
-        Array.isArray(tsValue) &&
-        tsValue.every((item) => typeof item === 'number')
-      ) {
-        return Either.right({
-          kind: 'list',
-          value: tsValue.map((item) => ({ kind: 'f32', value: item })),
-        });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'Float32Array'));
-      }
-    case TypeKind.Float64Array:
-      if (
-        Array.isArray(tsValue) &&
-        tsValue.every((item) => typeof item === 'number')
-      ) {
-        return Either.right({
-          kind: 'list',
-          value: tsValue.map((item) => ({ kind: 'f64', value: item })),
-        });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'Float64Array'));
-      }
+      const int32Array = handleTypedArray(tsValue, Int32Array);
+
+      return Either.map(int32Array, (arr) => ({
+        kind: 'list' as const,
+        value: Array.from(arr).map((item) => ({
+          kind: 's32',
+          value: item,
+        })),
+      }));
+
     case TypeKind.BigInt64Array:
-      if (
-        Array.isArray(tsValue) &&
-        tsValue.every((item) => typeof item === 'bigint')
-      ) {
-        return Either.right({
-          kind: 'list',
-          value: tsValue.map((item) => ({ kind: 's64', value: item })),
-        });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'BigInt64Array'));
-      }
+      const int64Array = handleTypedArray(tsValue, BigInt64Array);
+
+      return Either.map(int64Array, (arr) => ({
+        kind: 'list' as const,
+        value: Array.from(arr).map((item) => ({
+          kind: 's64',
+          value: item,
+        })),
+      }));
+
+    case TypeKind.Uint8Array:
+      const uint8Array = handleTypedArray(tsValue, Uint8Array);
+
+      return Either.map(uint8Array, (arr) => ({
+        kind: 'list' as const,
+        value: Array.from(arr).map((item) => ({
+          kind: 'u8',
+          value: item,
+        })),
+      }));
+
+    case TypeKind.Uint16Array:
+      const uint16Array = handleTypedArray(tsValue, Uint16Array);
+
+      return Either.map(uint16Array, (arr) => ({
+        kind: 'list' as const,
+        value: Array.from(arr).map((item) => ({
+          kind: 'u16',
+          value: item,
+        })),
+      }));
+
+    case TypeKind.Uint32Array:
+      const uint32Array = handleTypedArray(tsValue, Uint32Array);
+
+      return Either.map(uint32Array, (arr) => ({
+        kind: 'list' as const,
+        value: Array.from(arr).map((item) => ({
+          kind: 'u32',
+          value: item,
+        })),
+      }));
+
     case TypeKind.BigUint64Array:
-      if (
-        Array.isArray(tsValue) &&
-        tsValue.every((item) => typeof item === 'bigint')
-      ) {
-        return Either.right({
-          kind: 'list',
-          value: tsValue.map((item) => ({ kind: 'u64', value: item })),
-        });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'BigUint64Array'));
-      }
+      const uint64Array = handleTypedArray(tsValue, BigUint64Array);
+
+      return Either.map(uint64Array, (arr) => ({
+        kind: 'list' as const,
+        value: Array.from(arr).map((item) => ({
+          kind: 'u64',
+          value: item,
+        })),
+      }));
+
+    case TypeKind.Float32Array:
+      const float32Array = handleTypedArray(tsValue, Float32Array);
+
+      return Either.map(float32Array, (arr) => ({
+        kind: 'list' as const,
+        value: Array.from(arr).map((item) => ({
+          kind: 'f32',
+          value: item,
+        })),
+      }));
+
+    case TypeKind.Float64Array:
+      const float64Array = handleTypedArray(tsValue, Float64Array);
+
+      return Either.map(float64Array, (arr) => ({
+        kind: 'list' as const,
+        value: Array.from(arr).map((item) => ({
+          kind: 'f32',
+          value: item,
+        })),
+      }));
+
     case TypeKind.Object:
       return handleObject(tsValue, type);
 
@@ -488,6 +491,24 @@ export function fromTsValue(
     default:
       return Either.left(unexpectedTypeError(tsValue, type, Option.none()));
   }
+}
+
+function handleTypedArray<
+  A extends
+    | Uint8Array
+    | Uint16Array
+    | Uint32Array
+    | BigUint64Array
+    | Int8Array
+    | Int16Array
+    | Int32Array
+    | BigInt64Array
+    | Float32Array
+    | Float64Array,
+>(tsValue: unknown, ctor: { new (_: number): A }): Either.Either<A, string> {
+  return tsValue instanceof ctor
+    ? Either.right(tsValue)
+    : Either.left(invalidTypeError(tsValue, ctor.name));
 }
 
 function handleBooleanType(tsValue: any): Either.Either<Value, string> {
@@ -983,14 +1004,15 @@ export function toTsValue(value: Value, expectedType: Type): any {
         value.kind === 's8' ||
         value.kind === 's16' ||
         value.kind === 's32' ||
-        value.kind === 's64'
+        value.kind === 's64' ||
+        value.kind === 'f32'
       ) {
         return value.value;
       } else {
         throw new Error(`Expected number, obtained value ${value}`);
       }
     case TypeKind.BigInt:
-      if (value.kind === 'u64') {
+      if (value.kind === 'u64' || value.kind === 's64') {
         return value.value;
       } else {
         throw new Error(`Expected bigint, obtained value ${value}`);

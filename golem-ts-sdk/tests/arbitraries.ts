@@ -125,6 +125,16 @@ export const baseArb = fc.record({
   tupleProp: tupleArb,
   unionProp: unionArb,
   unionComplexProp: unionComplexArb,
+  uint8ArrayProp: fc.uint8Array({ minLength: 0, maxLength: 10 }),
+  uint16ArrayProp: fc.uint16Array({ minLength: 0, maxLength: 10 }),
+  uint32ArrayProp: fc.uint32Array({ minLength: 0, maxLength: 10 }),
+  uint64ArrayProp: fc.bigUint64Array({ minLength: 0, maxLength: 10 }),
+  int8ArrayProp: fc.int8Array({ minLength: 0, maxLength: 10 }),
+  int16ArrayProp: fc.int16Array({ minLength: 0, maxLength: 10 }),
+  int32ArrayProp: fc.int32Array({ minLength: 0, maxLength: 10 }),
+  int64ArrayProp: fc.bigInt64Array({ minLength: 0, maxLength: 10 }),
+  float32ArrayProp: fc.float32Array({ minLength: 0, maxLength: 10 }),
+  float64ArrayProp: fc.float64Array({ minLength: 0, maxLength: 10 }),
 });
 
 const optionalPropArb = fc
