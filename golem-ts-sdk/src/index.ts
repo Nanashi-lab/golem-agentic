@@ -33,8 +33,7 @@ export * as AgentClassName from './newTypes/AgentClassName';
 
 let resolvedAgent: Option.Option<ResolvedAgent> = Option.none();
 
-const UninitiatedAgentErrorMessage: string =
-  'Agent is not initialized';
+const UninitiatedAgentErrorMessage: string = 'Agent is not initialized';
 
 const UninitializedAgentError: AgentError = createCustomError(
   UninitiatedAgentErrorMessage,
