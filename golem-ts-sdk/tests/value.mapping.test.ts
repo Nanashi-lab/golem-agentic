@@ -178,7 +178,7 @@ describe('typescript value to wit value round-trip conversions', () => {
       int8ArrayProp: new Int8Array([1, 2, 3]),
       int16ArrayProp: new Int16Array([1, 2, 3]),
       int32ArrayProp: new Int32Array([1, 2, 3]),
-      // int64ArrayProp: new BigInt64Array([1n, 2n, 3n]),
+      int64ArrayProp: new BigInt64Array([1n, 2n, 3n]),
     };
 
     const type = getTestInterfaceType();
@@ -212,7 +212,7 @@ describe('typescript value to wit value round-trip conversions', () => {
       int8ArrayProp: new Int8Array([1, 2, 3]),
       int16ArrayProp: new Int16Array([1, 2, 3]),
       int32ArrayProp: new Int32Array([1, 2, 3]),
-      // int64ArrayProp: new BigInt64Array([1n, 2n, 3n]),
+      int64ArrayProp: new BigInt64Array([1n, 2n, 3n]),
       objectComplexProp: {
         a: '',
         b: 0,
@@ -264,7 +264,7 @@ describe('typescript value to wit value round-trip conversions', () => {
       int8ArrayProp: new Int8Array([1, 2, 3]),
       int16ArrayProp: new Int16Array([1, 2, 3]),
       int32ArrayProp: new Int32Array([1, 2, 3]),
-      // int64ArrayProp: new BigInt64Array([1n, 2n, 3n]),
+      int64ArrayProp: new BigInt64Array([1n, 2n, 3n]),
       objectComplexProp: {
         a: '',
         b: 0,

@@ -1015,7 +1015,7 @@ export function toTsValue(value: Value, expectedType: Type): any {
         throw new Error(`Expected number, obtained value ${value}`);
       }
     case TypeKind.BigInt:
-      if (value.kind === 'u64') {
+      if (value.kind === 'u64' || value.kind == 's64') {
         return value.value;
       } else {
         throw new Error(`Expected bigint, obtained value ${value}`);

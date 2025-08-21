@@ -110,7 +110,7 @@ export interface TestInterfaceType {
   int8ArrayProp: Int8Array;
   int16ArrayProp: Int16Array;
   int32ArrayProp: Int32Array;
-  //int64ArrayProp: BigInt64Array;
+  int64ArrayProp: BigInt64Array;
   // FIXME, `RTTIST` bug or not supported yet
   // mapAlternativeProp: MapTypeAlternative,
   // unionPropInlined: string | number;
