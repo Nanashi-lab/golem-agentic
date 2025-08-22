@@ -19,8 +19,8 @@ import { AgentError, AgentType, DataValue } from 'golem:agent/common';
 import { createCustomError } from './internal/agentError';
 import { AgentTypeRegistry } from './internal/registry/agentTypeRegistry';
 import * as Option from 'effect/Option';
-import * as AgentName from './newTypes/AgentTypeName';
 import { AgentInitiatorRegistry } from './internal/registry/agentInitiatorRegistry';
+import { AgentTypeName } from './newTypes/agentTypeName';
 
 export { BaseAgent } from './baseAgent';
 export { AgentId } from './agentId';
@@ -28,8 +28,7 @@ export { prompt, description, agent } from './decorators';
 export { Metadata, TypeMetadata } from './typeMetadata';
 export * from './newTypes/either';
 export { TextInput } from './newTypes/textInput';
-export * as AgentName from './newTypes/AgentTypeName';
-export * as AgentClassName from './newTypes/AgentClassName';
+export { AgentClassName } from './newTypes/agentClassName';
 
 let resolvedAgent: Option.Option<ResolvedAgent> = Option.none();
 
@@ -63,9 +62,7 @@ async function initialize(
     };
   }
 
-  const initiator = AgentInitiatorRegistry.lookup(
-    AgentName.fromString(agentType),
-  );
+  const initiator = AgentInitiatorRegistry.lookup(new AgentTypeName(agentType));
 
   if (Option.isNone(initiator)) {
     const entries = Array.from(AgentInitiatorRegistry.entries()).map(

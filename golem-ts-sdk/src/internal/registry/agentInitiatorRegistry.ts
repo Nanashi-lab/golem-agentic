@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { AgentTypeName } from '../../newTypes/AgentTypeName';
 import * as Option from 'effect/Option';
 import { AgentInitiator } from '../agentInitiator';
+import { AgentTypeName } from '../../newTypes/agentTypeName';
 
 // Although only 1 agent can exist max in a container,
 // the container still keeps track of initiators of all agent classes

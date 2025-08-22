@@ -16,7 +16,7 @@ import { ClassType, ParameterInfo, Type } from 'rttist';
 import * as Either from 'effect/Either';
 import { AgentMethod, DataSchema, ElementSchema } from 'golem:agent/common';
 import * as WitType from './mapping/types/WitType';
-import { AgentClassName } from '../newTypes/AgentClassName';
+import { AgentClassName } from '../newTypes/agentClassName';
 import { AgentMethodMetadataRegistry } from './registry/agentMethodMetadataRegistry';
 
 export function getConstructorDataSchema(
