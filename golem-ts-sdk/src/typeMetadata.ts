@@ -34,7 +34,7 @@ export const TypeMetadata = {
 
   lookupClassMetadata(className: AgentClassName): Option.Option<Type> {
     const types = Metadata.getTypes().filter(
-      (type) => type.isClass() && type.name === className.toString(),
+      (type) => type.isClass() && type.name === className.value,
     );
 
     if (types.length === 0) {
