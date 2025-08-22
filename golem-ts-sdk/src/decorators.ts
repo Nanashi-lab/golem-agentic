@@ -129,7 +129,7 @@ export function agent() {
       TypeMetadata.lookupClassMetadata(agentClassName),
       () => {
         throw new Error(
-          `Agent class ${agentClassName} is not registered in TypeMetadata. Please ensure the class is decorated with @agent()`,
+          `Agent class ${agentClassName.value} is not registered in TypeMetadata. Please ensure the class is decorated with @agent()`,
         );
       },
     );
