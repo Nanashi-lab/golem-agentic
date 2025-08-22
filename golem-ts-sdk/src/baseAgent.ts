@@ -16,7 +16,7 @@ import { AgentType } from 'golem:agent/common';
 import { AgentId } from './agentId';
 import { AgentTypeRegistry } from './internal/registry/agentTypeRegistry';
 import * as Option from 'effect/Option';
-import * as AgentClassName from './newTypes/AgentClassName';
+import { AgentClassName } from './newTypes/agentClassName';
 
 /**
  * BaseAgent is the foundational class for defining agent implementations.
@@ -59,7 +59,7 @@ export class BaseAgent {
    * @throws Will throw if metadata is missing or the agent is not properly registered.
    */
   getAgentType(): AgentType {
-    const agentClassName = AgentClassName.fromString(this.constructor.name);
+    const agentClassName = new AgentClassName(this.constructor.name);
 
     const agentType = AgentTypeRegistry.lookup(agentClassName);
 

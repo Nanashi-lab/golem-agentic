@@ -28,12 +28,12 @@ import {
 } from './internal/schema';
 import * as Option from 'effect/Option';
 import { AgentMethodMetadataRegistry } from './internal/registry/agentMethodMetadataRegistry';
-import * as AgentClassName from './newTypes/AgentClassName';
-import * as AgentName from './newTypes/AgentTypeName';
+import { AgentClassName } from './newTypes/agentClassName';
 import { AgentInitiatorRegistry } from './internal/registry/agentInitiatorRegistry';
 import { getSelfMetadata } from 'golem:api/host@1.1.7';
 import { AgentId } from './agentId';
 import { createCustomError } from './internal/agentError';
+import { AgentTypeName } from './newTypes/agentTypeName';
 
 /**
  * Marks a class as an Agent and registers it in the global agent registry.
@@ -119,7 +119,7 @@ import { createCustomError } from './internal/agentError';
  */
 export function agent() {
   return function <T extends new (...args: any[]) => any>(ctor: T) {
-    const agentClassName = AgentClassName.fromString(ctor.name);
+    const agentClassName = new AgentClassName(ctor.name);
 
     if (AgentTypeRegistry.exists(agentClassName)) {
       return ctor;
@@ -157,13 +157,13 @@ export function agent() {
 
     const methods = methodSchemaEither.right;
 
-    const agentName = AgentName.fromAgentClassName(agentClassName);
+    const agentTypeName = AgentTypeName.fromAgentClassName(agentClassName);
 
     const agentType: AgentType = {
-      typeName: agentName,
-      description: agentClassName,
+      typeName: agentTypeName.value,
+      description: agentClassName.value,
       constructor: {
-        name: agentClassName,
+        name: agentClassName.value,
         description: `Constructs ${agentClassName}`,
         promptHint: 'Enter something...',
         inputSchema: constructorDataSchema,
@@ -177,7 +177,7 @@ export function agent() {
     (ctor as any).get = getRemoteClient(ctor);
 
     AgentInitiatorRegistry.register(
-      AgentName.fromAgentClassName(agentClassName),
+      AgentTypeName.fromAgentClassName(agentClassName),
       {
         initiate: (agentName: string, constructorParams: DataValue) => {
           const constructorInfo = (classType as ClassType).getConstructors()[0];
@@ -331,7 +331,7 @@ export function agent() {
 
 export function prompt(prompt: string) {
   return function (target: Object, propertyKey: string) {
-    const agentClassName = AgentClassName.fromString(target.constructor.name);
+    const agentClassName = new AgentClassName(target.constructor.name);
     AgentMethodMetadataRegistry.setPromptName(
       agentClassName,
       propertyKey,
@@ -342,7 +342,7 @@ export function prompt(prompt: string) {
 
 export function description(desc: string) {
   return function (target: Object, propertyKey: string) {
-    const agentClassName = AgentClassName.fromString(target.constructor.name);
+    const agentClassName = new AgentClassName(target.constructor.name);
     AgentMethodMetadataRegistry.setDescription(
       agentClassName,
       propertyKey,

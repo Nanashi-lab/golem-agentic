@@ -19,10 +19,10 @@ import * as Either from 'effect/Either';
 import * as Value from './mapping/values/Value';
 import * as WitValue from './mapping/values/WitValue';
 import { AgentId } from '../agentId';
-import * as AgentClassName from '../newTypes/AgentClassName';
-import * as AgentTypeName from '../newTypes/AgentTypeName';
 import * as Option from 'effect/Option';
 import { getAgentType, RegisteredAgentType } from 'golem:agent/host';
+import { AgentTypeName } from '../newTypes/agentTypeName';
+import { AgentClassName } from '../newTypes/agentClassName';
 
 export function getRemoteClient<T extends new (...args: any[]) => any>(
   ctor: T,
@@ -30,11 +30,11 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
   return (...args: any[]) => {
     const instance = new ctor(...args);
 
-    const agentClassName = AgentClassName.fromString(ctor.name);
+    const agentClassName = new AgentClassName(ctor.name);
     const agentTypeName = AgentTypeName.fromAgentClassName(agentClassName);
 
     const metadataOpt = TypeMetadata.lookupClassMetadata(
-      AgentClassName.fromString(ctor.name),
+      new AgentClassName(ctor.name),
     );
 
     if (Option.isNone(metadataOpt)) {
@@ -70,7 +70,7 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
 
 // Initialize client simply does a rpc-invoke on the initialize function of the remote agent
 function initializeClient(
-  agentClassName: AgentClassName.AgentClassName,
+  agentClassName: AgentClassName,
   constructorArgs: any[],
   classMetadata: Type,
 ): Either.Either<WorkerId, string> {
@@ -108,7 +108,7 @@ function initializeClient(
 
   const agentTypeNameValue: Value.Value = {
     kind: 'string',
-    value: agentTypeName,
+    value: agentTypeName.value,
   };
 
   let witValues = [
@@ -130,7 +130,7 @@ function initializeClient(
 function getMethodProxy(
   classMetadata: Type,
   prop: string | symbol,
-  agentTypeName: AgentTypeName.AgentTypeName,
+  agentTypeName: AgentTypeName,
   workerId: WorkerId,
 ) {
   const methodSignature = (classMetadata as ClassType)
@@ -184,7 +184,7 @@ function getMethodProxy(
 // would be a way to reuse - may be a host function that retrieves the worker-id
 // given value in JSON format, and the wit-type of each value and agent-type name?
 function getWorkerId(
-  agentTypeName: AgentTypeName.AgentTypeName,
+  agentTypeName: AgentTypeName,
   constructorArgs: any[],
 ): Either.Either<WorkerId, string> {
   // PlaceHolder implementation that finds the container-id corresponding to the agentType!
@@ -192,7 +192,7 @@ function getWorkerId(
   // But we don't have that functionality yet, hence just retrieving the current
   // component-id (for now)
   const optionalRegisteredAgentType = Option.fromNullable(
-    getAgentType(agentTypeName),
+    getAgentType(agentTypeName.value),
   );
 
   if (Option.isNone(optionalRegisteredAgentType)) {

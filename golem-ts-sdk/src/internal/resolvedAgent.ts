@@ -18,7 +18,7 @@ import { AgentInternal } from './agentInternal';
 import { AgentId } from '../agentId';
 import { AgentTypeRegistry } from './registry/agentTypeRegistry';
 import * as Option from 'effect/Option';
-import * as AgentClassName from '../newTypes/AgentClassName';
+import * as AgentClassName from '../newTypes/agentClassName';
 
 export class ResolvedAgent {
   readonly classInstance: any;

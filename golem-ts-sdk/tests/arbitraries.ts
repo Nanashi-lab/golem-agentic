@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as fc from 'fast-check';
+import fc from 'fast-check';
+
 import {
   ListComplexType,
   ListType,
@@ -25,6 +26,37 @@ import {
   UnionComplexType,
   UnionType,
 } from './testData';
+
+import { AgentClassName } from '../src';
+
+const base = 'AssistantAgent';
+
+const specialChars = [
+  '$',
+  '_',
+  '0',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+];
+
+//Ts class names can have $ and _ and digits
+export const agentClassNameArb: fc.Arbitrary<AgentClassName> = fc
+  .array(fc.constantFrom(...specialChars), { maxLength: 5 })
+  .map((extraChars) => {
+    const chars = base.split('');
+    extraChars.forEach((c) => {
+      const index = Math.floor(Math.random() * (chars.length + 1));
+      chars.splice(index, 0, c);
+    });
+    return new AgentClassName(chars.join(''));
+  });
 
 export const mapArb: fc.Arbitrary<MapType> = fc
   .dictionary(fc.string(), fc.integer())

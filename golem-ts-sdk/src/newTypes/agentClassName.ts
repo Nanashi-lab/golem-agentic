@@ -12,18 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Branded } from '../internal/branding';
-import { AgentClassName } from './AgentClassName';
-
-export type AgentTypeName = Branded<string, 'AgentName'>;
-
-export const fromString = (name: string): AgentTypeName => {
-  return name as AgentTypeName;
-};
-
-export const fromAgentClassName = (
-  agentClassName: AgentClassName,
-): AgentTypeName => {
-  const name: string = agentClassName.toString(); // To be converted to kebab case
-  return name as AgentTypeName;
-};
+export class AgentClassName {
+  constructor(readonly value: string) {}
+}
