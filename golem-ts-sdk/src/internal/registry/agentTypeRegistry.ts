@@ -15,16 +15,25 @@
 import { AgentType } from 'golem:agent/common';
 import { AgentClassName } from '../../newTypes/agentClassName';
 import * as Option from 'effect/Option';
+import { AgentTypeName } from '../../newTypes/agentTypeName';
+import { AgentInitiator } from '../agentInitiator';
 
-const agentTypeRegistry = new Map<AgentClassName, AgentType>();
+type AgentClassNameString = string;
+
+const agentTypeRegistry = new Map<AgentClassNameString, AgentType>();
 
 export const AgentTypeRegistry = {
   register(agentClassName: AgentClassName, agentType: AgentType): void {
-    agentTypeRegistry.set(agentClassName, agentType);
+    agentTypeRegistry.set(agentClassName.value, agentType);
   },
 
   entries(): IterableIterator<[AgentClassName, AgentType]> {
-    return agentTypeRegistry.entries();
+    return Array.from(agentTypeRegistry.entries())
+      .map(
+        ([name, agentType]) =>
+          [new AgentClassName(name), agentType] as [AgentClassName, AgentType],
+      )
+      [Symbol.iterator]();
   },
 
   getRegisteredAgents(): AgentType[] {
@@ -32,10 +41,10 @@ export const AgentTypeRegistry = {
   },
 
   lookup(agentClassName: AgentClassName): Option.Option<AgentType> {
-    return Option.fromNullable(agentTypeRegistry.get(agentClassName));
+    return Option.fromNullable(agentTypeRegistry.get(agentClassName.value));
   },
 
   exists(agentClassName: AgentClassName): boolean {
-    return agentTypeRegistry.has(agentClassName);
+    return agentTypeRegistry.has(agentClassName.value);
   },
 };
