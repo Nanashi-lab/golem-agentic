@@ -66,13 +66,13 @@ async function initialize(
 
   if (Option.isNone(initiator)) {
     const entries = Array.from(AgentInitiatorRegistry.entries()).map(
-      (entry) => entry[0],
+      (entry) => entry[0].value,
     );
 
     return {
       tag: 'err',
       val: createCustomError(
-        `No implementation found for agent: ${agentType}. Valid entries are ${entries.join(', ')}`,
+        `Invalid agent'${agentType}'. Valid agents are ${entries.join(', ')}`,
       ),
     };
   }

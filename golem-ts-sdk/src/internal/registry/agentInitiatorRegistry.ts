@@ -16,21 +16,29 @@ import * as Option from 'effect/Option';
 import { AgentInitiator } from '../agentInitiator';
 import { AgentTypeName } from '../../newTypes/agentTypeName';
 
-// Although only 1 agent can exist max in a container,
-// the container still keeps track of initiators of all agent classes
-// in the user code
-const agentInitiators = new Map<AgentTypeName, AgentInitiator>();
+// Although only 1 agent instance can exist max in a container,
+// the container will end up keeping track of initiators of all agent classes
+// in the user code for obvious reasons
+const agentInitiators = new Map<string, AgentInitiator>();
 
 export const AgentInitiatorRegistry = {
   register(agentName: AgentTypeName, agentInitiator: AgentInitiator): void {
-    agentInitiators.set(agentName, agentInitiator);
+    agentInitiators.set(agentName.value, agentInitiator);
   },
 
   lookup(agentName: AgentTypeName): Option.Option<AgentInitiator> {
-    return Option.fromNullable(agentInitiators.get(agentName));
+    return Option.fromNullable(agentInitiators.get(agentName.value));
   },
 
   entries(): IterableIterator<[AgentTypeName, AgentInitiator]> {
-    return agentInitiators.entries();
+    return Array.from(agentInitiators.entries())
+      .map(
+        ([name, initiator]) =>
+          [new AgentTypeName(name), initiator] as [
+            AgentTypeName,
+            AgentInitiator,
+          ],
+      )
+      [Symbol.iterator]();
   },
 };

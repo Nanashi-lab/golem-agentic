@@ -14,24 +14,27 @@
 
 import { AgentClassName } from '../../newTypes/agentClassName';
 
+type AgentClassNameString = string;
+type AgentMethodNameString = string;
+
 const agentMethodMetadataRegistry = new Map<
-  AgentClassName,
-  Map<string, { prompt?: string; description?: string }>
+  AgentClassNameString,
+  Map<AgentMethodNameString, { prompt?: string; description?: string }>
 >();
 
 export const AgentMethodMetadataRegistry = {
   ensureMeta(agentClassName: AgentClassName, method: string) {
-    if (!agentMethodMetadataRegistry.has(agentClassName)) {
-      agentMethodMetadataRegistry.set(agentClassName, new Map());
+    if (!agentMethodMetadataRegistry.has(agentClassName.value)) {
+      agentMethodMetadataRegistry.set(agentClassName.value, new Map());
     }
-    const classMeta = agentMethodMetadataRegistry.get(agentClassName)!;
+    const classMeta = agentMethodMetadataRegistry.get(agentClassName.value)!;
     if (!classMeta.has(method)) {
       classMeta.set(method, {});
     }
   },
 
   lookup(agentClassName: AgentClassName) {
-    return agentMethodMetadataRegistry.get(agentClassName);
+    return agentMethodMetadataRegistry.get(agentClassName.value);
   },
 
   setPromptName(
@@ -40,7 +43,7 @@ export const AgentMethodMetadataRegistry = {
     prompt: string,
   ) {
     AgentMethodMetadataRegistry.ensureMeta(agentClassName, method);
-    const classMeta = agentMethodMetadataRegistry.get(agentClassName)!;
+    const classMeta = agentMethodMetadataRegistry.get(agentClassName.value)!;
     classMeta.get(method)!.prompt = prompt;
   },
 
@@ -50,7 +53,7 @@ export const AgentMethodMetadataRegistry = {
     description: string,
   ) {
     AgentMethodMetadataRegistry.ensureMeta(agentClassName, method);
-    const classMeta = agentMethodMetadataRegistry.get(agentClassName)!;
+    const classMeta = agentMethodMetadataRegistry.get(agentClassName.value)!;
     classMeta.get(method)!.description = description;
   },
 };
