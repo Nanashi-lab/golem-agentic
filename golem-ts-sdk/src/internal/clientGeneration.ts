@@ -116,7 +116,10 @@ function initializeClient(
     ...constructorParamWitValuesResult.right,
   ];
 
-  const initResult = rpc.invokeAndAwait(`agent.{initialize}`, witValues);
+  const initResult = rpc.invokeAndAwait(
+    `${agentTypeName}.{initialize}`,
+    witValues,
+  );
 
   if (initResult.tag === 'err') {
     throw new Error(
