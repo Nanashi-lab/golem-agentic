@@ -45,12 +45,10 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
 
     const metadata = metadataOpt.value;
 
-    const workerIdEither = initializeClient(agentClassName, args, metadata);
+    const workerIdEither = initialiseClient(agentClassName, args, metadata);
 
     if (Either.isLeft(workerIdEither)) {
-      throw new Error(
-        `Failed to initialize remote agent: ${workerIdEither.left}`,
-      );
+      throw new Error(workerIdEither.left);
     }
 
     const workerId = workerIdEither.right;
@@ -69,7 +67,8 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
 }
 
 // Initialize client simply does a rpc-invoke on the initialize function of the remote agent
-function initializeClient(
+// SDK will remove this initialization.
+function initialiseClient(
   agentClassName: AgentClassName,
   constructorArgs: any[],
   classMetadata: Type,
@@ -116,14 +115,16 @@ function initializeClient(
     ...constructorParamWitValuesResult.right,
   ];
 
-  const initResult = rpc.invokeAndAwait(
-    `${agentTypeName}.{initialize}`,
-    witValues,
-  );
+  const functionName = `${agentTypeName.value}.{initialize}`;
+
+  const initResult = rpc.invokeAndAwait(functionName, witValues);
 
   if (initResult.tag === 'err') {
     throw new Error(
-      'Failed to initialize remote agent: ' + JSON.stringify(initResult.val),
+      'Failed to initialize remote agent:' +
+        functionName +
+        ' ' +
+        JSON.stringify(initResult.val),
     );
   }
 
@@ -144,7 +145,7 @@ function getMethodProxy(
   const returnType = methodSignature.returnType;
 
   return (...fnArgs: any[]) => {
-    const functionName = `${agentTypeName}.{${prop.toString()}}`;
+    const functionName = `${agentTypeName.value}.{${prop.toString()}}`;
 
     const parameterWitValuesEither = Either.all(
       fnArgs.map((fnArg, index) => {
