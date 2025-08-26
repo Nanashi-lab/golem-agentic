@@ -78,8 +78,6 @@ export const TypeMetadata = {
         }
 
         TypeMetadata.updateV2(className, constructorArgs, methods);
-
-        console.log(`Metadata captured for class: ${className}`);
       }
     }
   },
