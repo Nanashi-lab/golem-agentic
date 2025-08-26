@@ -27,7 +27,8 @@ export { AgentId } from './agentId';
 export { prompt, description, agent } from './decorators';
 export { Metadata, TypeMetadata } from './typeMetadata';
 export * from './newTypes/either';
-export { TextInput } from './newTypes/textInput';
+export * from './newTypes/agentClassName';
+export * from './newTypes/textInput';
 export { AgentClassName } from './newTypes/agentClassName';
 
 let resolvedAgent: Option.Option<ResolvedAgent> = Option.none();

@@ -12,7 +12,6 @@ export default defineConfig({
         sourcemap: false,
     },
     external: (id) =>
-        id === '@golemcloud/golem-ts-sdk' ||
         // They are external. With tsup, only the parent package was needed
         // but with rollup, either specify one by one or just use startsWith
         // May be I am wrong - I am not used to rollup

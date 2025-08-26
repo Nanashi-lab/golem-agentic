@@ -67,6 +67,7 @@
   "private": false,
   "dependencies": {
     "effect": "^3.17.6",
-    "rttist": "^1.0.0-rc.4"
+    "rttist": "^1.0.0-rc.4",
+    "ts-morph": "^26.0.0"
   }
 }
