@@ -43,12 +43,22 @@ async function main() {
                 console.log(JSON.stringify(x));
             }
 
-            console.log("return tyoe is " + method.getReturnType().getText())
+            console.log("done with method params");
+
+            let x = describeType(method.getReturnType());
+            console.log(JSON.stringify(x));
         }
     }
 }
 
 function describeType(type: Type): any {
+
+    // --- Promise ---
+    const symbol = type.getSymbol();
+    if (symbol?.getName() === "Promise" && type.getTypeArguments().length === 1) {
+        const inner = type.getTypeArguments()[0];
+        return { kind: "promise", elementType: describeType(inner) };
+    }
 
     if (type.isArray()) {
         const elem = type.getArrayElementTypeOrThrow();
