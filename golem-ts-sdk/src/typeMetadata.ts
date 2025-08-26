@@ -15,7 +15,7 @@
 import {
   BaseMetadataLibrary,
   GlobalMetadata,
-  Type as RTTISTType,
+  Type as LegacyType,
 } from 'rttist';
 import { AgentClassName } from './newTypes/agentClassName';
 import * as Option from 'effect/Option';
@@ -77,12 +77,12 @@ export const TypeMetadata = {
           methods.set(method.getName(), { methodParams, returnType });
         }
 
-        TypeMetadata.updateV2(className, constructorArgs, methods);
+        TypeMetadata.update(className, constructorArgs, methods);
       }
     }
   },
 
-  updateV2(
+  update(
     className: ClassNameString,
     constructorArgs: ConstructorArg[],
     methods: Map<
@@ -105,12 +105,12 @@ export const TypeMetadata = {
     return MetadataV2;
   },
 
-  update(metadata: Array<any>): void {
+  updateLegacy(metadata: Array<any>): void {
     Metadata.clearMetadata(PackageName);
     metadata.forEach((mod) => mod.add(Metadata, false));
   },
 
-  lookupClassMetadata(className: AgentClassName): Option.Option<RTTISTType> {
+  lookupClassMetadata(className: AgentClassName): Option.Option<LegacyType> {
     const types = Metadata.getTypes().filter(
       (type) => type.isClass() && type.name === className.value,
     );
