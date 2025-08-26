@@ -3,11 +3,7 @@ import {
     agent,
     prompt,
     description,
-    TextInput
 } from '@golemcloud/golem-ts-sdk';
-
-import * as Option from 'effect/Option';
-
 
 type Question = {
     text: string
@@ -29,7 +25,7 @@ class AssistantAgent extends BaseAgent {
         const location: LatLong = { lat: 12.34, long: 56.78 };
 
         const remoteWeatherClient = WeatherAgent.get("afsal");
-        const remoteWeather = remoteWeatherClient.getWeather(location, Option.none());
+        const remoteWeather = await remoteWeatherClient.getWeather(location);
 
         return "The weather is: " + remoteWeather;
     }
@@ -46,7 +42,9 @@ class WeatherAgent extends BaseAgent {
 
     @prompt("Get weather")
     @description("Weather forecast weather for you")
-    getWeather(location: Location, x: string): Promise<TextInput> {
-        throw new Error("Method not implemented.");
+    async getWeather(location: Location): Promise<string> {
+        return Promise.resolve(
+            `Weather for ${location} is sunny!`
+        );
     }
 }
