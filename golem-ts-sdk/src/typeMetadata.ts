@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { BaseMetadataLibrary, GlobalMetadata, Type as RTTISTType } from 'rttist';
+import {
+  BaseMetadataLibrary,
+  GlobalMetadata,
+  Type as RTTISTType,
+} from 'rttist';
 import { AgentClassName } from './newTypes/agentClassName';
 import * as Option from 'effect/Option';
-import {SourceFile, Type} from 'ts-morph';
+import { SourceFile, Type } from 'ts-morph';
 
 export const PackageName = '@golemcloud/golem-ts-sdk';
 
@@ -30,7 +34,7 @@ export const Metadata = new BaseMetadataLibrary(
 type ClassNameString = string;
 type MethodNameString = string;
 
-type MethodParams  =  Map<string, Type>;
+type MethodParams = Map<string, Type>;
 
 type ReturnType = Type;
 
@@ -38,14 +42,15 @@ type ConstructorArg = { name: string; type: Type };
 
 type ClassMetadata = {
   constructorArgs: ConstructorArg[];
-  methods: Map<MethodNameString, { methodParams: MethodParams; returnType: ReturnType }>;
+  methods: Map<
+    MethodNameString,
+    { methodParams: MethodParams; returnType: ReturnType }
+  >;
 };
-
 
 const MetadataV2 = new Map<ClassNameString, ClassMetadata>();
 
 export const TypeMetadata = {
-
   updateFromSourceFiles(sourceFiles: SourceFile[]) {
     for (const sourceFile of sourceFiles) {
       const classes = sourceFile.getClasses();
@@ -54,14 +59,20 @@ export const TypeMetadata = {
         const className = classDecl.getName();
         if (!className) continue;
 
-        const constructorArgs = classDecl.getConstructors()[0]?.getParameters().map(p => ({
-          name: p.getName(),
-          type: p.getType(),
-        })) ?? [];
+        const constructorArgs =
+          classDecl
+            .getConstructors()[0]
+            ?.getParameters()
+            .map((p) => ({
+              name: p.getName(),
+              type: p.getType(),
+            })) ?? [];
 
         const methods = new Map();
         for (const method of classDecl.getMethods()) {
-          const methodParams = new Map(method.getParameters().map(p => [p.getName(), p.getType()]));
+          const methodParams = new Map(
+            method.getParameters().map((p) => [p.getName(), p.getType()]),
+          );
           const returnType = method.getReturnType();
           methods.set(method.getName(), { methodParams, returnType });
         }
@@ -74,9 +85,12 @@ export const TypeMetadata = {
   },
 
   updateV2(
-      className: ClassNameString,
-      constructorArgs: ConstructorArg[],
-      methods: Map<MethodNameString, { methodParams: MethodParams; returnType: ReturnType }>
+    className: ClassNameString,
+    constructorArgs: ConstructorArg[],
+    methods: Map<
+      MethodNameString,
+      { methodParams: MethodParams; returnType: ReturnType }
+    >,
   ) {
     MetadataV2.set(className, { constructorArgs, methods });
   },
@@ -85,11 +99,9 @@ export const TypeMetadata = {
     return MetadataV2.get(className);
   },
 
-
   has(className: ClassNameString): boolean {
     return MetadataV2.has(className);
   },
-
 
   getAll(): Map<ClassNameString, ClassMetadata> {
     return MetadataV2;
