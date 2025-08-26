@@ -34,13 +34,13 @@ export const Metadata = new BaseMetadataLibrary(
 type ClassNameString = string;
 type MethodNameString = string;
 
-type MethodParams = Map<string, Type>;
+export type MethodParams = Map<string, Type>;
 
-type ReturnType = Type;
+export type ReturnType = Type;
 
-type ConstructorArg = { name: string; type: Type };
+export type ConstructorArg = { name: string; type: Type };
 
-type ClassMetadata = {
+export type ClassMetadata = {
   constructorArgs: ConstructorArg[];
   methods: Map<
     MethodNameString,
@@ -93,8 +93,8 @@ export const TypeMetadata = {
     MetadataV2.set(className, { constructorArgs, methods });
   },
 
-  get(className: ClassNameString): ClassMetadata | undefined {
-    return MetadataV2.get(className);
+  get(className: AgentClassName): Option.Option<ClassMetadata> {
+    return Option.fromNullable(MetadataV2.get(className.value));
   },
 
   has(className: ClassNameString): boolean {

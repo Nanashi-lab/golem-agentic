@@ -125,14 +125,11 @@ export function agent() {
       return ctor;
     }
 
-    let classType = Option.getOrElse(
-      TypeMetadata.lookupClassMetadata(agentClassName),
-      () => {
-        throw new Error(
-          `Agent class ${agentClassName.value} is not registered in TypeMetadata. Please ensure the class is decorated with @agent()`,
-        );
-      },
-    );
+    let classType = Option.getOrElse(TypeMetadata.get(agentClassName), () => {
+      throw new Error(
+        `Agent class ${agentClassName.value} is not registered in TypeMetadata. Please ensure the class is decorated with @agent()`,
+      );
+    });
 
     const constructorDataSchema = Either.getOrElse(
       getConstructorDataSchema(classType),

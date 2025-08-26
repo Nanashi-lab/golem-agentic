@@ -18,22 +18,13 @@ import { AgentMethod, DataSchema, ElementSchema } from 'golem:agent/common';
 import * as WitType from './mapping/types/WitType';
 import { AgentClassName } from '../newTypes/agentClassName';
 import { AgentMethodMetadataRegistry } from './registry/agentMethodMetadataRegistry';
+import { ClassMetadata, ConstructorArg } from '../typeMetadata';
 
 export function getConstructorDataSchema(
-  classType: Type,
+  classType: ClassMetadata,
 ): Either.Either<DataSchema, string> {
-  const constructorInfos = (classType as ClassType).getConstructors();
-
-  if (constructorInfos.length > 1) {
-    throw new Error(
-      `Agent type ${classType.name} has multiple constructors. Please specify the constructor parameters explicitly.`,
-    );
-  }
-
-  const constructorSignatureInfo = constructorInfos[0];
-
-  const constructorParamInfos: readonly ParameterInfo[] =
-    constructorSignatureInfo.getParameters();
+  const constructorParamInfos: readonly ConstructorArg[] =
+    classType.constructorArgs;
 
   const constructorParamTypes = Either.all(
     constructorParamInfos.map((paramInfo) =>
