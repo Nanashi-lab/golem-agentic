@@ -46,7 +46,7 @@ class WeatherAgent extends BaseAgent {
 
     @prompt("Get weather")
     @description("Weather forecast weather for you")
-    getWeather(location: Location, x: Option.Option<string>): Promise<TextInput> {
+    getWeather(location: Location, x: string): Promise<TextInput> {
         throw new Error("Method not implemented.");
     }
 }

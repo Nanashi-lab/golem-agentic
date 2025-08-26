@@ -1,22 +1,22 @@
 import {Project, ts, Type} from "ts-morph";
 
 async function main() {
-    
+
     const project = new Project({
         tsConfigFilePath: "./tsconfig.json",
     });
 
-    
+
     const sourceFile = project.getSourceFileOrThrow("src/index.ts");
 
-    
+
     const classDecls = sourceFile.getClasses();
 
     for (const classDecl of classDecls) {
 
         console.log("Class:", classDecl.getName());
 
-        
+
         for (const ctor of classDecl.getConstructors()) {
             console.log("  Constructor:");
             for (const param of ctor.getParameters()) {
@@ -27,12 +27,12 @@ async function main() {
             }
         }
 
-        
+
         for (const prop of classDecl.getProperties()) {
             console.log("  Property:", prop.getName(), ":", prop.getType().getText());
         }
 
-        
+
         for (const method of classDecl.getMethods()) {
             console.log("  Method:", method.getName(), "→", method.getReturnType().getText());
             for (const param of method.getParameters()) {
@@ -40,7 +40,7 @@ async function main() {
 
                 let x = describeType(type);
 
-                console.log(x);
+                console.log(JSON.stringify(x));
             }
 
             console.log("return tyoe is " + method.getReturnType().getText())
@@ -49,7 +49,7 @@ async function main() {
 }
 
 function describeType(type: Type): any {
-    
+
     if (type.isArray()) {
         const elem = type.getArrayElementTypeOrThrow();
         return {
@@ -58,12 +58,19 @@ function describeType(type: Type): any {
         };
     }
 
-    
+    if (type.isUnion()) {
+        return {
+            kind: "union",
+            types: type.getUnionTypes().map(t => describeType(t))
+        };
+    }
+
+
     if (type.isString()) return { kind: "string" };
     if (type.isNumber()) return { kind: "number" };
     if (type.isBoolean()) return { kind: "boolean" };
 
-    
+
     if (type.isObject()) {
         const props: Record<string, any> = {};
         for (const prop of type.getProperties()) {
@@ -76,7 +83,7 @@ function describeType(type: Type): any {
         };
     }
 
-    
+
     return { kind: "unknown", text: type.getText() };
 }
 
