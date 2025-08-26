@@ -121,9 +121,9 @@ function initialiseClient(
 
   if (initResult.tag === 'err') {
     throw new Error(
-      'Failed to initialize remote agent:' +
+      'Failed to initialize remote agent (' +
         functionName +
-        ' ' +
+        '). Error: ' +
         JSON.stringify(initResult.val),
     );
   }
