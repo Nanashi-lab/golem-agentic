@@ -1,4 +1,5 @@
-import {Project, ts, Type} from "ts-morph";
+import {Project, Type} from "ts-morph";
+import {TypeMetadata} from "@golemcloud/golem-ts-sdk";
 
 async function main() {
 
@@ -7,48 +8,9 @@ async function main() {
     });
 
 
-    const sourceFile = project.getSourceFileOrThrow("src/index.ts");
+    const sourceFiles = project.getSourceFiles("src/**/*.ts");
 
-
-    const classDecls = sourceFile.getClasses();
-
-    for (const classDecl of classDecls) {
-
-        console.log("Class:", classDecl.getName());
-
-
-        for (const ctor of classDecl.getConstructors()) {
-            console.log("  Constructor:");
-            for (const param of ctor.getParameters()) {
-                let x: Type = param.getType();
-                console.log(x.getText());
-
-                console.log("    -", param.getName(), ":", param.getType().getText());
-            }
-        }
-
-
-        for (const prop of classDecl.getProperties()) {
-            console.log("  Property:", prop.getName(), ":", prop.getType().getText());
-        }
-
-
-        for (const method of classDecl.getMethods()) {
-            console.log("  Method:", method.getName(), "→", method.getReturnType().getText());
-            for (const param of method.getParameters()) {
-                let type = param. getType();
-
-                let x = describeType(type);
-
-                console.log(JSON.stringify(x));
-            }
-
-            console.log("done with method params");
-
-            let x = describeType(method.getReturnType());
-            console.log(JSON.stringify(x));
-        }
-    }
+    TypeMetadata.updateFromSourceFiles(sourceFiles)
 }
 
 function describeType(type: Type): any {
