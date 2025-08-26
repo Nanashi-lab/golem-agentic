@@ -13,9 +13,9 @@ async function main() {
     TypeMetadata.updateFromSourceFiles(sourceFiles)
 }
 
+// To be kind of moved to SDK lqter on
 function describeType(type: Type): any {
-
-    // --- Promise ---
+    // hmmm
     const symbol = type.getSymbol();
     if (symbol?.getName() === "Promise" && type.getTypeArguments().length === 1) {
         const inner = type.getTypeArguments()[0];
