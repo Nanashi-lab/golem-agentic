@@ -66,6 +66,7 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
   };
 }
 
+// TODO: Initialisation can/should be removed from SDK when golem executor does it automatically
 // Initialize client simply does a rpc-invoke on the initialize function of the remote agent
 // SDK will remove this initialization.
 function initialiseClient(
