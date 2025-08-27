@@ -39,7 +39,7 @@ import {
   unionComplexArb,
 } from './arbitraries';
 import * as fc from 'fast-check';
-import { Type } from 'rttist';
+import { Type } from 'ts-morph';
 import * as EffectEither from 'effect/Either';
 import { ok } from '../src/newTypes/either';
 import * as WitValue from '../src/internal/mapping/values/WitValue';

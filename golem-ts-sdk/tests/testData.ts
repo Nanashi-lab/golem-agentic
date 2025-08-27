@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import { Either } from '../src/newTypes/either';
+import {agent, BaseAgent} from '../src';
 
 // DO NOT RENAME INTERFACES OR PROPERTIES.
 // These names are introspected using RTTIST metadata reflection
@@ -138,3 +139,39 @@ export interface TestInterfaceType {
 // }
 //
 // type EnumTypeAlias = EnumType;
+
+@agent()
+class MyAgent extends BaseAgent {
+  constructor(readonly testInterfaceType: TestInterfaceType) {
+    super();
+    this.testInterfaceType = testInterfaceType;
+  }
+
+  async getWeather(
+    complexType: ObjectComplexType,
+    union: UnionComplexType,
+    numberType: NumberType,
+    stringType: StringType,
+    booleanType: BooleanType,
+    mapType: MapType,
+    tupleComplexType: TupleComplexType,
+    tupleType: TupleType,
+    listComplexType: ListComplexType,
+    listType: ListType,
+    objectType: ObjectType,
+  ): PromiseType {
+    console.log(this.testInterfaceType);
+    console.log(complexType);
+    console.log(union);
+    console.log(numberType);
+    console.log(stringType);
+    console.log(booleanType);
+    console.log(mapType);
+    console.log(tupleComplexType);
+    console.log(tupleType);
+    console.log(listComplexType);
+    console.log(listType);
+    console.log(objectType);
+    return Promise.resolve(`Weather for ${location} is sunny!`);
+  }
+}
