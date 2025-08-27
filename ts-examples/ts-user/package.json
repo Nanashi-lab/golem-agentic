@@ -25,9 +25,8 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "@golemcloud/golem-ts-sdk": "^0.0.1-dev.24",
+    "@golemcloud/golem-ts-sdk": "^0.0.1-dev.25",
     "effect": "^3.17.9",
-    "rttist": "^1.0.0-rc.4",
     "tslib": "^2.0.0"
   }
 }

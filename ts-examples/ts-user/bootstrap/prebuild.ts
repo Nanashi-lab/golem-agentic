@@ -16,16 +16,6 @@ const __dirname = path.dirname(__filename)
 const configPath = path.resolve(__dirname, '../.buildrc.json');
 const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 
-try {
-    // !!! npx should come in as part of node js- that's what I found
-    // so this may not be needed.
-    execSync('npx --version', { stdio: 'ignore' });
-    execSync('npx @rttist/typegen@0.2.0 generate', { stdio: 'inherit' });
-} catch (e) {
-    console.error('npx is not available. Please install Node.js with npm >= 5.2.0');
-    process.exit(1);
-}
-
 const outputDir = path.resolve(__dirname, '../.generated');
 fs.mkdirSync(outputDir, { recursive: true });
 
@@ -35,16 +25,8 @@ const userEntryModule  = config.entry.replace(/\.ts$/, '');
 
 // FIXME: Remove irrelevant comments
 const wrapperContent = `
-import '../.metadata/metadata.index';
-import { Metadata } from '@golemcloud/golem-ts-sdk';
-import { metadataCollection } from '../.metadata/metadata.index';
 import {Project, Type} from "ts-morph";
-
-// Legacy to be replaced
-Metadata.clearMetadata("@golemcloud/golem-ts-sdk");
-
-// Legacy to be replaced
-metadataCollection.forEach(mod => mod.add(Metadata, false));
+import { TypeMetadata } from "@golemcloud/golem-ts-sdk";
 
 const project = new Project({
   tsConfigFilePath: "./tsconfig.json",
