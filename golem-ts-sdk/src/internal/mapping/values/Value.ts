@@ -285,8 +285,10 @@ function buildNodes(value: Value, nodes: WitNode[]): number {
 // as `Type` holds more information, and can be used to determine the error messages for wrong `tsValue` more accurately.
 export function fromTsValue(
   tsValue: any,
-  type: Type,
+  expectedType: Type,
 ): Either.Either<Value, string> {
+  const type = unwrapAlias(expectedType);
+
   const name = getTypeName(type);
 
   if (type.isNull()) {
@@ -334,6 +336,9 @@ export function fromTsValue(
     return handleUnion(tsValue, type);
   }
 
+  if (name === 'Map') return handleKeyValuePairs(tsValue, type);
+
+
   if (type.isObject()) {
     return handleObject(tsValue, type);
   }
@@ -341,8 +346,6 @@ export function fromTsValue(
   if (type.isInterface()) {
     return handleObject(tsValue, type);
   }
-
-  if (name === 'Map') return handleKeyValuePairs(tsValue, type);
 
   switch (name) {
     case 'Int8Array':
@@ -568,7 +571,8 @@ function handleKeyValuePairs(
 
 function handleObject(tsValue: any, type: Type): Either.Either<Value, string> {
   if (typeof tsValue !== 'object' || tsValue === null) {
-    return Either.left(invalidTypeError('object', tsValue));
+    const something = JSON.stringify(tsValue);
+    return Either.left(invalidTypeError(tsValue, tsValue));
   }
   const innerProperties: Symbol[] = type.getProperties();
   const values: Value[] = [];
@@ -887,6 +891,54 @@ export function toTsValue(value: Value, type: Type): any {
       }
   }
 
+  if (name === 'Map') {
+    const typeArgs = expectedType.getTypeArguments();
+
+    if (typeArgs.length !== 2) {
+      throw new Error('Map must have two type arguments');
+    }
+
+    if (value.kind === 'list') {
+      const entries: [any, any][] = value.value.map((item: Value) => {
+        if (item.kind !== 'tuple' || item.value.length !== 2) {
+          throw new Error(
+              `Expected tuple of two items, obtained value ${item}`,
+          );
+        }
+
+        return [
+          toTsValue(item.value[0], typeArgs[0]),
+          toTsValue(item.value[1], typeArgs[1]),
+        ] as [any, any];
+      });
+      return new Map(entries);
+    } else {
+      throw new Error(`Expected Map, obtained value ${value}`);
+    }
+  }
+
+  if (expectedType.isTuple()) {
+    const typeArg = expectedType.getTypeArguments?.();
+    if (value.kind === 'tuple') {
+      return value.value.map((item: Value, idx: number) =>
+          toTsValue(item, typeArg[idx]),
+      );
+    } else {
+      throw new Error(`Expected tuple, obtained value ${value}`);
+    }
+  }
+
+  if (expectedType.isArray()) {
+    if (value.kind === 'list') {
+      return value.value.map((item: Value) =>
+          toTsValue(item, expectedType.getTypeArguments?.()[0]),
+      );
+    } else {
+      throw new Error(`Expected array, obtained value ${value}`);
+    }
+  }
+
+
   if (expectedType.isObject()) {
     if (value.kind === 'record') {
       const fieldValues = value.value;
@@ -903,7 +955,7 @@ export function toTsValue(value: Value, type: Type): any {
         {} as Record<string, any>,
       );
     } else {
-      throw new Error(`Expected object, obtained value ${value}`);
+      throw new Error(`Expected object, obtained value ${JSON.stringify(value)}`);
     }
   }
 
@@ -951,52 +1003,6 @@ export function toTsValue(value: Value, type: Type): any {
     return toTsValue(value, innerType);
   }
 
-  if (name === 'Map') {
-    const typeArgs = expectedType.getTypeArguments();
-
-    if (typeArgs.length !== 2) {
-      throw new Error('Map must have two type arguments');
-    }
-
-    if (value.kind === 'list') {
-      const entries: [any, any][] = value.value.map((item: Value) => {
-        if (item.kind !== 'tuple' || item.value.length !== 2) {
-          throw new Error(
-            `Expected tuple of two items, obtained value ${item}`,
-          );
-        }
-
-        return [
-          toTsValue(item.value[0], typeArgs[0]),
-          toTsValue(item.value[1], typeArgs[1]),
-        ] as [any, any];
-      });
-      return new Map(entries);
-    } else {
-      throw new Error(`Expected Map, obtained value ${value}`);
-    }
-  }
-
-  if (expectedType.isArray()) {
-    if (value.kind === 'list') {
-      return value.value.map((item: Value) =>
-        toTsValue(item, expectedType.getTypeArguments?.()[0]),
-      );
-    } else {
-      throw new Error(`Expected array, obtained value ${value}`);
-    }
-  }
-
-  if (expectedType.isTuple()) {
-    const typeArg = expectedType.getTypeArguments?.();
-    if (value.kind === 'tuple') {
-      return value.value.map((item: Value, idx: number) =>
-        toTsValue(item, typeArg[idx]),
-      );
-    } else {
-      throw new Error(`Expected tuple, obtained value ${value}`);
-    }
-  }
 
   throw new Error(`'Type ${name} is not supported in golem'`);
 }

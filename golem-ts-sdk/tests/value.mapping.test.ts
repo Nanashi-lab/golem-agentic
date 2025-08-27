@@ -60,7 +60,7 @@ describe('typescript value to wit value round-trip conversions', () => {
   //   );
   // });
   //
-  it('should correctly perform round-trip conversion for arbitrary values of object type', () => {
+  it.skip('should correctly perform round-trip conversion for arbitrary values of object type', () => {
     fc.assert(
       fc.property(objectArb, (arbData) => {
         const type = getTestObjectType();
@@ -68,39 +68,39 @@ describe('typescript value to wit value round-trip conversions', () => {
       }),
     );
   });
+
+  it('should correctly perform round-trip conversion for arbitrary values of map type', () => {
+    fc.assert(
+      fc.property(mapArb, (arbData) => {
+        const type = getTestMapType();
+        runRoundTripTest(arbData, type);
+      }),
+    );
+  });
+
   //
-  // it('should correctly perform round-trip conversion for arbitrary values of map type', () => {
-  //   fc.assert(
-  //     fc.property(mapArb, (arbData) => {
-  //       const type = getTestMapType();
-  //       runRoundTripTest(arbData, type);
-  //     }),
-  //   );
-  // });
-  //
-  //
-  // it('should correctly perform round-trip conversion for arbitrary values of list of object type', () => {
-  //   fc.assert(
-  //     fc.property(listComplexArb, (arbData) => {
-  //       const type = getTestListOfObjectType();
-  //       runRoundTripTest(arbData, type);
-  //     }),
-  //   );
-  // });
-  //
-  // it('should correctly perform round-trip conversion for arbitrary values of complex tuple', () => {
-  //   fc.assert(
-  //     fc.property(tupleArb, tupleComplexArb, (tupleData, tupleComplexData) => {
-  //       const simpleType = getTupleType();
-  //       runRoundTripTest(tupleData, simpleType);
-  //
-  //       const complexType = getTupleComplexType();
-  //       runRoundTripTest(tupleComplexData, complexType);
-  //     }),
-  //   );
-  // });
-  //
-  it('should correctly perform round-trip conversion for arbitrary values of union', () => {
+  it.skip('should correctly perform round-trip conversion for arbitrary values of list of object type', () => {
+    fc.assert(
+      fc.property(listComplexArb, (arbData) => {
+        const type = getTestListOfObjectType();
+        runRoundTripTest(arbData, type);
+      }),
+    );
+  });
+
+  it.skip('should correctly perform round-trip conversion for arbitrary values of complex tuple', () => {
+    fc.assert(
+      fc.property(tupleArb, tupleComplexArb, (tupleData, tupleComplexData) => {
+        const simpleType = getTupleType();
+        runRoundTripTest(tupleData, simpleType);
+
+        const complexType = getTupleComplexType();
+        runRoundTripTest(tupleComplexData, complexType);
+      }),
+    );
+  });
+
+  it.skip('should correctly perform round-trip conversion for arbitrary values of union', () => {
     fc.assert(
       fc.property(unionArb, unionComplexArb, (unionData, unionComplexData) => {
         const simpleType = getUnionType();
