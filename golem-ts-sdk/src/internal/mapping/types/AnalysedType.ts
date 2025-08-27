@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Type, Type as TsType} from "ts-morph";
+import {Node, Type, Type as TsType} from "ts-morph";
 import * as Either from "effect/Either";
 import {numberToOrdinalKebab} from "./typeIndexOrdinal";
 import {getTypeName} from "../../../typeMetadata";
@@ -317,7 +317,16 @@ export function fromTsTypeInternal(tsType: TsType, visited: Set<TsType>): Either
   if (type.isObject()) {
     const result = Either.all(type.getProperties().map((prop) => {
       const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());
+      const nodes: Node[] = prop.getDeclarations();
+      const node = nodes[0];
+
       const tsType = fromTsTypeInternal(type, visited);
+
+      if ((Node.isPropertySignature(node) || Node.isPropertyDeclaration(node)) && node.hasQuestionToken()) {
+        return Either.map(tsType, (analysedType) => {
+          return field(prop.getName(), option(analysedType))
+        });
+      }
 
       return Either.map(tsType, (analysedType) => {
         return field(prop.getName(), analysedType)
@@ -330,7 +339,16 @@ export function fromTsTypeInternal(tsType: TsType, visited: Set<TsType>): Either
   if (type.isInterface()) {
     const result = Either.all(type.getProperties().map((prop) => {
       const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());
+      const nodes: Node[] = prop.getDeclarations();
+      const node = nodes[0];
+
       const tsType = fromTsTypeInternal(type, visited);
+
+      if ((Node.isPropertySignature(node) || Node.isPropertyDeclaration(node)) && node.hasQuestionToken()) {
+        return Either.map(tsType, (analysedType) => {
+          return field(prop.getName(), option(analysedType))
+        });
+      }
 
       return Either.map(tsType, (analysedType) => {
         return field(prop.getName(), analysedType)

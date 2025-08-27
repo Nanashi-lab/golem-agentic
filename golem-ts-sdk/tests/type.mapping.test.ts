@@ -232,6 +232,8 @@ function checkPrimitiveFields(fields: any[]) {
 
 function checkOptionalFields(fields: NameTypePair[]) {
   const optionalFields = fields.filter((f) => f.name.startsWith('optional'));
+
+  console.log(JSON.stringify(optionalFields));
   optionalFields.forEach((field) => {
     expect(field.typ.kind).toBe('option');
   });
