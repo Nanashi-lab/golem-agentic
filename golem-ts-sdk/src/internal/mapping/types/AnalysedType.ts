@@ -216,7 +216,7 @@ export function fromTsType(type: TsType): Either.Either<AnalysedType, string> {
 
   if (type.isBoolean()) {
       return Either.right(bool())
-    };
+    }
 
   if (name === "Map" && type.getTypeArguments().length === 2) {
     const [keyT, valT] = type.getTypeArguments();
@@ -227,17 +227,17 @@ export function fromTsType(type: TsType): Either.Either<AnalysedType, string> {
 
     return Either.zipWith(key, value, (k, v) =>
         list(tuple([k, v])));
-  };
+  }
 
   if (name === "Iterable" && type.getTypeArguments().length === 1) {
     const inner = type.getTypeArguments()[0];
     return Either.map(fromTsType(inner), (result) => list(result));
-  };
+  }
 
   if (name === "AsyncIterable" && type.getTypeArguments().length === 1) {
     const inner = type.getTypeArguments()[0];
     return Either.map(fromTsType(inner), (result) => list(result));
-  };
+  }
 
 
   if (name === "Iterator" && type.getTypeArguments().length === 1) {
