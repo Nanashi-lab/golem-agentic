@@ -15,8 +15,9 @@
 import { AgentType, DataValue, AgentError } from 'golem:agent/common';
 import { AgentInternal } from './internal/agentInternal';
 import { ResolvedAgent } from './internal/resolvedAgent';
-import { TypeMetadata } from './typeMetadata';
-import { ClassType, ParameterInfo, Type } from 'rttist';
+import { MethodParams, TypeMetadata } from './typeMetadata';
+import { ClassType, ParameterInfo } from 'rttist';
+import { Type } from 'ts-morph';
 import { getRemoteClient } from './internal/clientGeneration';
 import { BaseAgent } from './baseAgent';
 import { AgentTypeRegistry } from './internal/registry/agentTypeRegistry';
@@ -125,21 +126,24 @@ export function agent() {
       return ctor;
     }
 
-    let classType = Option.getOrElse(TypeMetadata.get(agentClassName), () => {
-      throw new Error(
-        `Agent class ${agentClassName.value} is not registered in TypeMetadata. Please ensure the class is decorated with @agent()`,
-      );
-    });
+    let classMetadata = Option.getOrElse(
+      TypeMetadata.get(agentClassName),
+      () => {
+        throw new Error(
+          `Agent class ${agentClassName.value} is not registered in TypeMetadata. Please ensure the class is decorated with @agent()`,
+        );
+      },
+    );
 
     const constructorDataSchema = Either.getOrElse(
-      getConstructorDataSchema(classType),
+      getConstructorDataSchema(classMetadata),
       (err) => {
         throw new Error('Invalid constructor parameters for the agent: ' + err);
       },
     );
 
     const methodSchemaEither = getAgentMethodSchema(
-      filteredType,
+      classMetadata,
       agentClassName,
     );
 
@@ -175,20 +179,18 @@ export function agent() {
       AgentTypeName.fromAgentClassName(agentClassName),
       {
         initiate: (agentName: string, constructorParams: DataValue) => {
-          const constructorInfo = (classType as ClassType).getConstructors()[0];
+          const constructorInfo = classMetadata.constructorArgs;
 
-          const constructorParamTypes: readonly ParameterInfo[] =
-            constructorInfo.getParameters();
+          const constructorParamTypes: Type[] = constructorInfo.map(
+            (p) => p.type,
+          );
 
           const constructorParamWitValues =
             getWitValueFromDataValue(constructorParams);
 
           const convertedConstructorArgs = constructorParamWitValues.map(
             (witVal, idx) => {
-              return WitValue.toTsValue(
-                witVal,
-                constructorParamTypes[idx].type,
-              );
+              return WitValue.toTsValue(witVal, constructorParamTypes[idx]);
             },
           );
 
@@ -251,19 +253,29 @@ export function agent() {
 
               const agentType = agentTypeOpt.value;
 
-              const methodInfo = (classType as ClassType).getMethod(method)!;
+              const methodInfo = classMetadata.methods.get(method);
 
-              const methodSignature = methodInfo.getSignatures()[0];
+              if (!methodInfo) {
+                const error: AgentError = {
+                  tag: 'invalid-method',
+                  val: `Method ${method} not found in metadata for agent ${agentClassName}.`,
+                };
+                return {
+                  tag: 'err',
+                  val: error,
+                };
+              }
 
-              const paramTypes: readonly ParameterInfo[] =
-                methodSignature.getParameters();
+              const paramTypes: MethodParams = methodInfo.methodParams;
 
               const argsWitValues = getWitValueFromDataValue(args);
 
-              const returnType: Type = methodSignature.returnType;
+              const returnType: Type = methodInfo.returnType;
 
               const convertedArgs = argsWitValues.map((witVal, idx) => {
-                return WitValue.toTsValue(witVal, paramTypes[idx].type);
+                const paramTypeArray = Array.from(paramTypes.values());
+                const paramType = paramTypeArray[idx];
+                return WitValue.toTsValue(witVal, paramType);
               });
 
               const result = await fn.apply(instance, convertedArgs);
@@ -346,7 +358,7 @@ export function description(desc: string) {
   };
 }
 
-// FIXME: in the next verison, handle all dataValues
+// FIXME: in the next version, handle all dataValues
 function getWitValueFromDataValue(dataValue: DataValue): WitValue.WitValue[] {
   if (dataValue.tag === 'tuple') {
     return dataValue.val.map((elem) => {

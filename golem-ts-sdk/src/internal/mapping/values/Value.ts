@@ -19,11 +19,12 @@ import {
   ObjectType,
   PromiseType,
   PropertyInfo,
-  Type,
   TypeAliasType,
   TypeKind,
   UnionType,
 } from 'rttist';
+
+import { Type } from 'ts-morph';
 import { isInBuiltResult } from '../types/inbuilt';
 import * as Either from 'effect/Either';
 import * as Option from 'effect/Option';
