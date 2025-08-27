@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TypeMetadata } from '../src/typeMetadata';
+import { getTypeName, TypeMetadata } from '../src/typeMetadata';
 import { Type } from 'ts-morph';
 import './setup';
 import {
@@ -61,19 +61,19 @@ export function getTupleComplexType(): Type {
 }
 
 export function getBooleanType(): Type {
-  return fetchType('BooleanType');
+  return fetchType('boolean');
 }
 
 export function getStringType(): Type {
-  return fetchType('StringType');
+  return fetchType('string');
 }
 
 export function getNumberType(): Type {
-  return fetchType('NumberType');
+  return fetchType('number');
 }
 
 export function getPromiseType(): Type {
-  return fetchType('PromiseType');
+  return fetchType('Promise');
 }
 
 export function getRecordFieldsFromAnalysedType(
@@ -86,9 +86,10 @@ function fetchType(typeNameInTestData: string): Type {
   const classMetadata = Array.from(getAll()).map(([_, v]) => v);
 
   for (const type of classMetadata) {
-    const constructorArg = type.constructorArgs.find(
-      (arg) => arg.name === typeNameInTestData,
-    );
+    const constructorArg = type.constructorArgs.find((arg) => {
+      const typeName = getTypeName(arg.type);
+      return typeName === typeNameInTestData;
+    });
 
     if (constructorArg) {
       return constructorArg.type;
@@ -99,14 +100,15 @@ function fetchType(typeNameInTestData: string): Type {
     for (const method of methods) {
       if (
         method.returnType &&
-        method.returnType.getText() === typeNameInTestData
+        getTypeName(method.returnType) === typeNameInTestData
       ) {
         return method.returnType;
       }
 
-      const param = Array.from(method.methodParams.entries()).find(
-        ([_, t]) => t.getText() === typeNameInTestData,
-      );
+      const param = Array.from(method.methodParams.entries()).find(([_, t]) => {
+        return getTypeName(t) === typeNameInTestData;
+      });
+
       if (param) {
         return param[1];
       }

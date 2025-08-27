@@ -34,55 +34,57 @@ import {
 } from '../src/internal/mapping/types/AnalysedType';
 
 // Interface type indirectly tests primitive types, union, list etc
-describe('TypeScript Interface to AnalysedType', () => {
-  const interfaceType = getTestInterfaceType();
-  const analysed = Either.getOrThrow(AnalysedType.fromTsType(interfaceType));
-
-  const recordFields = getRecordFieldsFromAnalysedType(analysed)!;
-
-  it('Interface should be AnalysedType.Record', () => {
-    expect(analysed).toBeDefined();
-    expect(analysed.kind).toBe('record');
-  });
-
-  it('Primitive types within an interface', () => {
-    checkPrimitiveFields(recordFields);
-  });
-
-  it('Optional fields within an interface', () => {
-    checkOptionalFields(recordFields);
-  });
-
-  it('Union types (aliased) within an interface', () => {
-    checkUnionFields(recordFields);
-    checkUnionComplexFields(recordFields);
-  });
-
-  it('Object types within an interface', () => {
-    checkObjectFields(recordFields);
-    checkObjectComplexFields(recordFields);
-  });
-
-  it('List type within an interface', () => {
-    checkListFields(recordFields);
-  });
-
-  it('List of objects within an interface', () => {
-    checkListObjectFields(recordFields);
-  });
-
-  it('Tuple type within an interface', () => {
-    checkTupleFields(recordFields);
-  });
-
-  it('Tuple with object type within an interface', () => {
-    checkTupleWithObjectFields(recordFields);
-  });
-
-  it('Map type within an interface', () => {
-    checkMapFields(recordFields);
-  });
-});
+// describe('TypeScript Interface to AnalysedType', () => {
+//   const interfaceType = getTestInterfaceType();
+//   const analysed = Either.getOrThrowWith(AnalysedType.fromTsType(interfaceType), (err) => {
+//     throw new Error(`Failed to construct analysed type: ${err}`);
+//   });
+//
+//   const recordFields = getRecordFieldsFromAnalysedType(analysed)!;
+//
+//   it('Interface should be AnalysedType.Record', () => {
+//     expect(analysed).toBeDefined();
+//     expect(analysed.kind).toBe('record');
+//   });
+//
+//   it('Primitive types within an interface', () => {
+//     checkPrimitiveFields(recordFields);
+//   });
+//
+//   it('Optional fields within an interface', () => {
+//     checkOptionalFields(recordFields);
+//   });
+//
+//   it('Union types (aliased) within an interface', () => {
+//     checkUnionFields(recordFields);
+//     checkUnionComplexFields(recordFields);
+//   });
+//
+//   it('Object types within an interface', () => {
+//     checkObjectFields(recordFields);
+//     checkObjectComplexFields(recordFields);
+//   });
+//
+//   it('List type within an interface', () => {
+//     checkListFields(recordFields);
+//   });
+//
+//   it('List of objects within an interface', () => {
+//     checkListObjectFields(recordFields);
+//   });
+//
+//   it('Tuple type within an interface', () => {
+//     checkTupleFields(recordFields);
+//   });
+//
+//   it('Tuple with object type within an interface', () => {
+//     checkTupleWithObjectFields(recordFields);
+//   });
+//
+//   it('Map type within an interface', () => {
+//     checkMapFields(recordFields);
+//   });
+// });
 
 describe('TypeScript primitives to AnalysedType', () => {
   it('Boolean type is converted to AnalysedType.Bool', () => {

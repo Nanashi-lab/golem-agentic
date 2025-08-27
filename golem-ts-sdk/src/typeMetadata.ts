@@ -19,7 +19,7 @@ import {
 } from 'rttist';
 import { AgentClassName } from './newTypes/agentClassName';
 import * as Option from 'effect/Option';
-import { SourceFile, Type } from 'ts-morph';
+import { SourceFile, Type as TsType, Type } from 'ts-morph';
 
 export const PackageName = '@golemcloud/golem-ts-sdk';
 
@@ -71,7 +71,9 @@ export const TypeMetadata = {
         const methods = new Map();
         for (const method of classDecl.getMethods()) {
           const methodParams = new Map(
-            method.getParameters().map((p) => [p.getName(), p.getType()]),
+            method.getParameters().map((p) => {
+              return [p.getName(), p.getType()];
+            }),
           );
           const returnType = method.getReturnType();
           methods.set(method.getName(), { methodParams, returnType });
@@ -122,3 +124,19 @@ export const TypeMetadata = {
     return Option.some(types[0]);
   },
 };
+
+export function getTypeName(type: Type): string | undefined {
+  const rawName = type.getSymbol()?.getName();
+
+  if (!rawName || rawName == '__type') {
+    const alias = type.getAliasSymbol()?.getName();
+
+    if (!alias || alias == '__type') {
+      return type.getText();
+    }
+
+    return alias;
+  }
+
+  return rawName;
+}

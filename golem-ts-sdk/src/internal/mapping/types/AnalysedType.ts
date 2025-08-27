@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Type as TsType} from "ts-morph";
+import {Type, Type as TsType} from "ts-morph";
 import * as Either from "effect/Either";
 import {numberToOrdinalKebab} from "./typeIndexOrdinal";
+import {getTypeName} from "../../../typeMetadata";
 
 export interface NameTypePair {
   name: string;
@@ -202,16 +203,36 @@ export const option = (inner: AnalysedType): AnalysedType => ({ kind: 'option', 
       ({ kind: 'handle', value: { name: undefined, owner: undefined, resourceId, mode } });
 
 
-export function fromTsType(type: TsType): Either.Either<AnalysedType, string> {
-  const symbol = type.getSymbol();
-  const name = symbol?.getName();
+export function fromTsType(tsType: TsType): Either.Either<AnalysedType, string> {
+  const visited = new Set<TsType>();
+  return fromTsTypeInternal(tsType, visited);
+}
 
-  if (type.getAliasSymbol()) {
-    const aliasType = type.getAliasTypeArguments().length > 0
-        ? type.getAliasTypeArguments()[0] // e.g., MyAlias<T>
-        : type.getAliasSymbol()!.getDeclaredType();
 
-    return fromTsType(aliasType);
+export function fromTsTypeInternal(tsType: TsType, visited: Set<TsType>): Either.Either<AnalysedType, string> {
+
+  const type = unwrapAlias(tsType);
+
+
+  const name =
+      getTypeName(type)
+
+  switch (name) {
+    case "Float64Array": return Either.right(list(f64()));
+    case "Float32Array": return Either.right(list(f32()));
+    case "Int8Array":    return Either.right(list(s8()));
+    case "Uint8Array":   return Either.right(list(u8()));
+    case "Int16Array":   return Either.right(list(s16()));
+    case "Uint16Array":  return Either.right(list(u16()));
+    case "Int32Array":   return Either.right(list(s32()));
+    case "Uint32Array":  return Either.right(list(u32()));
+    case "BigInt64Array":  return Either.right(list(s64()));
+    case "BigUint64Array": return Either.right(list(u64()));
+  }
+
+  if (name === "Promise" && type.getTypeArguments().length === 1) {
+    const inner = type.getTypeArguments()[0];
+    return fromTsTypeInternal(inner, visited);
   }
 
   if (type.isBoolean()) {
@@ -221,8 +242,8 @@ export function fromTsType(type: TsType): Either.Either<AnalysedType, string> {
   if (name === "Map" && type.getTypeArguments().length === 2) {
     const [keyT, valT] = type.getTypeArguments();
 
-    const key = fromTsType(keyT);
-    const value = fromTsType(valT);
+    const key = fromTsTypeInternal(keyT, visited);
+    const value = fromTsTypeInternal(valT, visited);
 
 
     return Either.zipWith(key, value, (k, v) =>
@@ -231,22 +252,22 @@ export function fromTsType(type: TsType): Either.Either<AnalysedType, string> {
 
   if (name === "Iterable" && type.getTypeArguments().length === 1) {
     const inner = type.getTypeArguments()[0];
-    return Either.map(fromTsType(inner), (result) => list(result));
+    return Either.map(fromTsTypeInternal(inner, visited), (result) => list(result));
   }
 
   if (name === "AsyncIterable" && type.getTypeArguments().length === 1) {
     const inner = type.getTypeArguments()[0];
-    return Either.map(fromTsType(inner), (result) => list(result));
+    return Either.map(fromTsTypeInternal(inner, visited), (result) => list(result));
   }
 
 
   if (name === "Iterator" && type.getTypeArguments().length === 1) {
     const inner = type.getTypeArguments()[0];
-    return Either.map(fromTsType(inner), (result) => list(result));
+    return Either.map(fromTsTypeInternal(inner, visited), (result) => list(result));
   };
 
   if (type.isTuple()) {
-    const tupleElems = Either.all(type.getTupleElements().map(el => fromTsType(el)));
+    const tupleElems = Either.all(type.getTupleElements().map(el => fromTsTypeInternal(el, visited)));
 
     return Either.map(tupleElems, (items) => tuple(items));
   };
@@ -258,7 +279,7 @@ export function fromTsType(type: TsType): Either.Either<AnalysedType, string> {
       return Either.left("Unable to determine the array element type");
     }
 
-    const elemType = fromTsType(arrayElementType);
+    const elemType = fromTsTypeInternal(arrayElementType, visited);
 
     return Either.map(elemType, (inner) => list(inner));
   };
@@ -268,8 +289,20 @@ export function fromTsType(type: TsType): Either.Either<AnalysedType, string> {
 
     const possibleTypes: NameOptionTypePair[] = [];
 
+    let boolTracked = false;
+
     for (const t of type.getUnionTypes()) {
-      Either.map(fromTsType(t), (result) => {
+      if (t.isBoolean() || getTypeName(t) === "false" || getTypeName(t) === "true") {
+        if (boolTracked) continue;
+        boolTracked = true;
+        possibleTypes.push({
+          name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
+          typ: bool()
+        });
+        continue;
+      }
+
+      Either.map(fromTsTypeInternal(t, visited), (result) => {
         possibleTypes.push({
           name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
           typ: result,
@@ -284,7 +317,7 @@ export function fromTsType(type: TsType): Either.Either<AnalysedType, string> {
   if (type.isObject()) {
     const result = Either.all(type.getProperties().map((prop) => {
       const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());
-      const tsType = fromTsType(type);
+      const tsType = fromTsTypeInternal(type, visited);
 
       return Either.map(tsType, (analysedType) => {
         return field(prop.getName(), analysedType)
@@ -297,7 +330,7 @@ export function fromTsType(type: TsType): Either.Either<AnalysedType, string> {
   if (type.isInterface()) {
     const result = Either.all(type.getProperties().map((prop) => {
       const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());
-      const tsType = fromTsType(type);
+      const tsType = fromTsTypeInternal(type, visited);
 
       return Either.map(tsType, (analysedType) => {
         return field(prop.getName(), analysedType)
@@ -316,6 +349,11 @@ export function fromTsType(type: TsType): Either.Either<AnalysedType, string> {
     return Either.right(u64())
   }
 
+
+  if (type.isUndefined()) {
+    return Either.right(tuple([]))
+  }
+
   if (type.isNumber()) {
     return Either.right(s32()) // For the same reason - as an example - Rust defaults to i32
   }
@@ -324,26 +362,29 @@ export function fromTsType(type: TsType): Either.Either<AnalysedType, string> {
     return Either.right(str())
   }
 
-  switch (name) {
-    case "Float64Array": return Either.right(list(f64()));
-    case "Float32Array": return Either.right(list(f32()));
-    case "Int8Array":    return Either.right(list(s8()));
-    case "Uint8Array":   return Either.right(list(u8()));
-    case "Int16Array":   return Either.right(list(s16()));
-    case "Uint16Array":  return Either.right(list(u16()));
-    case "Int32Array":   return Either.right(list(s32()));
-    case "Uint32Array":  return Either.right(list(u32()));
-    case "BigInt64Array":  return Either.right(list(s64()));
-    case "BigUint64Array": return Either.right(list(u64()));
-  }
-
-  if (name === "Promise" && type.getTypeArguments().length === 1) {
-    const inner = type.getTypeArguments()[0];
-    return fromTsType(inner);
-  }
-
-
   return Either.left(`The following type is not supported as argument or return type in agentic context. Type Name: ${name}. Please report this issue to Golem Cloud`);
 
 }
 
+
+function unwrapAlias(type: TsType): TsType {
+  let current = type;
+
+  const visited = new Set<TsType>();
+
+  while (true) {
+    const aliasSymbol = current.getAliasSymbol();
+    if (!aliasSymbol || visited.has(current)) break;
+    visited.add(current);
+
+    const decl = aliasSymbol.getDeclarations()[0];
+    if (!decl) break;
+
+    const realType = decl.getType();
+
+    if (realType === current) break;
+    current = realType;
+  }
+
+    return current;
+}
