@@ -138,8 +138,6 @@ export function agent() {
       },
     );
 
-    let filteredType = classType as ClassType;
-
     const methodSchemaEither = getAgentMethodSchema(
       filteredType,
       agentClassName,
