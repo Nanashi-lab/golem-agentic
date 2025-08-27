@@ -16,7 +16,6 @@ import { AgentType, DataValue, AgentError } from 'golem:agent/common';
 import { AgentInternal } from './internal/agentInternal';
 import { ResolvedAgent } from './internal/resolvedAgent';
 import { MethodParams, TypeMetadata } from './typeMetadata';
-import { ClassType, ParameterInfo } from 'rttist';
 import { Type } from 'ts-morph';
 import { getRemoteClient } from './internal/clientGeneration';
 import { BaseAgent } from './baseAgent';

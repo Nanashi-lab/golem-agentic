@@ -12,24 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  BaseMetadataLibrary,
-  GlobalMetadata,
-  Type as LegacyType,
-} from 'rttist';
 import { AgentClassName } from './newTypes/agentClassName';
 import * as Option from 'effect/Option';
-import { SourceFile, Type as TsType, Type } from 'ts-morph';
-
-export const PackageName = '@golemcloud/golem-ts-sdk';
-
-export const Metadata = new BaseMetadataLibrary(
-  {
-    nullability: false,
-  },
-  PackageName,
-  GlobalMetadata,
-);
+import { SourceFile, Type } from 'ts-morph';
 
 type ClassNameString = string;
 type MethodNameString = string;
@@ -99,29 +84,8 @@ export const TypeMetadata = {
     return Option.fromNullable(MetadataV2.get(className.value));
   },
 
-  has(className: ClassNameString): boolean {
-    return MetadataV2.has(className);
-  },
-
   getAll(): Map<ClassNameString, ClassMetadata> {
     return MetadataV2;
-  },
-
-  updateLegacy(metadata: Array<any>): void {
-    Metadata.clearMetadata(PackageName);
-    metadata.forEach((mod) => mod.add(Metadata, false));
-  },
-
-  lookupClassMetadata(className: AgentClassName): Option.Option<LegacyType> {
-    const types = Metadata.getTypes().filter(
-      (type) => type.isClass() && type.name === className.value,
-    );
-
-    if (types.length === 0) {
-      return Option.none();
-    }
-
-    return Option.some(types[0]);
   },
 };
 
