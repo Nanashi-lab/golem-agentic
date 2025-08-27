@@ -128,10 +128,10 @@ export const TypeMetadata = {
 export function getTypeName(type: Type): string | undefined {
   const rawName = type.getSymbol()?.getName();
 
-  if (!rawName || rawName == '__type') {
+  if (!rawName || rawName === '__type') {
     const alias = type.getAliasSymbol()?.getName();
 
-    if (!alias || alias == '__type') {
+    if (!alias || alias === '__type') {
       return type.getText();
     }
 

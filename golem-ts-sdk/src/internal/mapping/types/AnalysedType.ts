@@ -235,7 +235,7 @@ export function fromTsTypeInternal(tsType: TsType, visited: Set<TsType>): Either
     return fromTsTypeInternal(inner, visited);
   }
 
-  if (type.isBoolean() || name == 'true' || name == 'false')  {
+  if (type.isBoolean() || name === 'true' || name === 'false')  {
       return Either.right(bool())
     }
 

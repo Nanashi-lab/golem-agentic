@@ -407,7 +407,7 @@ export function fromTsValue(
     return Either.right({ kind: 'tuple', value: [] });
   }
 
-  if (type.isBoolean() || name == 'true' || name == 'false') {
+  if (type.isBoolean() || name === 'true' || name === 'false') {
     return handleBooleanType(tsValue);
   }
 
@@ -652,7 +652,7 @@ function matchesType(value: any, expectedType: Type): boolean {
     return typeof value === 'number';
   }
 
-  if (type.isBoolean() || name == 'true' || name == 'false') {
+  if (type.isBoolean() || name === 'true' || name === 'false') {
     return typeof value === 'boolean';
   }
 
@@ -830,7 +830,7 @@ export function toTsValue(value: Value, type: Type): any {
     }
   }
 
-  if (expectedType.isBoolean() || name == 'true' || name == 'false') {
+  if (expectedType.isBoolean() || name === 'true' || name === 'false') {
     if (value.kind === 'bool') {
       return value.value;
     } else {
@@ -910,7 +910,7 @@ export function toTsValue(value: Value, type: Type): any {
       }
   }
 
-  if (name == 'Promise') {
+  if (name === 'Promise') {
     if (expectedType.getTypeArguments().length !== 1) {
       throw new Error(`Expected Promise to have one type argument`);
     }

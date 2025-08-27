@@ -59,8 +59,8 @@ describe('typescript value to wit value round-trip conversions', () => {
       }),
     );
   });
-  //
-  it.skip('should correctly perform round-trip conversion for arbitrary values of object type', () => {
+
+  it('should correctly perform round-trip conversion for arbitrary values of object type', () => {
     fc.assert(
       fc.property(objectArb, (arbData) => {
         const type = getTestObjectType();
