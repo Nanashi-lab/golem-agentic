@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Either } from '../src/newTypes/either';
 import { agent, BaseAgent } from '../src';
 
 // DO NOT RENAME INTERFACES OR PROPERTIES.
@@ -81,8 +80,6 @@ export type ObjectComplexType = {
   i: TupleComplexType;
   j: MapType;
   k: SimpleInterfaceType;
-  l: Either<number, string>;
-  //m: Either.Either<number, string> // FIXME: Effect.Either is inferred as Invalid by RTTIST
 };
 
 export interface TestInterfaceType {
