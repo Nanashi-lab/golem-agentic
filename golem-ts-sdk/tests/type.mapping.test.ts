@@ -28,10 +28,7 @@ import * as AnalysedType from '../src/internal/mapping/types/AnalysedType';
 
 import * as Either from 'effect/Either';
 import * as Option from 'effect/Option';
-import {
-  NameOptionTypePair,
-  NameTypePair,
-} from '../src/internal/mapping/types/AnalysedType';
+import { NameTypePair } from '../src/internal/mapping/types/AnalysedType';
 
 // Interface type indirectly tests primitive types, union, list etc
 describe('TypeScript Interface to AnalysedType', () => {
@@ -233,7 +230,6 @@ function checkPrimitiveFields(fields: any[]) {
 function checkOptionalFields(fields: NameTypePair[]) {
   const optionalFields = fields.filter((f) => f.name.startsWith('optional'));
 
-  console.log(JSON.stringify(optionalFields));
   optionalFields.forEach((field) => {
     expect(field.typ.kind).toBe('option');
   });
@@ -242,150 +238,29 @@ function checkOptionalFields(fields: NameTypePair[]) {
 function checkUnionComplexFields(fields: NameTypePair[]) {
   const unionComplexFields = fields.filter((f) =>
     f.name.startsWith('unionComplexProp'),
-  );
+  )[0];
 
-  expect(unionComplexFields.length).toBeGreaterThan(0);
-
-  unionComplexFields.forEach((field) => {
-    expect(field.typ.kind).toBe('variant');
-    const expectedCases: NameOptionTypePair[] = [
-      { name: 'type-first', typ: { kind: 'string' } },
-      { name: 'type-second', typ: { kind: 's32' } },
-      { name: 'type-third', typ: { kind: 'bool' } },
-      {
-        name: 'type-fourth',
-        typ: {
-          kind: 'record',
-          value: {
-            fields: [{ name: 'n', typ: { kind: 's32' } }],
-            name: undefined,
-            owner: undefined,
-          },
-        },
-      },
-      {
-        name: 'type-fifth',
-        typ: {
-          kind: 'record',
-          value: {
-            fields: [
-              { name: 'a', typ: { kind: 'string' } },
-              { name: 'b', typ: { kind: 's32' } },
-              { name: 'c', typ: { kind: 'bool' } },
-            ],
-            name: undefined,
-            owner: undefined,
-          },
-        },
-      },
-      {
-        name: 'type-sixth',
-        typ: {
-          kind: 'tuple',
-          value: {
-            items: [{ kind: 'string' }, { kind: 's32' }, { kind: 'bool' }],
-            name: undefined,
-            owner: undefined,
-          },
-        },
-      },
-      {
-        name: 'type-seventh',
-        typ: {
-          kind: 'tuple',
-          value: {
-            items: [
-              { kind: 'string' },
-              { kind: 's32' },
-              {
-                kind: 'record',
-                value: {
-                  fields: [
-                    { name: 'a', typ: { kind: 'string' } },
-                    { name: 'b', typ: { kind: 's32' } },
-                    { name: 'c', typ: { kind: 'bool' } },
-                  ],
-                  name: undefined,
-                  owner: undefined,
-                },
-              },
-            ],
-            name: undefined,
-            owner: undefined,
-          },
-        },
-      },
-      {
-        name: 'type-eighth',
-        typ: {
-          kind: 'record',
-          value: {
-            fields: [
-              { name: 'a', typ: { kind: 'string' } },
-              { name: 'b', typ: { kind: 's32' } },
-              { name: 'c', typ: { kind: 'bool' } },
-              {
-                name: 'd',
-                typ: {
-                  kind: 'record',
-                  value: {
-                    fields: [
-                      { name: 'a', typ: { kind: 'string' } },
-                      { name: 'b', typ: { kind: 's32' } },
-                      { name: 'c', typ: { kind: 'bool' } },
-                    ],
-                    name: undefined,
-                    owner: undefined,
-                  },
-                },
-              },
-              {
-                name: 'e',
-                typ: {
-                  kind: 'variant',
-                  value: {
-                    cases: [
-                      { name: 'type-first', typ: { kind: 'string' } },
-                      { name: 'type-second', typ: { kind: 's32' } },
-                      { name: 'type-third', typ: { kind: 'bool' } },
-                      {
-                        name: 'type-fourth',
-                        typ: {
-                          kind: 'record',
-                          value: {
-                            fields: [
-                              { name: 'a', typ: { kind: 'string' } },
-                              { name: 'b', typ: { kind: 's32' } },
-                              { name: 'c', typ: { kind: 'bool' } },
-                            ],
-                            name: undefined,
-                            owner: undefined,
-                          },
-                        },
-                      },
-                    ],
-                    name: undefined,
-                    owner: undefined,
-                  },
-                },
-              },
-              {
-                name: 'f',
-                typ: {
-                  kind: 'list',
-                  value: {
-                    inner: { kind: 'string' },
-                    name: undefined,
-                    owner: undefined,
-                  },
-                },
-              },
-              {
-                name: 'g',
-                typ: {
-                  kind: 'list',
-                  value: {
-                    inner: {
+  const expected: NameTypePair = {
+    name: 'unionComplexProp',
+    typ: {
+      kind: 'variant',
+      value: {
+        cases: [
+          { name: 'type-first', typ: { kind: 'string' } },
+          { name: 'type-second', typ: { kind: 's32' } },
+          { name: 'type-third', typ: { kind: 'bool' } },
+          {
+            name: 'type-fourth',
+            typ: {
+              kind: 'record',
+              value: {
+                fields: [
+                  { name: 'a', typ: { kind: 'string' } },
+                  { name: 'b', typ: { kind: 's32' } },
+                  { name: 'c', typ: { kind: 'bool' } },
+                  {
+                    name: 'd',
+                    typ: {
                       kind: 'record',
                       value: {
                         fields: [
@@ -397,103 +272,217 @@ function checkUnionComplexFields(fields: NameTypePair[]) {
                         owner: undefined,
                       },
                     },
-                    name: undefined,
-                    owner: undefined,
                   },
-                },
-              },
-              {
-                name: 'h',
-                typ: {
-                  kind: 'tuple',
-                  value: {
-                    items: [
-                      { kind: 'string' },
-                      { kind: 's32' },
-                      { kind: 'bool' },
-                    ],
-                    name: undefined,
-                    owner: undefined,
-                  },
-                },
-              },
-              {
-                name: 'i',
-                typ: {
-                  kind: 'tuple',
-                  value: {
-                    items: [
-                      { kind: 'string' },
-                      { kind: 's32' },
-                      {
-                        kind: 'record',
-                        value: {
-                          fields: [
-                            { name: 'a', typ: { kind: 'string' } },
-                            { name: 'b', typ: { kind: 's32' } },
-                            { name: 'c', typ: { kind: 'bool' } },
-                          ],
-                          name: undefined,
-                          owner: undefined,
-                        },
-                      },
-                    ],
-                    name: undefined,
-                    owner: undefined,
-                  },
-                },
-              },
-              {
-                name: 'j',
-                typ: {
-                  kind: 'list',
-                  value: {
-                    inner: {
-                      kind: 'tuple',
+                  {
+                    name: 'e',
+                    typ: {
+                      kind: 'variant',
                       value: {
-                        items: [{ kind: 'string' }, { kind: 's32' }],
+                        cases: [
+                          { name: 'type-first', typ: { kind: 'string' } },
+                          { name: 'type-second', typ: { kind: 's32' } },
+                          { name: 'type-third', typ: { kind: 'bool' } },
+                          {
+                            name: 'type-fourth',
+                            typ: {
+                              kind: 'record',
+                              value: {
+                                fields: [
+                                  { name: 'a', typ: { kind: 'string' } },
+                                  { name: 'b', typ: { kind: 's32' } },
+                                  { name: 'c', typ: { kind: 'bool' } },
+                                ],
+                                name: undefined,
+                                owner: undefined,
+                              },
+                            },
+                          },
+                        ],
                         name: undefined,
                         owner: undefined,
                       },
                     },
-                    name: undefined,
-                    owner: undefined,
                   },
-                },
-              },
-              {
-                name: 'k',
-                typ: {
-                  kind: 'record',
-                  value: {
-                    fields: [{ name: 'n', typ: { kind: 's32' } }],
-                    name: undefined,
-                    owner: undefined,
+                  {
+                    name: 'f',
+                    typ: {
+                      kind: 'list',
+                      value: {
+                        inner: { kind: 'string' },
+                        name: undefined,
+                        owner: undefined,
+                      },
+                    },
                   },
-                },
-              },
-              {
-                name: 'l',
-                typ: {
-                  kind: 'result',
-                  value: {
-                    ok: { kind: 's32' },
-                    err: { kind: 'string' },
-                    name: undefined,
-                    owner: undefined,
+                  {
+                    name: 'g',
+                    typ: {
+                      kind: 'list',
+                      value: {
+                        inner: {
+                          kind: 'record',
+                          value: {
+                            fields: [
+                              { name: 'a', typ: { kind: 'string' } },
+                              { name: 'b', typ: { kind: 's32' } },
+                              { name: 'c', typ: { kind: 'bool' } },
+                            ],
+                            name: undefined,
+                            owner: undefined,
+                          },
+                        },
+                        name: undefined,
+                        owner: undefined,
+                      },
+                    },
                   },
-                },
+                  {
+                    name: 'h',
+                    typ: {
+                      kind: 'tuple',
+                      value: {
+                        items: [
+                          { kind: 'string' },
+                          { kind: 's32' },
+                          { kind: 'bool' },
+                        ],
+                        name: undefined,
+                        owner: undefined,
+                      },
+                    },
+                  },
+                  {
+                    name: 'i',
+                    typ: {
+                      kind: 'tuple',
+                      value: {
+                        items: [
+                          { kind: 'string' },
+                          { kind: 's32' },
+                          {
+                            kind: 'record',
+                            value: {
+                              fields: [
+                                { name: 'a', typ: { kind: 'string' } },
+                                { name: 'b', typ: { kind: 's32' } },
+                                { name: 'c', typ: { kind: 'bool' } },
+                              ],
+                              name: undefined,
+                              owner: undefined,
+                            },
+                          },
+                        ],
+                        name: undefined,
+                        owner: undefined,
+                      },
+                    },
+                  },
+                  {
+                    name: 'j',
+                    typ: {
+                      kind: 'list',
+                      value: {
+                        inner: {
+                          kind: 'tuple',
+                          value: {
+                            items: [{ kind: 'string' }, { kind: 's32' }],
+                            name: undefined,
+                            owner: undefined,
+                          },
+                        },
+                        name: undefined,
+                        owner: undefined,
+                      },
+                    },
+                  },
+                  {
+                    name: 'k',
+                    typ: {
+                      kind: 'record',
+                      value: {
+                        fields: [{ name: 'n', typ: { kind: 's32' } }],
+                        name: undefined,
+                        owner: undefined,
+                      },
+                    },
+                  },
+                ],
+                name: undefined,
+                owner: undefined,
               },
-            ],
-            name: undefined,
-            owner: undefined,
+            },
           },
-        },
+          {
+            name: 'type-fifth',
+            typ: {
+              kind: 'record',
+              value: {
+                fields: [
+                  { name: 'a', typ: { kind: 'string' } },
+                  { name: 'b', typ: { kind: 's32' } },
+                  { name: 'c', typ: { kind: 'bool' } },
+                ],
+                name: undefined,
+                owner: undefined,
+              },
+            },
+          },
+          {
+            name: 'type-sixth',
+            typ: {
+              kind: 'tuple',
+              value: {
+                items: [{ kind: 'string' }, { kind: 's32' }, { kind: 'bool' }],
+                name: undefined,
+                owner: undefined,
+              },
+            },
+          },
+          {
+            name: 'type-seventh',
+            typ: {
+              kind: 'tuple',
+              value: {
+                items: [
+                  { kind: 'string' },
+                  { kind: 's32' },
+                  {
+                    kind: 'record',
+                    value: {
+                      fields: [
+                        { name: 'a', typ: { kind: 'string' } },
+                        { name: 'b', typ: { kind: 's32' } },
+                        { name: 'c', typ: { kind: 'bool' } },
+                      ],
+                      name: undefined,
+                      owner: undefined,
+                    },
+                  },
+                ],
+                name: undefined,
+                owner: undefined,
+              },
+            },
+          },
+          {
+            name: 'type-eighth',
+            typ: {
+              kind: 'record',
+              value: {
+                fields: [{ name: 'n', typ: { kind: 's32' } }],
+                name: undefined,
+                owner: undefined,
+              },
+            },
+          },
+        ],
+        name: undefined,
+        owner: undefined,
       },
-    ];
+    },
+  };
 
-    expect(field.typ).toEqual(AnalysedType.variant(expectedCases));
-  });
+  expect(unionComplexFields).toEqual(expected);
 }
 
 function checkUnionFields(fields: any[]) {

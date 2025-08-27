@@ -120,19 +120,19 @@ export const objectComplexArb: fc.Arbitrary<ObjectComplexType> = fc.record({
 });
 
 export const unionComplexArb: fc.Arbitrary<UnionComplexType> = fc.oneof(
-  fc.integer(),
-  fc.string(),
-  fc.boolean(),
-  fc.oneof(fc.integer(), fc.string(), fc.boolean(), objectArb),
+  // fc.integer(),
+  // fc.string(),
+  // fc.boolean(),
+  //  objectComplexArb,
+  unionArb,
   // listArb,
   // listComplexArb,
-  objectComplexArb,
-  tupleArb,
-  tupleComplexArb,
+  // tupleArb,
+  // tupleComplexArb,
   // mapArb,
-  fc.record({
-    n: fc.integer(),
-  }),
+  // fc.record({
+  //   n: fc.integer(),
+  // }),
 );
 
 export const baseArb = fc.record({

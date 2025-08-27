@@ -53,6 +53,8 @@ export type StringType = string;
 
 export type NumberType = number;
 
+// this is important to note that the 5th UnionType is resolved as ObjectType
+// since the first three primitive types are already covered making `UnionType` is just an Object
 export type UnionComplexType =
   | number
   | string

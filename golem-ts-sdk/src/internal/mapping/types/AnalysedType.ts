@@ -282,7 +282,7 @@ export function fromTsTypeInternal(tsType: TsType, visited: Set<TsType>): Either
     const elemType = fromTsTypeInternal(arrayElementType, visited);
 
     return Either.map(elemType, (inner) => list(inner));
-  };
+  }
 
   if (type.isUnion()) {
     let fieldIdx = 1;
@@ -293,25 +293,26 @@ export function fromTsTypeInternal(tsType: TsType, visited: Set<TsType>): Either
 
     for (const t of type.getUnionTypes()) {
       if (t.isBoolean() || getTypeName(t) === "false" || getTypeName(t) === "true") {
-        if (boolTracked) continue;
+        if (boolTracked) {
+          continue;
+        }
         boolTracked = true;
         possibleTypes.push({
           name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
           typ: bool()
         });
-        continue;
-      }
-
-      Either.map(fromTsTypeInternal(t, visited), (result) => {
-        possibleTypes.push({
-          name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
-          typ: result,
+      } else {
+        Either.map(fromTsTypeInternal(t, visited), (result) => {
+          possibleTypes.push({
+            name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
+            typ: result,
+          });
         });
-      });
+      }
     }
 
     return Either.right(variant(possibleTypes));
-  };
+  }
 
 
   if (type.isObject()) {
