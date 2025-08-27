@@ -157,7 +157,6 @@ class MyAgent extends BaseAgent {
     tupleComplexType: TupleComplexType,
     tupleType: TupleType,
     listComplexType: ListComplexType,
-    listType: ListType,
     objectType: ObjectType,
   ): PromiseType {
     return Promise.resolve(`Weather for ${location} is sunny!`);

@@ -29,19 +29,15 @@ export function getTestInterfaceType(): Type {
 }
 
 export function getTestMapType(): Type {
-  return fetchType('MapType');
+  return fetchType('Map');
 }
 
 export function getTestObjectType(): Type {
   return fetchType('ObjectType');
 }
 
-export function getTestListType(): Type {
-  return fetchType('ListType');
-}
-
 export function getTestListOfObjectType(): Type {
-  return fetchType('ListComplexType');
+  return fetchType('Array');
 }
 
 export function getUnionType(): Type {
@@ -106,7 +102,8 @@ function fetchType(typeNameInTestData: string): Type {
       }
 
       const param = Array.from(method.methodParams.entries()).find(([_, t]) => {
-        return getTypeName(t) === typeNameInTestData;
+        const typeName = getTypeName(t);
+        return typeName === typeNameInTestData;
       });
 
       if (param) {

@@ -17,6 +17,9 @@ import { WitNode, WitValue } from 'golem:rpc/types@0.2.2';
 import { Type, Symbol, Node } from 'ts-morph';
 import * as Either from 'effect/Either';
 import * as Option from 'effect/Option';
+import { getTypeName } from '../../../typeMetadata';
+import { unwrapAlias } from '../types/AnalysedType';
+import { expect } from 'vitest';
 
 export type Value =
   | { kind: 'bool'; value: boolean }
@@ -284,14 +287,13 @@ export function fromTsValue(
   tsValue: any,
   type: Type,
 ): Either.Either<Value, string> {
-  const symbol = type.getSymbol();
-  const name = symbol?.getName();
+  const name = getTypeName(type);
 
   if (type.isNull()) {
     return Either.right({ kind: 'tuple', value: [] });
   }
 
-  if (type.isBoolean()) {
+  if (type.isBoolean() || name == 'true' || name == 'false') {
     return handleBooleanType(tsValue);
   }
 
@@ -522,70 +524,6 @@ function handleTupleType(
   );
 }
 
-function handleResultType(
-  tsValue: any,
-  okType: Type,
-  errorType: Type,
-): Either.Either<Value, string> {
-  if (
-    typeof tsValue === 'object' &&
-    tsValue !== null &&
-    'tag' in tsValue &&
-    'val' in tsValue
-  ) {
-    if (tsValue.tag === 'ok') {
-      const okTsVal = tsValue.val;
-
-      const okValue = fromTsValue(okTsVal, okType);
-
-      return Either.map(okValue, (okValue) => {
-        return {
-          kind: 'result',
-          value: {
-            ok: okValue,
-          },
-        };
-      });
-    } else if (tsValue.tag === 'err') {
-      const errTsVal = tsValue.val;
-
-      const errValue = fromTsValue(errTsVal, errorType);
-
-      return Either.map(errValue, (errValue) => {
-        return {
-          kind: 'result',
-          value: {
-            err: errValue,
-          },
-        };
-      });
-    } else {
-      return Either.left(invalidTypeError(tsValue, 'result'));
-    }
-  } else {
-    return Either.left(invalidTypeError(tsValue, 'result'));
-  }
-}
-
-function handleInBuiltResult(
-  tsValue: any,
-  genericType: Type,
-): Either.Either<Value, string> {
-  const okType = genericType.getTypeArguments?.()[0];
-  const errorType = genericType.getTypeArguments?.()[1];
-
-  if (!okType || !errorType) {
-    return Either.left(
-      unexpectedTypeError(
-        tsValue,
-        genericType,
-        Option.some('Result must have two type arguments'),
-      ),
-    );
-  }
-  return handleResultType(tsValue, okType, errorType);
-}
-
 function handleKeyValuePairs(
   tsValue: any,
   type: Type,
@@ -703,15 +641,16 @@ function findTypeOfAny(
   return undefined;
 }
 
-function matchesType(value: any, type: Type): boolean {
-  const symbol = type.getSymbol();
-  const name = symbol?.getName();
+function matchesType(value: any, expectedType: Type): boolean {
+  const type = unwrapAlias(expectedType);
+
+  const name = getTypeName(type);
 
   if (type.isNumber()) {
     return typeof value === 'number';
   }
 
-  if (type.isBoolean()) {
+  if (type.isBoolean() || name == 'true' || name == 'false') {
     return typeof value === 'boolean';
   }
 
@@ -759,15 +698,6 @@ function matchesType(value: any, type: Type): boolean {
 
   if (type.isInterface()) {
     return handleObjectMatch(value, type);
-  }
-
-  if (type.getAliasSymbol()) {
-    const aliasType =
-      type.getAliasTypeArguments().length > 0
-        ? type.getAliasTypeArguments()[0]
-        : type.getAliasSymbol()!.getDeclaredType();
-
-    return matchesType(value, aliasType);
   }
 
   if (type.isUnion()) {
@@ -847,21 +777,49 @@ function unexpectedTypeError(
   return error + (Option.isSome(message) ? ` Reason: ${message.value}` : '');
 }
 
-export function toTsValue(value: Value, expectedType: Type): any {
-  const symbol = expectedType.getSymbol();
-  const name = symbol?.getName();
+export function toTsValue(value: Value, type: Type): any {
+  const expectedType = unwrapAlias(type);
 
-  if (expectedType.getAliasSymbol()) {
-    const aliasType =
-      expectedType.getAliasTypeArguments().length > 0
-        ? expectedType.getAliasTypeArguments()[0]
-        : expectedType.getAliasSymbol()!.getDeclaredType();
-
-    return toTsValue(value, aliasType);
-  }
+  const name = getTypeName(expectedType);
 
   if (expectedType.isNumber()) {
     return convertToNumber(value);
+  }
+
+  if (expectedType.isString()) {
+    if (value.kind === 'string') {
+      return value.value;
+    } else {
+      throw new Error(`Expected string, obtained value ${value}`);
+    }
+  }
+
+  if (expectedType.isBigInt()) {
+    return convertToBigInt(value);
+  }
+
+  if (expectedType.isNull()) {
+    if (value.kind === 'tuple' && value.value.length === 0) {
+      return null;
+    } else {
+      throw new Error(`Expected null (unit), obtained value ${value}`);
+    }
+  }
+
+  if (expectedType.isVoid()) {
+    if (value.kind === 'tuple' && value.value.length === 0) {
+      return undefined;
+    } else {
+      throw new Error(`Expected void (unit), obtained value ${value}`);
+    }
+  }
+
+  if (expectedType.isBoolean() || name == 'true' || name == 'false') {
+    if (value.kind === 'bool') {
+      return value.value;
+    } else {
+      throw new Error(`Expected boolean, obtained value ${value}`);
+    }
   }
 
   switch (name) {

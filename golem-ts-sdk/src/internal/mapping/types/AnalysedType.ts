@@ -386,7 +386,7 @@ export function fromTsTypeInternal(tsType: TsType, visited: Set<TsType>): Either
 }
 
 
-function unwrapAlias(type: TsType): TsType {
+export function unwrapAlias(type: TsType): TsType {
   let current = type;
 
   const visited = new Set<TsType>();
