@@ -12,28 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ClassType, ParameterInfo, Type } from 'rttist';
+import { Type } from 'ts-morph';
 import * as Either from 'effect/Either';
 import { AgentMethod, DataSchema, ElementSchema } from 'golem:agent/common';
 import * as WitType from './mapping/types/WitType';
 import { AgentClassName } from '../newTypes/agentClassName';
 import { AgentMethodMetadataRegistry } from './registry/agentMethodMetadataRegistry';
+import {
+  ClassMetadata,
+  ConstructorArg,
+  MethodParams,
+  ReturnType,
+} from '../typeMetadata';
 
 export function getConstructorDataSchema(
-  classType: Type,
+  classType: ClassMetadata,
 ): Either.Either<DataSchema, string> {
-  const constructorInfos = (classType as ClassType).getConstructors();
-
-  if (constructorInfos.length > 1) {
-    throw new Error(
-      `Agent type ${classType.name} has multiple constructors. Please specify the constructor parameters explicitly.`,
-    );
-  }
-
-  const constructorSignatureInfo = constructorInfos[0];
-
-  const constructorParamInfos: readonly ParameterInfo[] =
-    constructorSignatureInfo.getParameters();
+  const constructorParamInfos: readonly ConstructorArg[] =
+    classType.constructorArgs;
 
   const constructorParamTypes = Either.all(
     constructorParamInfos.map((paramInfo) =>
@@ -66,21 +62,25 @@ export function getConstructorDataSchema(
 }
 
 export function getAgentMethodSchema(
-  classType: Type,
+  classMetadata: ClassMetadata,
   agentClassName: AgentClassName,
 ): Either.Either<AgentMethod[], string> {
-  let filteredType = classType as ClassType;
-  let methodNames = filteredType.getMethods();
+  if (!classMetadata) {
+    return Either.left(
+      `No metadata found for agent class ${agentClassName.value}`,
+    );
+  }
+
+  const methodMetadata = Array.from(classMetadata.methods.entries());
 
   return Either.all(
-    methodNames.map((methodInfo) => {
-      const signature = methodInfo.getSignatures()[0];
+    methodMetadata.map((methodInfo) => {
+      const methodName = methodInfo[0];
+      const signature = methodInfo[1];
 
-      const parameters = signature.getParameters();
+      const parameters: MethodParams = signature.methodParams;
 
-      const returnType: Type = signature.returnType;
-
-      const methodName = methodInfo.name.toString();
+      const returnType: ReturnType = signature.returnType;
 
       const baseMeta =
         AgentMethodMetadataRegistry.lookup(agentClassName)?.get(methodName) ??
@@ -118,12 +118,12 @@ export function getAgentMethodSchema(
 }
 
 export function buildInputSchema(
-  paramTypes: readonly ParameterInfo[],
+  paramTypes: MethodParams,
 ): Either.Either<DataSchema, string> {
   const result = Either.all(
-    paramTypes.map((parameterInfo) =>
-      Either.map(convertToElementSchema(parameterInfo.type), (result) => {
-        return [parameterInfo.name, result] as [string, ElementSchema];
+    Array.from(paramTypes).map((parameterInfo) =>
+      Either.map(convertToElementSchema(parameterInfo[1]), (result) => {
+        return [parameterInfo[0], result] as [string, ElementSchema];
       }),
     ),
   );

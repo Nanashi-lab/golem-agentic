@@ -13,20 +13,13 @@
 // limitations under the License.
 
 import { WitNode, WitValue } from 'golem:rpc/types@0.2.2';
-import {
-  GenericType,
-  InterfaceType,
-  ObjectType,
-  PromiseType,
-  PropertyInfo,
-  Type,
-  TypeAliasType,
-  TypeKind,
-  UnionType,
-} from 'rttist';
-import { isInBuiltResult } from '../types/inbuilt';
+
+import { Type, Symbol, Node } from 'ts-morph';
 import * as Either from 'effect/Either';
 import * as Option from 'effect/Option';
+import { getTypeName } from '../../../typeMetadata';
+import { unwrapAlias } from '../types/AnalysedType';
+import { expect } from 'vitest';
 
 export type Value =
   | { kind: 'bool'; value: boolean }
@@ -292,84 +285,14 @@ function buildNodes(value: Value, nodes: WitNode[]): number {
 // as `Type` holds more information, and can be used to determine the error messages for wrong `tsValue` more accurately.
 export function fromTsValue(
   tsValue: any,
-  type: Type,
+  expectedType: Type,
 ): Either.Either<Value, string> {
-  switch (type.kind) {
-    case TypeKind.Null:
-      return Either.right({ kind: 'tuple', value: [] });
+  const type = unwrapAlias(expectedType);
 
-    case TypeKind.Boolean:
-      return handleBooleanType(tsValue);
+  const name = getTypeName(type);
 
-    case TypeKind.False:
-      return handleBooleanType(tsValue);
-
-    case TypeKind.True:
-      return handleBooleanType(tsValue);
-
-    case TypeKind.Number:
-      if (typeof tsValue === 'number') {
-        return Either.right({ kind: 's32', value: tsValue });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'number'));
-      }
-
-    case TypeKind.BigInt:
-      if (typeof tsValue === 'bigint' || typeof tsValue === 'number') {
-        return Either.right({ kind: 'u64', value: tsValue as any });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'bigint'));
-      }
-
-    case TypeKind.String:
-      if (typeof tsValue === 'string') {
-        return Either.right({ kind: 'string', value: tsValue });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'string'));
-      }
-
-    case TypeKind.PromiseDefinition:
-      const promiseDefType = type as PromiseType;
-      const promiseDefArgType = promiseDefType.getTypeArguments()[0];
-      return fromTsValue(tsValue, promiseDefArgType);
-
-    case TypeKind.Interface:
-      return handleObject(tsValue, type);
-
-    case TypeKind.Union: {
-      return handleUnion(tsValue, type);
-    }
-
-    case TypeKind.Alias:
-      const aliasType = type as TypeAliasType;
-      const targetType = aliasType.target;
-      return fromTsValue(tsValue, targetType);
-
-    case TypeKind.Promise:
-      const promiseType = type as PromiseType;
-      const argument = promiseType.getTypeArguments()[0];
-      return fromTsValue(tsValue, argument);
-
-    case TypeKind.Type:
-      return handleGeneralType(tsValue, type);
-
-    case TypeKind.ObjectType:
-      return handleObject(tsValue, type);
-
-    case TypeKind.Uint8ClampedArray:
-      if (
-        Array.isArray(tsValue) &&
-        tsValue.every((item) => typeof item === 'number')
-      ) {
-        return Either.right({
-          kind: 'list',
-          value: tsValue.map((item) => ({ kind: 'u8', value: item })),
-        });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'Uint8ClampedArray'));
-      }
-
-    case TypeKind.Int8Array:
+  switch (name) {
+    case 'Int8Array':
       const int8Array = handleTypedArray(tsValue, Int8Array);
 
       return Either.map(int8Array, (arr) => ({
@@ -380,7 +303,7 @@ export function fromTsValue(
         })),
       }));
 
-    case TypeKind.Int16Array:
+    case 'Int16Array':
       const int16Array = handleTypedArray(tsValue, Int16Array);
 
       return Either.map(int16Array, (arr) => ({
@@ -391,7 +314,7 @@ export function fromTsValue(
         })),
       }));
 
-    case TypeKind.Int32Array:
+    case 'Int32Array':
       const int32Array = handleTypedArray(tsValue, Int32Array);
 
       return Either.map(int32Array, (arr) => ({
@@ -402,7 +325,7 @@ export function fromTsValue(
         })),
       }));
 
-    case TypeKind.BigInt64Array:
+    case 'BigInt64Array':
       const int64Array = handleTypedArray(tsValue, BigInt64Array);
 
       return Either.map(int64Array, (arr) => ({
@@ -413,7 +336,7 @@ export function fromTsValue(
         })),
       }));
 
-    case TypeKind.Uint8Array:
+    case 'Uint8Array':
       const uint8Array = handleTypedArray(tsValue, Uint8Array);
 
       return Either.map(uint8Array, (arr) => ({
@@ -424,7 +347,7 @@ export function fromTsValue(
         })),
       }));
 
-    case TypeKind.Uint16Array:
+    case 'Uint16Array':
       const uint16Array = handleTypedArray(tsValue, Uint16Array);
 
       return Either.map(uint16Array, (arr) => ({
@@ -435,7 +358,7 @@ export function fromTsValue(
         })),
       }));
 
-    case TypeKind.Uint32Array:
+    case 'Uint32Array':
       const uint32Array = handleTypedArray(tsValue, Uint32Array);
 
       return Either.map(uint32Array, (arr) => ({
@@ -446,7 +369,7 @@ export function fromTsValue(
         })),
       }));
 
-    case TypeKind.BigUint64Array:
+    case 'BigUint64Array':
       const uint64Array = handleTypedArray(tsValue, BigUint64Array);
 
       return Either.map(uint64Array, (arr) => ({
@@ -457,7 +380,7 @@ export function fromTsValue(
         })),
       }));
 
-    case TypeKind.Float32Array:
+    case 'Float32Array':
       const float32Array = handleTypedArray(tsValue, Float32Array);
 
       return Either.map(float32Array, (arr) => ({
@@ -468,7 +391,7 @@ export function fromTsValue(
         })),
       }));
 
-    case TypeKind.Float64Array:
+    case 'Float64Array':
       const float64Array = handleTypedArray(tsValue, Float64Array);
 
       return Either.map(float64Array, (arr) => ({
@@ -478,19 +401,64 @@ export function fromTsValue(
           value: item,
         })),
       }));
-
-    case TypeKind.Object:
-      return handleObject(tsValue, type);
-
-    case TypeKind.StringLiteral:
-      if (typeof tsValue === 'string') {
-        return Either.right({ kind: 'string', value: tsValue });
-      } else {
-        return Either.left(invalidTypeError(tsValue, 'string literal'));
-      }
-    default:
-      return Either.left(unexpectedTypeError(tsValue, type, Option.none()));
   }
+
+  if (type.isNull()) {
+    return Either.right({ kind: 'tuple', value: [] });
+  }
+
+  if (type.isBoolean() || name === 'true' || name === 'false') {
+    return handleBooleanType(tsValue);
+  }
+
+  if (type.isNumber()) {
+    if (typeof tsValue === 'number') {
+      return Either.right({ kind: 's32', value: tsValue });
+    } else {
+      return Either.left(invalidTypeError(tsValue, 'number'));
+    }
+  }
+
+  if (type.isBigInt()) {
+    if (typeof tsValue === 'bigint' || typeof tsValue === 'number') {
+      return Either.right({ kind: 'u64', value: tsValue as any });
+    } else {
+      return Either.left(invalidTypeError(tsValue, 'bigint'));
+    }
+  }
+
+  if (type.isString()) {
+    if (typeof tsValue === 'string') {
+      return Either.right({ kind: 'string', value: tsValue });
+    } else {
+      return Either.left(invalidTypeError(tsValue, 'string'));
+    }
+  }
+
+  if (type.isArray()) return handleArrayType(tsValue, type);
+
+  if (name === 'Promise' && type.getTypeArguments().length === 1) {
+    const inner = type.getTypeArguments()[0];
+    return fromTsValue(tsValue, inner);
+  }
+
+  if (type.isTuple()) return handleTupleType(tsValue, type);
+
+  if (type.isUnion()) {
+    return handleUnion(tsValue, type);
+  }
+
+  if (name === 'Map') return handleKeyValuePairs(tsValue, type);
+
+  if (type.isObject()) {
+    return handleObject(tsValue, type);
+  }
+
+  if (type.isInterface()) {
+    return handleObject(tsValue, type);
+  }
+
+  return Either.left(unexpectedTypeError(tsValue, type, Option.none()));
 }
 
 function handleTypedArray<
@@ -517,23 +485,6 @@ function handleBooleanType(tsValue: any): Either.Either<Value, string> {
   } else {
     return Either.left(invalidTypeError(tsValue, 'boolean'));
   }
-}
-
-function handleGeneralType(
-  tsValue: any,
-  type: Type,
-): Either.Either<Value, string> {
-  if (type.isArray()) return handleArrayType(tsValue, type);
-  if (type.isTuple()) return handleTupleType(tsValue, type);
-  if (type.isGenericType()) return handleOtherComplexTypes(tsValue, type);
-
-  return Either.left(
-    unexpectedTypeError(
-      tsValue,
-      type,
-      Option.some(`Unsupported TypeKind.Type: ${type.displayName}`),
-    ),
-  );
 }
 
 function handleArrayType(
@@ -573,112 +524,6 @@ function handleTupleType(
     Either.all(tsValue.map((item, idx) => fromTsValue(item, typeArgs[idx]))),
     (values) => ({ kind: 'tuple', value: values }),
   );
-}
-
-function handleOtherComplexTypes(
-  tsValue: any,
-  type: Type,
-): Either.Either<Value, string> {
-  const genericType = type as GenericType<typeof type>;
-  const name = genericType.genericTypeDefinition.name;
-
-  if (name === 'Map') return handleKeyValuePairs(tsValue, type);
-
-  if (isInBuiltResult(type)) return handleInBuiltResult(tsValue, type);
-
-  if (name === 'Promise') return handlePromiseType(tsValue, type);
-
-  return Either.left(
-    unexpectedTypeError(
-      tsValue,
-      type,
-      Option.some(`Unsupported generic type: ${name}`),
-    ),
-  );
-}
-
-function handlePromiseType(
-  tsValue: any,
-  type: Type,
-): Either.Either<Value, string> {
-  const typeArgs = type.getTypeArguments?.();
-
-  if (!typeArgs || typeArgs.length !== 1) {
-    return Either.left(
-      unexpectedTypeError(
-        tsValue,
-        type,
-        Option.some(`${type.name} must have one type argument`),
-      ),
-    );
-  }
-
-  const innerType = typeArgs[0];
-  return fromTsValue(tsValue, innerType);
-}
-
-function handleResultType(
-  tsValue: any,
-  okType: Type,
-  errorType: Type,
-): Either.Either<Value, string> {
-  if (
-    typeof tsValue === 'object' &&
-    tsValue !== null &&
-    'tag' in tsValue &&
-    'val' in tsValue
-  ) {
-    if (tsValue.tag === 'ok') {
-      const okTsVal = tsValue.val;
-
-      const okValue = fromTsValue(okTsVal, okType);
-
-      return Either.map(okValue, (okValue) => {
-        return {
-          kind: 'result',
-          value: {
-            ok: okValue,
-          },
-        };
-      });
-    } else if (tsValue.tag === 'err') {
-      const errTsVal = tsValue.val;
-
-      const errValue = fromTsValue(errTsVal, errorType);
-
-      return Either.map(errValue, (errValue) => {
-        return {
-          kind: 'result',
-          value: {
-            err: errValue,
-          },
-        };
-      });
-    } else {
-      return Either.left(invalidTypeError(tsValue, 'result'));
-    }
-  } else {
-    return Either.left(invalidTypeError(tsValue, 'result'));
-  }
-}
-
-function handleInBuiltResult(
-  tsValue: any,
-  genericType: Type,
-): Either.Either<Value, string> {
-  const okType = genericType.getTypeArguments?.()[0];
-  const errorType = genericType.getTypeArguments?.()[1];
-
-  if (!okType || !errorType) {
-    return Either.left(
-      unexpectedTypeError(
-        tsValue,
-        genericType,
-        Option.some('Result must have two type arguments'),
-      ),
-    );
-  }
-  return handleResultType(tsValue, okType, errorType);
 }
 
 function handleKeyValuePairs(
@@ -725,32 +570,36 @@ function handleKeyValuePairs(
 
 function handleObject(tsValue: any, type: Type): Either.Either<Value, string> {
   if (typeof tsValue !== 'object' || tsValue === null) {
-    return Either.left(invalidTypeError('object', tsValue));
+    return Either.left(invalidTypeError(tsValue, tsValue));
   }
-
-  const innerType = type as ObjectType;
-  const innerProperties = innerType.getProperties();
+  const innerProperties: Symbol[] = type.getProperties();
   const values: Value[] = [];
 
   for (const prop of innerProperties) {
-    const key = prop.name.toString();
+    const key = prop.getName();
+
+    const nodes: Node[] = prop.getDeclarations();
+    const node = nodes[0];
+    const propType = prop.getTypeAtLocation(node);
 
     if (!Object.prototype.hasOwnProperty.call(tsValue, key)) {
-      if (prop.optional) {
-        values.push({ kind: 'option' });
-      } else if (prop.type.isString() && tsValue === '') {
-        values.push({ kind: 'string', value: '' });
-      } else if (prop.type.isNumber() && tsValue === 0) {
-        values.push({ kind: 's32', value: 0 });
-      } else if (prop.type.isBoolean() && tsValue === false) {
-        values.push({ kind: 'bool', value: false });
-      } else {
-        return Either.left(missingValueForKey(key, tsValue));
+      if (Node.isPropertySignature(node) || Node.isPropertyDeclaration(node)) {
+        if (node.hasQuestionToken()) {
+          values.push({ kind: 'option' });
+        } else if (propType.isString() && tsValue === '') {
+          values.push({ kind: 'string', value: '' });
+        } else if (propType.isNumber() && tsValue === 0) {
+          values.push({ kind: 's32', value: 0 });
+        } else if (propType.isBoolean() && tsValue === false) {
+          values.push({ kind: 'bool', value: false });
+        } else {
+          return Either.left(missingValueForKey(key, tsValue));
+        }
+        continue;
       }
-      continue;
     }
 
-    const fieldVal = fromTsValue(tsValue[key], prop.type);
+    const fieldVal = fromTsValue(tsValue[key], propType);
 
     if (Either.isLeft(fieldVal)) {
       return Either.left(fieldVal.left);
@@ -763,8 +612,7 @@ function handleObject(tsValue: any, type: Type): Either.Either<Value, string> {
 }
 
 function handleUnion(tsValue: any, type: Type): Either.Either<Value, string> {
-  const unionType = type as UnionType;
-  const possibleTypes = unionType.types;
+  const possibleTypes = type.getUnionTypes();
   const typeWithIndex = findTypeOfAny(tsValue, possibleTypes);
 
   if (!typeWithIndex) {
@@ -795,55 +643,35 @@ function findTypeOfAny(
   return undefined;
 }
 
-function matchesType(value: any, type: Type): boolean {
-  switch (type.kind) {
-    case TypeKind.Number:
-      return typeof value === 'number';
+function matchesType(value: any, expectedType: Type): boolean {
+  const type = unwrapAlias(expectedType);
 
-    case TypeKind.String:
-      return typeof value === 'string';
+  const name = getTypeName(type);
 
-    case TypeKind.Boolean:
-    case TypeKind.True:
-    case TypeKind.False:
-      return typeof value === 'boolean';
-
-    case TypeKind.Null:
-      return value === null;
-
-    case TypeKind.Undefined:
-      return value === undefined;
-
-    case TypeKind.Any:
-      return true;
-
-    case TypeKind.Type:
-      return matchesComplexType(value, type);
-
-    case TypeKind.ArrayBuffer:
-      return matchesArray(value, type.getTypeArguments?.()[0]);
-
-    case TypeKind.TupleDefinition:
-      return matchesTuple(value, type.getTypeArguments());
-
-    case TypeKind.ObjectType:
-    case TypeKind.Interface:
-    case TypeKind.Object:
-    case TypeKind.NonPrimitiveObject:
-      return handleObjectMatch(value, type);
-
-    case TypeKind.Alias:
-      return matchesType(value, (type as TypeAliasType).target);
-
-    case TypeKind.Union:
-      return (type as UnionType).types.some((t) => matchesType(value, t));
-
-    default:
-      return false;
+  if (type.isNumber()) {
+    return typeof value === 'number';
   }
-}
 
-function matchesComplexType(value: any, type: Type): boolean {
+  if (type.isBoolean() || name === 'true' || name === 'false') {
+    return typeof value === 'boolean';
+  }
+
+  if (type.isString()) {
+    return typeof value === 'string';
+  }
+
+  if (type.isNull()) {
+    return value === null;
+  }
+
+  if (type.isUndefined()) {
+    return value === undefined;
+  }
+
+  if (type.isAny()) {
+    return true;
+  }
+
   if (type.isArray()) {
     const elemType = type.getTypeArguments?.()[0];
     return matchesArray(value, elemType);
@@ -853,43 +681,29 @@ function matchesComplexType(value: any, type: Type): boolean {
     return matchesTuple(value, type.getTypeArguments?.());
   }
 
-  if (type.isGenericType()) {
-    const genericType = type as GenericType<typeof type>;
-    const genericName = genericType.genericTypeDefinition.name;
+  if (name === 'Map' && type.getTypeArguments().length === 2) {
+    const [keyType, valType] = type.getTypeArguments?.() ?? [];
 
-    if (genericName === 'Map') {
-      const [keyType, valType] = type.getTypeArguments?.() ?? [];
-      if (!keyType || !valType) {
-        return false;
-      }
-      if (!(value instanceof Map)) return false;
-
-      return Array.from(value.entries()).every(
-        ([k, v]) => matchesType(k, keyType) && matchesType(v, valType),
-      );
-    }
-
-    if (isInBuiltResult(type)) {
-      const okType = genericType.getTypeArguments?.()[0];
-      const errorType = genericType.getTypeArguments?.()[1];
-
-      if (!okType || !errorType) {
-        return false;
-      }
-
-      if (typeof value !== 'object' || value === null) return false;
-
-      if ('tag' in value && 'val' in value) {
-        if (value.tag === 'ok') {
-          return matchesType(value.val, okType);
-        } else if (value.tag === 'err') {
-          return matchesType(value.val, errorType);
-        }
-      }
+    if (!keyType || !valType) {
       return false;
     }
+    if (!(value instanceof Map)) return false;
 
-    return false;
+    return Array.from(value.entries()).every(
+      ([k, v]) => matchesType(k, keyType) && matchesType(v, valType),
+    );
+  }
+
+  if (type.isObject()) {
+    return handleObjectMatch(value, type);
+  }
+
+  if (type.isInterface()) {
+    return handleObjectMatch(value, type);
+  }
+
+  if (type.isUnion()) {
+    return type.getUnionTypes().some((t) => matchesType(value, t));
   }
 
   return false;
@@ -915,22 +729,29 @@ function matchesArray(value: any, elementType: Type | undefined): boolean {
 function handleObjectMatch(value: any, type: Type): boolean {
   if (typeof value !== 'object' || value === null) return false;
 
-  const objectType = type as ObjectType;
-  const props = objectType.getProperties() ?? [];
+  const props: Symbol[] = type.getProperties();
 
-  // Allow extra keys? If no, strict check:
   const valueKeys = Object.keys(value);
   if (valueKeys.length !== props.length) return false;
 
   for (const prop of props) {
-    const key = prop.name.toString();
-    const hasKey = key in value;
+    const propName = prop.getName();
+    const hasKey = Object.prototype.hasOwnProperty.call(value, propName);
+
+    const decl = prop.getDeclarations()[0];
+    let isOptional = false;
+
+    if (Node.isPropertySignature(decl)) {
+      isOptional = decl.hasQuestionToken();
+    } else if (Node.isPropertyDeclaration(decl)) {
+      isOptional = decl.hasQuestionToken();
+    }
 
     if (!hasKey) {
-      if (!prop.optional) return false;
-      // Optional property missing: OK
+      if (!isOptional) return false;
     } else {
-      if (!matchesType(value[key], prop.type)) return false;
+      const propType = prop.getTypeAtLocation(decl);
+      if (!matchesType(value[propName], propType)) return false;
     }
   }
 
@@ -946,7 +767,7 @@ function missingValueForKey(key: string, tsValue: any): string {
 }
 
 function unionTypeMatchError(unionTypes: Type[], tsValue: any): string {
-  return `Value '${tsValue}' does not match any of the union types: ${unionTypes.map((t) => t.name).join(', ')}`;
+  return `Value '${tsValue}' does not match any of the union types: ${unionTypes.map((t) => t.getSymbol()?.getName()).join(', ')}`;
 }
 
 function unexpectedTypeError(
@@ -954,445 +775,282 @@ function unexpectedTypeError(
   expectedType: Type,
   message: Option.Option<string>,
 ): string {
-  const error = `Value ${JSON.stringify(tsValue)} cannot be handled. Type of this value is inferred to be ${expectedType.name}`;
+  const error = `Value ${JSON.stringify(tsValue)} cannot be handled. Type of this value is inferred to be ${expectedType.getSymbol()?.getName()}`;
   return error + (Option.isSome(message) ? ` Reason: ${message.value}` : '');
 }
 
-export function toTsValue(value: Value, expectedType: Type): any {
-  if (value === undefined) {
-    return null;
+export function toTsValue(value: Value, type: Type): any {
+  const expectedType = unwrapAlias(type);
+
+  const name = getTypeName(expectedType);
+
+  if (value.kind === 'option') {
+    const caseValue = value.value;
+    if (!caseValue) {
+      return undefined;
+    }
+
+    return toTsValue(caseValue, expectedType);
+
+    // const unionTypes = expectedType.getUnionTypes();
+    // const matchingType = unionTypes[value.caseIdx];
+    //
+    // return toTsValue(caseValue, matchingType);
   }
 
-  // There is no option type in type-script, so take analysed type along with expected type.
-  if (value.kind === 'option') {
-    if (!value.value) {
-      return null;
+  if (expectedType.isNumber()) {
+    return convertToNumber(value);
+  }
+
+  if (expectedType.isString()) {
+    if (value.kind === 'string') {
+      return value.value;
     } else {
-      return toTsValue(value.value, expectedType);
+      throw new Error(`Expected string, obtained value ${value}`);
     }
   }
 
-  switch (expectedType.kind) {
-    case TypeKind.Null:
-      return null;
+  if (expectedType.isBigInt()) {
+    return convertToBigInt(value);
+  }
 
-    case TypeKind.Boolean:
-      if (value.kind === 'bool') {
-        return value.value;
-      } else {
-        throw new Error(`Expected boolean, obtained value ${value}`);
-      }
-    case TypeKind.False:
-      if (value.kind === 'bool') {
-        return value.value;
-      } else {
-        throw new Error(`Expected boolean, obtained value ${value}`);
-      }
-    case TypeKind.True:
-      if (value.kind === 'bool') {
-        return value.value;
-      } else {
-        throw new Error(`Expected boolean, obtained value ${value}`);
-      }
-    case TypeKind.Number:
-      if (
-        value.kind === 'f64' ||
-        value.kind === 'u8' ||
-        value.kind === 'u16' ||
-        value.kind === 'u32' ||
-        value.kind === 'u64' ||
-        value.kind === 's8' ||
-        value.kind === 's16' ||
-        value.kind === 's32' ||
-        value.kind === 's64' ||
-        value.kind === 'f32'
-      ) {
-        return value.value;
-      } else {
-        throw new Error(`Expected number, obtained value ${value}`);
-      }
-    case TypeKind.BigInt:
-      if (value.kind === 'u64' || value.kind === 's64') {
-        return value.value;
-      } else {
-        throw new Error(`Expected bigint, obtained value ${value}`);
-      }
-    case TypeKind.String:
-      if (value.kind === 'string') {
-        return value.value;
-      } else {
-        throw new Error(`Expected string, obtained value ${value}`);
-      }
-    case TypeKind.NonPrimitiveObject:
-      if (value.kind === 'record') {
-        const fieldValues = value.value;
-        const expectedTypeFields: ReadonlyArray<PropertyInfo> = (
-          expectedType as ObjectType
-        ).getProperties();
-        return expectedTypeFields.reduce(
-          (acc, field, idx) => {
-            const name: string = field.name.toString();
-            const expectedFieldType = field.type;
-            acc[name] = toTsValue(fieldValues[idx], expectedFieldType);
-            return acc;
-          },
-          {} as Record<string, any>,
-        );
-      } else {
-        throw new Error(`Expected object, obtained value ${value}`);
-      }
-    case TypeKind.ObjectType:
-      if (value.kind === 'record') {
-        const fieldValues = value.value;
-        const expectedTypeFields: ReadonlyArray<PropertyInfo> = (
-          expectedType as ObjectType
-        ).getProperties();
-        return expectedTypeFields.reduce(
-          (acc, field, idx) => {
-            const name: string = field.name.toString();
-            const expectedFieldType = field.type;
-            acc[name] = toTsValue(fieldValues[idx], expectedFieldType);
-            return acc;
-          },
-          {} as Record<string, any>,
-        );
-      } else {
-        throw new Error(`Expected object, obtained value ${value}`);
-      }
-    case TypeKind.Date:
-      if (value.kind === 'string') {
-        return new Date(value.value);
-      } else {
-        throw new Error(`Expected date, obtained value ${value}`);
-      }
-    case TypeKind.Error:
-      if (value.kind === 'result') {
-        if (value.value.err !== undefined) {
-          if (value.value.err.kind === 'string') {
-            return new Error(value.value.err.value);
-          } else {
-            throw new Error(
-              `Expected error string, obtained value ${value.value.err}`,
-            );
-          }
-        } else {
-          throw new Error(`Expected error, obtained value ${value}`);
-        }
-      } else {
-        throw new Error(`Expected error, obtained value ${value}`);
-      }
-    case TypeKind.RegExp:
-      if (value.kind === 'string') {
-        return new RegExp(value.value);
-      } else {
-        throw new Error(`Expected RegExp, obtained value ${value}`);
-      }
-    case TypeKind.Int8Array:
+  if (expectedType.isNull()) {
+    if (value.kind === 'tuple' && value.value.length === 0) {
+      return null;
+    } else {
+      throw new Error(`Expected null (unit), obtained value ${value}`);
+    }
+  }
+
+  if (expectedType.isVoid()) {
+    if (value.kind === 'tuple' && value.value.length === 0) {
+      return undefined;
+    } else {
+      throw new Error(`Expected void (unit), obtained value ${value}`);
+    }
+  }
+
+  if (expectedType.isBoolean() || name === 'true' || name === 'false') {
+    if (value.kind === 'bool') {
+      return value.value;
+    } else {
+      throw new Error(`Expected boolean, obtained value ${value}`);
+    }
+  }
+
+  switch (name) {
+    case 'Uint8Array':
       if (value.kind === 'list') {
-        return new Int8Array(value.value.map((v) => toTsValue(v, Type.Number)));
-      } else {
-        throw new Error(`Expected Int8Array, obtained value ${value}`);
-      }
-    case TypeKind.Uint8Array:
-      if (value.kind === 'list') {
-        return new Uint8Array(
-          value.value.map((v) => toTsValue(v, Type.Number)),
-        );
+        return new Uint8Array(value.value.map((v) => convertToNumber(v)));
       } else {
         throw new Error(`Expected Uint8Array, obtained value ${value}`);
       }
-    case TypeKind.Uint8ClampedArray:
+    case 'Uint8ClampedArray':
       if (value.kind === 'list') {
         return new Uint8ClampedArray(
-          value.value.map((v) => toTsValue(v, Type.Number)),
+          value.value.map((v) => convertToNumber(v)),
         );
       } else {
         throw new Error(`Expected Uint8ClampedArray, obtained value ${value}`);
       }
-    case TypeKind.Int16Array:
+    case 'Int8Array':
       if (value.kind === 'list') {
-        return new Int16Array(
-          value.value.map((v) => toTsValue(v, Type.Number)),
-        );
+        return new Int8Array(value.value.map((v) => convertToNumber(v)));
+      } else {
+        throw new Error(`Expected Int8Array, obtained value ${value}`);
+      }
+
+    case 'Int16Array':
+      if (value.kind === 'list') {
+        return new Int16Array(value.value.map((v) => convertToNumber(v)));
       } else {
         throw new Error(`Expected Int16Array, obtained value ${value}`);
       }
-    case TypeKind.Uint16Array:
+    case 'Uint16Array':
       if (value.kind === 'list') {
-        return new Uint16Array(
-          value.value.map((v) => toTsValue(v, Type.Number)),
-        );
+        return new Uint16Array(value.value.map((v) => convertToNumber(v)));
       } else {
         throw new Error(`Expected Uint16Array, obtained value ${value}`);
       }
-    case TypeKind.Int32Array:
+    case 'Int32Array':
       if (value.kind === 'list') {
-        return new Int32Array(
-          value.value.map((v) => toTsValue(v, Type.Number)),
-        );
+        return new Int32Array(value.value.map((v) => convertToNumber(v)));
       } else {
         throw new Error(`Expected Int32Array, obtained value ${value}`);
       }
-    case TypeKind.Uint32Array:
+    case 'Uint32Array':
       if (value.kind === 'list') {
-        return new Uint32Array(
-          value.value.map((v) => toTsValue(v, Type.Number)),
-        );
+        return new Uint32Array(value.value.map((v) => convertToNumber(v)));
       } else {
         throw new Error(`Expected Uint32Array, obtained value ${value}`);
       }
-    case TypeKind.Float32Array:
+    case 'Float32Array':
       if (value.kind === 'list') {
-        return new Float32Array(
-          value.value.map((v) => toTsValue(v, Type.Number)),
-        );
+        return new Float32Array(value.value.map((v) => convertToNumber(v)));
       } else {
         throw new Error(`Expected Float32Array, obtained value ${value}`);
       }
-    case TypeKind.Float64Array:
+    case 'Float64Array':
       if (value.kind === 'list') {
-        return new Float64Array(
-          value.value.map((v) => toTsValue(v, Type.Number)),
-        );
+        return new Float64Array(value.value.map((v) => convertToNumber(v)));
       } else {
         throw new Error(`Expected Float64Array, obtained value ${value}`);
       }
-    case TypeKind.BigInt64Array:
+    case 'BigInt64Array':
       if (value.kind === 'list') {
-        return new BigInt64Array(
-          value.value.map((v) => toTsValue(v, Type.BigInt)),
-        );
+        return new BigInt64Array(value.value.map((v) => convertToBigInt(v)));
       } else {
         throw new Error(`Expected BigInt64Array, obtained value ${value}`);
       }
-    case TypeKind.BigUint64Array:
+    case 'BigUint64Array':
       if (value.kind === 'list') {
-        return new BigUint64Array(
-          value.value.map((v) => toTsValue(v, Type.BigInt)),
-        );
+        return new BigUint64Array(value.value.map((v) => convertToBigInt(v)));
       } else {
         throw new Error(`Expected BigUint64Array, obtained value ${value}`);
       }
-    case TypeKind.ArrayBuffer:
-      if (value.kind === 'list') {
-        const byteArray = value.value.map((v) => {
-          const convertedValue = toTsValue(v, Type.Number);
-          if (typeof convertedValue !== 'number') {
-            throw new Error(
-              `Expected number, obtained value ${convertedValue}`,
-            );
-          }
-          return convertedValue;
-        });
-        return new Uint8Array(byteArray).buffer;
-      } else {
-        throw new Error(`Expected ArrayBuffer, obtained value ${value}`);
-      }
-    case TypeKind.SharedArrayBuffer:
-      if (value.kind === 'list') {
-        const byteArray = value.value.map((v) => {
-          const convertedValue = toTsValue(v, Type.Number);
-          if (typeof convertedValue !== 'number') {
-            throw new Error(
-              `Expected number, obtained value ${convertedValue}`,
-            );
-          }
-          return convertedValue;
-        });
-        return new Uint8Array(byteArray).buffer;
-      } else {
-        throw new Error(`Expected SharedArrayBuffer, obtained value ${value}`);
-      }
-    case TypeKind.DataView:
-      if (value.kind === 'list') {
-        const byteArray = value.value.map((v) => {
-          const convertedValue = toTsValue(v, Type.Number);
-          if (typeof convertedValue !== 'number') {
-            throw new Error(
-              `Expected number, obtained value ${convertedValue}`,
-            );
-          }
-          return convertedValue;
-        });
-        return new DataView(new Uint8Array(byteArray).buffer);
-      } else {
-        throw new Error(`Expected DataView, obtained value ${value}`);
-      }
-    case TypeKind.Object:
-      if (value.kind === 'record') {
-        const fieldValues = value.value;
-        const expectedTypeFields: ReadonlyArray<PropertyInfo> = (
-          expectedType as ObjectType
-        ).getProperties();
-        return expectedTypeFields.reduce(
-          (acc, field, idx) => {
-            const name: string = field.name.toString();
-            const expectedFieldType = field.type;
-            const tsValue = toTsValue(fieldValues[idx], expectedFieldType);
-            if (field.optional && (tsValue === undefined || tsValue === null)) {
-              return acc;
-            } else {
-              acc[name] = tsValue;
-              return acc;
-            }
-          },
-          {} as Record<string, any>,
-        );
-      } else {
-        throw new Error(`Expected object, obtained value ${value}`);
-      }
-    case TypeKind.Interface:
-      if (value.kind === 'record') {
-        const fieldValues = value.value;
-        const expectedTypeFields: ReadonlyArray<PropertyInfo> = (
-          expectedType as InterfaceType
-        ).getProperties();
-        return expectedTypeFields.reduce(
-          (acc, field, idx) => {
-            const name: string = field.name.toString();
-            const expectedFieldType = field.type;
-            const tsValue = toTsValue(fieldValues[idx], expectedFieldType);
-            if (field.optional && (tsValue === undefined || tsValue === null)) {
-              return acc;
-            } else {
-              acc[name] = tsValue;
-              return acc;
-            }
-          },
-          {} as Record<string, any>,
-        );
-      } else {
-        throw new Error(`Expected object, obtained value ${value}`);
-      }
-    case TypeKind.Undefined:
-      return null;
-    case TypeKind.Union:
-      if (value.kind === 'variant') {
-        const caseValue = value.caseValue;
-        if (!caseValue) {
-          throw new Error(`Expected value, obtained value ${value}`);
-        }
+  }
 
-        const unionTypes = (expectedType as UnionType).types;
-        const matchingType = unionTypes[value.caseIdx];
+  if (name === 'Promise') {
+    if (expectedType.getTypeArguments().length !== 1) {
+      throw new Error(`Expected Promise to have one type argument`);
+    }
+    const innerType = expectedType.getTypeArguments()[0];
+    return toTsValue(value, innerType);
+  }
 
-        return toTsValue(caseValue, matchingType);
-      } else {
-        throw new Error(`Expected union, obtained value ${value}`);
-      }
-    case TypeKind.Alias:
-      const aliasType = expectedType as TypeAliasType;
-      const targetType = aliasType.target;
-      return toTsValue(value, targetType);
-    case TypeKind.StringLiteral:
-      if (value.kind === 'string') {
-        return value.value;
-      } else {
-        throw new Error(`Unrecognized value for ${value.kind}`);
-      }
-    case TypeKind.Promise:
-      const innerType = (expectedType as PromiseType).getTypeArguments()[0];
-      return toTsValue(value, innerType);
-    case TypeKind.Type:
-      if (expectedType.isArray()) {
-        if (value.kind === 'list') {
-          return value.value.map((item: Value) =>
-            toTsValue(item, expectedType.getTypeArguments?.()[0]),
-          );
-        } else {
-          throw new Error(`Expected array, obtained value ${value}`);
-        }
-      } else if (expectedType.isTuple()) {
-        const typeArg = expectedType.getTypeArguments?.();
-        if (value.kind === 'tuple') {
-          return value.value.map((item: Value, idx: number) =>
-            toTsValue(item, typeArg[idx]),
-          );
-        } else {
-          throw new Error(`Expected tuple, obtained value ${value}`);
-        }
-      } else if (expectedType.isGenericType()) {
-        const genericType: GenericType<typeof expectedType> =
-          expectedType as GenericType<typeof expectedType>;
-        const genericTypeDefinition = genericType.genericTypeDefinition;
-        if (genericTypeDefinition.name === 'Map') {
-          const typeArgs = expectedType.getTypeArguments?.();
+  if (name === 'Map') {
+    const typeArgs = expectedType.getTypeArguments();
 
-          if (!typeArgs || typeArgs.length !== 2) {
-            throw new Error('Map must have two type arguments');
-          }
+    if (typeArgs.length !== 2) {
+      throw new Error('Map must have two type arguments');
+    }
 
-          if (value.kind === 'list') {
-            const entries: [any, any][] = value.value.map((item: Value) => {
-              if (item.kind !== 'tuple' || item.value.length !== 2) {
-                throw new Error(
-                  `Expected tuple of two items, obtained value ${item}`,
-                );
-              }
-
-              return [
-                toTsValue(item.value[0], typeArgs[0]),
-                toTsValue(item.value[1], typeArgs[1]),
-              ] as [any, any];
-            });
-            return new Map(entries);
-          } else {
-            throw new Error(`Expected Map, obtained value ${value}`);
-          }
-        } else if (isInBuiltResult(expectedType)) {
-          if (value.kind === 'result') {
-            const resultValue = value.value;
-
-            const typeArgs = expectedType.getTypeArguments?.();
-            if (!typeArgs || typeArgs.length !== 2) {
-              throw new Error('Result type must have two type arguments');
-            }
-
-            if (resultValue.ok !== undefined) {
-              const okType = typeArgs[0];
-              const resulValue = resultValue.ok;
-              const tsValue = toTsValue(resulValue, okType);
-              return {
-                tag: 'ok',
-                val: tsValue,
-              };
-            } else if (resultValue.err !== undefined) {
-              const errType = typeArgs[1];
-              const resulValue = resultValue.err;
-              const tsValue = toTsValue(resulValue, errType);
-              return {
-                tag: 'err',
-                val: tsValue,
-              };
-            } else {
-              throw new Error(
-                `Expected result with ok or err, obtained value ${value}`,
-              );
-            }
-          }
-        } else if (genericTypeDefinition.name === 'Promise') {
-          const typeArgs = expectedType.getTypeArguments?.();
-          if (!typeArgs || typeArgs.length !== 1) {
-            throw new Error('Promise type must have one type argument');
-          }
-
-          return toTsValue(value, typeArgs[0]);
-        } else {
+    if (value.kind === 'list') {
+      const entries: [any, any][] = value.value.map((item: Value) => {
+        if (item.kind !== 'tuple' || item.value.length !== 2) {
           throw new Error(
-            `Generic type ${genericTypeDefinition.name} not supported`,
+            `Expected tuple of two items, obtained value ${item}`,
           );
         }
-      } else {
-        const arg = expectedType.getTypeArguments?.()[0];
-        if (!arg) {
-          throw new Error('Type must have a type argument');
-        }
-        return toTsValue(value, arg);
+
+        return [
+          toTsValue(item.value[0], typeArgs[0]),
+          toTsValue(item.value[1], typeArgs[1]),
+        ] as [any, any];
+      });
+      return new Map(entries);
+    } else {
+      throw new Error(`Expected Map, obtained value ${value}`);
+    }
+  }
+
+  if (expectedType.isTuple()) {
+    const typeArg = expectedType.getTypeArguments?.();
+    if (value.kind === 'tuple') {
+      return value.value.map((item: Value, idx: number) =>
+        toTsValue(item, typeArg[idx]),
+      );
+    } else {
+      throw new Error(`Expected tuple, obtained value ${value}`);
+    }
+  }
+
+  if (expectedType.isArray()) {
+    if (value.kind === 'list') {
+      return value.value.map((item: Value) =>
+        toTsValue(item, expectedType.getTypeArguments?.()[0]),
+      );
+    } else {
+      throw new Error(`Expected array, obtained value ${value}`);
+    }
+  }
+
+  if (expectedType.isObject()) {
+    if (value.kind === 'record') {
+      const fieldValues = value.value;
+      const expectedTypeFields = expectedType.getProperties();
+      return expectedTypeFields.reduce(
+        (acc, field, idx) => {
+          const name = field.getName();
+          const expectedFieldType = field.getTypeAtLocation(
+            field.getDeclarations()[0],
+          );
+          acc[name] = toTsValue(fieldValues[idx], expectedFieldType);
+          return acc;
+        },
+        {} as Record<string, any>,
+      );
+    } else {
+      throw new Error(
+        `Expected object ${name}, obtained value ${JSON.stringify(value)}`,
+      );
+    }
+  }
+
+  if (expectedType.isInterface()) {
+    if (value.kind === 'record') {
+      const fieldValues = value.value;
+      const expectedTypeFields = expectedType.getProperties();
+      return expectedTypeFields.reduce(
+        (acc, field, idx) => {
+          const name = field.getName();
+          const expectedFieldType = field.getTypeAtLocation(
+            field.getDeclarations()[0],
+          );
+          acc[name] = toTsValue(fieldValues[idx], expectedFieldType);
+          return acc;
+        },
+        {} as Record<string, any>,
+      );
+    } else {
+      throw new Error(`Expected object, obtained value ${value}`);
+    }
+  }
+
+  if (expectedType.isUnion()) {
+    if (value.kind === 'variant') {
+      const caseValue = value.caseValue;
+      if (!caseValue) {
+        throw new Error(`Expected value, obtained value ${value}`);
       }
 
-    default:
+      const unionTypes = expectedType.getUnionTypes();
+      const matchingType = unionTypes[value.caseIdx];
+
+      return toTsValue(caseValue, matchingType);
+    } else {
       throw new Error(
-        `'${expectedType.displayName} with kind ${expectedType.kind} not supported'`,
+        `Expected union, obtained value ${JSON.stringify(value)}`,
       );
+    }
+  }
+
+  throw new Error(`'Type ${name} is not supported in golem'`);
+}
+
+function convertToNumber(value: Value): any {
+  if (
+    value.kind === 'f64' ||
+    value.kind === 'u8' ||
+    value.kind === 'u16' ||
+    value.kind === 'u32' ||
+    value.kind === 'u64' ||
+    value.kind === 's8' ||
+    value.kind === 's16' ||
+    value.kind === 's32' ||
+    value.kind === 's64' ||
+    value.kind === 'f32'
+  ) {
+    return value.value;
+  } else {
+    throw new Error(`Expected number, obtained value ${value}`);
+  }
+}
+
+function convertToBigInt(value: Value): any {
+  if (value.kind === 'u64' || value.kind === 's64') {
+    return value.value;
+  } else {
+    throw new Error(`Expected bigint, obtained value ${value}`);
   }
 }

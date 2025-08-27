@@ -12,7 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { metadataCollection } from '../.metadata/metadata.index';
 import { TypeMetadata } from '../src/typeMetadata';
 
-TypeMetadata.updateLegacy(metadataCollection);
+import { Project } from 'ts-morph';
+
+const project = new Project({
+  tsConfigFilePath: './tsconfig.json',
+});
+
+const sourceFiles = project.getSourceFiles('tests/testData.ts');
+
+TypeMetadata.updateFromSourceFiles(sourceFiles);

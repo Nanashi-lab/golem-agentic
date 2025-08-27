@@ -12,35 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  BaseMetadataLibrary,
-  GlobalMetadata,
-  Type as LegacyType,
-} from 'rttist';
 import { AgentClassName } from './newTypes/agentClassName';
 import * as Option from 'effect/Option';
 import { SourceFile, Type } from 'ts-morph';
 
-export const PackageName = '@golemcloud/golem-ts-sdk';
-
-export const Metadata = new BaseMetadataLibrary(
-  {
-    nullability: false,
-  },
-  PackageName,
-  GlobalMetadata,
-);
-
 type ClassNameString = string;
 type MethodNameString = string;
 
-type MethodParams = Map<string, Type>;
+export type MethodParams = Map<string, Type>;
 
-type ReturnType = Type;
+export type ReturnType = Type;
 
-type ConstructorArg = { name: string; type: Type };
+export type ConstructorArg = { name: string; type: Type };
 
-type ClassMetadata = {
+export type ClassMetadata = {
   constructorArgs: ConstructorArg[];
   methods: Map<
     MethodNameString,
@@ -71,7 +56,9 @@ export const TypeMetadata = {
         const methods = new Map();
         for (const method of classDecl.getMethods()) {
           const methodParams = new Map(
-            method.getParameters().map((p) => [p.getName(), p.getType()]),
+            method.getParameters().map((p) => {
+              return [p.getName(), p.getType()];
+            }),
           );
           const returnType = method.getReturnType();
           methods.set(method.getName(), { methodParams, returnType });
@@ -93,32 +80,27 @@ export const TypeMetadata = {
     MetadataV2.set(className, { constructorArgs, methods });
   },
 
-  get(className: ClassNameString): ClassMetadata | undefined {
-    return MetadataV2.get(className);
-  },
-
-  has(className: ClassNameString): boolean {
-    return MetadataV2.has(className);
+  get(className: AgentClassName): Option.Option<ClassMetadata> {
+    return Option.fromNullable(MetadataV2.get(className.value));
   },
 
   getAll(): Map<ClassNameString, ClassMetadata> {
     return MetadataV2;
   },
+};
 
-  updateLegacy(metadata: Array<any>): void {
-    Metadata.clearMetadata(PackageName);
-    metadata.forEach((mod) => mod.add(Metadata, false));
-  },
+export function getTypeName(type: Type): string | undefined {
+  const rawName = type.getSymbol()?.getName();
 
-  lookupClassMetadata(className: AgentClassName): Option.Option<LegacyType> {
-    const types = Metadata.getTypes().filter(
-      (type) => type.isClass() && type.name === className.value,
-    );
+  if (!rawName || rawName === '__type') {
+    const alias = type.getAliasSymbol()?.getName();
 
-    if (types.length === 0) {
-      return Option.none();
+    if (!alias || alias === '__type') {
+      return type.getText();
     }
 
-    return Option.some(types[0]);
-  },
-};
+    return alias;
+  }
+
+  return rawName;
+}

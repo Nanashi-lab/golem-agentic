@@ -25,7 +25,7 @@ import { AgentTypeName } from './newTypes/agentTypeName';
 export { BaseAgent } from './baseAgent';
 export { AgentId } from './agentId';
 export { prompt, description, agent } from './decorators';
-export { Metadata, TypeMetadata } from './typeMetadata';
+export { TypeMetadata } from './typeMetadata';
 export * from './newTypes/either';
 export * from './newTypes/agentClassName';
 export * from './newTypes/textInput';

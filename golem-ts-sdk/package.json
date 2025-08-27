@@ -35,9 +35,9 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write \"src/**/*\" \"tests/**/*\"",
     "format:check": "prettier --check \"src/**/*\" \"tests/**/*\"",
-    "test": "npx @rttist/typegen@0.2.0 generate --force && tsc --noEmit && vitest run",
+    "test": "tsc --noEmit && vitest run",
     "prebuild": "wasm-rquickjs generate-dts --wit ../wit --output types",
-    "build": "npm run prebuild && npx @rttist/typegen@0.2.0 generate --force && tsc --noEmit && rollup -c",
+    "build": "npm run prebuild && tsc --noEmit && rollup -c",
     "dev": "rollup -c -w"
   },
   "keywords": [],
@@ -62,12 +62,12 @@
     "rollup-plugin-typescript2": "^0.36.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.39.0",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "ts-morph": "^26.0.0"
+
   },
   "private": false,
   "dependencies": {
-    "effect": "^3.17.6",
-    "rttist": "^1.0.0-rc.4",
-    "ts-morph": "^26.0.0"
+    "effect": "^3.17.6"
   }
 }

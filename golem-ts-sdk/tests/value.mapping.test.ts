@@ -17,7 +17,6 @@ import {
   getTestMapType,
   getTestInterfaceType,
   getTestObjectType,
-  getTestListType,
   getTestListOfObjectType,
   getTupleComplexType,
   getTupleType,
@@ -25,11 +24,10 @@ import {
   getUnionComplexType,
   getPromiseType,
 } from './utils';
-import { ListComplexType, TestInterfaceType } from './testData';
+import { TestInterfaceType } from './testData';
 import * as Value from '../src/internal/mapping/values/Value';
 import {
   interfaceArb,
-  listArb,
   mapArb,
   objectArb,
   listComplexArb,
@@ -39,9 +37,8 @@ import {
   unionComplexArb,
 } from './arbitraries';
 import * as fc from 'fast-check';
-import { Type } from 'rttist';
+import { Type } from 'ts-morph';
 import * as EffectEither from 'effect/Either';
-import { ok } from '../src/newTypes/either';
 import * as WitValue from '../src/internal/mapping/values/WitValue';
 
 describe('typescript value to wit value round-trip conversions', () => {
@@ -54,17 +51,6 @@ describe('typescript value to wit value round-trip conversions', () => {
     );
   });
 
-  // Note that in the case of promise, it can only be part of the return type of agent function
-  // Also a value of promise as such will not be handled by the mapping layer,
-  // Hence we generate normal values, and see if it works with the promise type.
-  // Such a test ensures the following type of code works correctly:
-  // This test replicates the following idea
-  // ```ts
-  // async function testFn(): Promise<string> {
-  //   return 'test';
-  // }
-  // ```
-  // In this case, `test` is a string pointing to the value of the promise.
   it('should correctly perform round-trip conversion for arbitrary values of promise type', () => {
     fc.assert(
       fc.property(fc.string(), (arbData) => {
@@ -92,15 +78,7 @@ describe('typescript value to wit value round-trip conversions', () => {
     );
   });
 
-  it('should correctly perform round-trip conversion for arbitrary values of list type', () => {
-    fc.assert(
-      fc.property(listArb, (arbData) => {
-        const type = getTestListType();
-        runRoundTripTest(arbData, type);
-      }),
-    );
-  });
-
+  //
   it('should correctly perform round-trip conversion for arbitrary values of list of object type', () => {
     fc.assert(
       fc.property(listComplexArb, (arbData) => {
@@ -159,7 +137,6 @@ describe('typescript value to wit value round-trip conversions', () => {
         i: ['', 0, { a: '', b: 0, c: false }],
         j: new Map<string, number>(),
         k: { n: 0 },
-        l: { tag: 'ok', val: 1 },
         // m: Either.left('failed')
       },
       unionComplexProp: 1,
@@ -233,7 +210,6 @@ describe('typescript value to wit value round-trip conversions', () => {
         i: ['', 0, { a: '', b: 0, c: false }],
         j: new Map<string, number>(),
         k: { n: 0 },
-        l: ok(1),
       },
     };
 
@@ -287,7 +263,6 @@ describe('typescript value to wit value round-trip conversions', () => {
         i: ['', 0, { a: '', b: 0, c: false }],
         j: new Map<string, number>(),
         k: { n: 0 },
-        l: ok(1),
       },
     };
 

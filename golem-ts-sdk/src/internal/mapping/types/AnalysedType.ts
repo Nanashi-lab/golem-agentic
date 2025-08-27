@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {GenericType, InterfaceType, ObjectType, Type, TypeAliasType, TypeKind, UnionType} from "rttist";
-import {Type as TsType} from "rttist/dist/Type";
+import {Node, Type, Type as TsType} from "ts-morph";
 import * as Either from "effect/Either";
-import {isInBuiltResult} from "./inbuilt";
 import {numberToOrdinalKebab} from "./typeIndexOrdinal";
+import {getTypeName} from "../../../typeMetadata";
 
 export interface NameTypePair {
   name: string;
@@ -204,304 +203,207 @@ export const option = (inner: AnalysedType): AnalysedType => ({ kind: 'option', 
       ({ kind: 'handle', value: { name: undefined, owner: undefined, resourceId, mode } });
 
 
-export function fromTsType(type: TsType): Either.Either<AnalysedType, string> {
-  switch (type.kind) {
-    case TypeKind.Boolean:
-      return Either.right(bool());
-    case TypeKind.False:
-      return Either.right(bool());
-    case TypeKind.True:
-      return Either.right(bool());
-    case TypeKind.DataView:
-      return Either.right(list(u8()));
-    case TypeKind.MapDefinition:
-      const mapKeyType = type.getTypeArguments?.()[0];
-      const mapValueType = type.getTypeArguments?.()[1];
-      const key = fromTsType(mapKeyType);
-      const value = fromTsType(mapValueType);
+export function fromTsType(tsType: TsType): Either.Either<AnalysedType, string> {
+  const visited = new Set<TsType>();
+  return fromTsTypeInternal(tsType, visited);
+}
 
-      return Either.zipWith(key, value, (k, v) =>
-          list(tuple([k, v])));
 
-    case TypeKind.WeakMapDefinition:
-      const weakMapKeyType = type.getTypeArguments?.()[0];
-      const weakMapValueType = type.getTypeArguments?.()[1];
-      const weakKey = fromTsType(weakMapKeyType);
-      const weakValue = fromTsType(weakMapValueType);
+export function fromTsTypeInternal(tsType: TsType, visited: Set<TsType>): Either.Either<AnalysedType, string> {
 
-      return Either.zipWith(
-          weakKey,
-          weakValue,
-          (k, v) => list(tuple([k, v])
-          ));
+  const type = unwrapAlias(tsType);
 
-    case TypeKind.IteratorDefinition:
-      const iteratorType = type.getTypeArguments?.()[0];
 
-      if (!iteratorType) {
-        return Either.left("Iterator must have a type argument");
-      } else {
-        return Either.map(fromTsType(iteratorType), (result) => list(result));
-      }
+  const name =
+      getTypeName(type)
 
-    case TypeKind.IterableDefinition:
-      const iterableType = type.getTypeArguments?.()[0];
-      if (!iterableType) {
-        return Either.left("Iterable must have a type argument");
-      } else {
-        return Either.map(fromTsType(iterableType), (result) => list(result));
-      }
+  switch (name) {
+    case "Float64Array": return Either.right(list(f64()));
+    case "Float32Array": return Either.right(list(f32()));
+    case "Int8Array":    return Either.right(list(s8()));
+    case "Uint8Array":   return Either.right(list(u8()));
+    case "Int16Array":   return Either.right(list(s16()));
+    case "Uint16Array":  return Either.right(list(u16()));
+    case "Int32Array":   return Either.right(list(s32()));
+    case "Uint32Array":  return Either.right(list(u32()));
+    case "BigInt64Array":  return Either.right(list(s64()));
+    case "BigUint64Array": return Either.right(list(u64()));
+  }
 
-    case TypeKind.IterableIteratorDefinition:
-      const iterableIteratorType = type.getTypeArguments?.()[0];
-      if (!iterableIteratorType) {
-        return Either.left("IterableIterator must have a type argument");
-      } else {
-        return Either.map(fromTsType(iterableIteratorType), (result) => list(result));
-      }
+  if (name === "Promise" && type.getTypeArguments().length === 1) {
+    const inner = type.getTypeArguments()[0];
+    return fromTsTypeInternal(inner, visited);
+  }
 
-    case TypeKind.Type: {
-      const typeArgs = type.getTypeArguments?.() ?? [];
-
-      const requireArgs = (n: number, msg: string) => {
-        if (typeArgs.length !== n) {
-          return Either.left(`Unable to handle the type ${type.id} ${type.name}. ${msg}`);
-        }
-        return null;
-      };
-
-      const handleSingleArg = (msg: string) => {
-        const err = requireArgs(1, msg);
-        if (err) return err;
-        return fromTsType(typeArgs[0]);
-      };
-
-      if (type.isArray()) {
-        const err = requireArgs(1, "Array must have a type argument");
-        if (err) return err;
-        return Either.map(
-            fromTsType(typeArgs[0]),
-            list
-        );
-      }
-
-      if (type.isTuple()) {
-        return Either.map(
-            Either.all(typeArgs.map(fromTsType)),
-            tuple
-        );
-      }
-
-      if (type.isGenericType()) {
-        const genericType = type as GenericType<typeof type>;
-        const defName = genericType.genericTypeDefinition.name;
-
-        if (defName === "Map") {
-          const err = requireArgs(2, "Map must have two type arguments");
-          if (err) return err;
-          return Either.zipWith(
-              fromTsType(typeArgs[0]),
-              fromTsType(typeArgs[1]),
-              (keyType, valueType) =>
-                  list(tuple([keyType, valueType]))
-          );
-        }
-
-        if (isInBuiltResult(type)) {
-          const err = requireArgs(2, "Result type must have concrete type arguments");
-          if (err) return err;
-          return Either.zipWith(
-              fromTsType(typeArgs[0]),
-              fromTsType(typeArgs[1]),
-              result
-          );
-        }
-
-        return handleSingleArg(`The type id is ${genericType.id}.`);
-      }
-
-      return handleSingleArg(`The type id is ${type.id}.`);
+  if (type.isBoolean() || name === 'true' || name === 'false')  {
+      return Either.right(bool())
     }
 
-    case TypeKind.Object:
-      const object = type as ObjectType;
-      const props = object.getProperties();
-      if (props.length === 0) {
-        return Either.left(`Unsupported type for type ${type}`);
-      }
+  if (name === "Map" && type.getTypeArguments().length === 2) {
+    const [keyT, valT] = type.getTypeArguments();
 
-      const objectFields = Either.all(props.map(prop =>
-          Either.map(fromTsType(prop.type), (propType) =>
-              field(prop.name.toString(), propType))
-      ));
+    const key = fromTsTypeInternal(keyT, visited);
+    const value = fromTsTypeInternal(valT, visited);
 
-      return Either.map(objectFields, (fields) => record(fields))
 
-    case TypeKind.Interface:
-      const objectInterface = type as InterfaceType;
-      const interfaceFields = Either.all(objectInterface.getProperties().map(prop => {
-        const propertyAnalysedType = fromTsType(prop.type);
+    return Either.zipWith(key, value, (k, v) =>
+        list(tuple([k, v])));
+  }
 
-        if (prop.optional) {
-          return Either.map(propertyAnalysedType, (result) =>
-              field(prop.name.toString(), option(result))
-          )
-        } else {
-          return Either.map(propertyAnalysedType, (result) =>
-              field(prop.name.toString(), result)
-          )
+  if (name === "Iterable" && type.getTypeArguments().length === 1) {
+    const inner = type.getTypeArguments()[0];
+    return Either.map(fromTsTypeInternal(inner, visited), (result) => list(result));
+  }
+
+  if (name === "AsyncIterable" && type.getTypeArguments().length === 1) {
+    const inner = type.getTypeArguments()[0];
+    return Either.map(fromTsTypeInternal(inner, visited), (result) => list(result));
+  }
+
+
+  if (name === "Iterator" && type.getTypeArguments().length === 1) {
+    const inner = type.getTypeArguments()[0];
+    return Either.map(fromTsTypeInternal(inner, visited), (result) => list(result));
+  };
+
+  if (type.isTuple()) {
+    const tupleElems = Either.all(type.getTupleElements().map(el => fromTsTypeInternal(el, visited)));
+
+    return Either.map(tupleElems, (items) => tuple(items));
+  };
+
+  if (type.isArray()) {
+    const arrayElementType = type.getArrayElementType();
+
+    if (!arrayElementType) {
+      return Either.left("Unable to determine the array element type");
+    }
+
+    const elemType = fromTsTypeInternal(arrayElementType, visited);
+
+    return Either.map(elemType, (inner) => list(inner));
+  }
+
+  if (type.isUnion()) {
+    let fieldIdx = 1;
+
+    const possibleTypes: NameOptionTypePair[] = [];
+
+    let boolTracked = false;
+
+    for (const t of type.getUnionTypes()) {
+      if (t.isBoolean() || getTypeName(t) === "false" || getTypeName(t) === "true") {
+        if (boolTracked) {
+          continue;
         }
-      }));
-
-      return Either.map(interfaceFields, (fields) => record(fields));
-
-    case TypeKind.Union:
-      let fieldIdx = 1;
-      const unionType = type as UnionType;
-
-      let foundBool = false;
-      const possibleTypes: NameOptionTypePair[] = [];
-
-      for (const t of unionType.types) {
-        // To work around RTTIST bug where boolean fields in a union are split into true/false
-        const isBoolLike =
-            t.kind === TypeKind.Boolean ||
-            t.kind === TypeKind.True ||
-            t.kind === TypeKind.False;
-
-        if (isBoolLike) {
-          if (foundBool) continue;
-          foundBool = true;
-        }
-
-        Either.map(fromTsType(t), (result) => {
+        boolTracked = true;
+        possibleTypes.push({
+          name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
+          typ: bool()
+        });
+      } else {
+        Either.map(fromTsTypeInternal(t, visited), (result) => {
           possibleTypes.push({
             name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
             typ: result,
           });
         });
       }
+    }
 
-      return Either.right(variant(possibleTypes));
+    return Either.right(variant(possibleTypes));
+  }
 
-    case TypeKind.Alias:
-      const typeAlias = type as TypeAliasType;
-      return fromTsType(typeAlias.target)
 
-    case TypeKind.Null:
-      return Either.right(tuple([]))
+  if (type.isObject()) {
+    const result = Either.all(type.getProperties().map((prop) => {
+      const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());
+      const nodes: Node[] = prop.getDeclarations();
+      const node = nodes[0];
 
-    case TypeKind.BigInt:
-      return Either.right(u64());
+      const tsType = fromTsTypeInternal(type, visited);
 
-    case TypeKind.Float64Array:
-      return Either.right(f64());
-
-    case TypeKind.Number:
-      return Either.right(s32()); // For the same reason - as an example - Rust defaults to i32
-
-    case TypeKind.String:
-      return Either.right(str());
-
-    case TypeKind.RegExp:
-      return Either.right(str());
-
-    case TypeKind.Error:
-      return Either.right(resultErr(str()));
-
-    case TypeKind.Int8Array:
-      return Either.right(list(s8()));
-
-    case TypeKind.Uint8Array:
-      return Either.right(list(u8()));
-
-    case TypeKind.Uint8ClampedArray:
-      return Either.right(list(u8()));
-
-    case TypeKind.ArrayBuffer:
-      return Either.right(list(u8()));
-
-    case TypeKind.SharedArrayBuffer:
-      return Either.right(list(u8()));
-
-    case TypeKind.Int16Array:
-      return Either.right(list(s16()));
-
-    case TypeKind.Uint16Array:
-      return Either.right(list(u16()));
-
-    case TypeKind.Int32Array:
-      return Either.right(list(s32()));
-
-    case TypeKind.Uint32Array:
-      return Either.right(list(u32()));
-
-    case TypeKind.Float32Array:
-      return Either.right(list(f32()));
-
-    case TypeKind.BigInt64Array:
-      return Either.right(list(s64()));
-
-    case TypeKind.BigUint64Array:
-      return Either.right(list(u64()));
-
-    case TypeKind.NumberLiteral:
-      return Either.right(f64());
-    case TypeKind.BigIntLiteral:
-      return Either.right(s64());
-    case TypeKind.StringLiteral:
-      return Either.right(str());
-
-    case TypeKind.Promise:
-      const promiseType = type.getTypeArguments?.()[0];
-
-      if (!promiseType) {
-        return Either.left("Promise must have a type argument");
+      if ((Node.isPropertySignature(node) || Node.isPropertyDeclaration(node)) && node.hasQuestionToken()) {
+        return Either.map(tsType, (analysedType) => {
+          return field(prop.getName(), option(analysedType))
+        });
       }
 
-      return fromTsType(promiseType);
+      return Either.map(tsType, (analysedType) => {
+        return field(prop.getName(), analysedType)
+      })
+    }));
 
-    case TypeKind.PromiseDefinition:
-      const promiseDefType = type.getTypeArguments?.()[0];
+    return Either.map(result, (fields) => record(fields));
+  }
 
-      if (!promiseDefType) {
-        return Either.left("PromiseDefinition must have a type argument");
+  if (type.isInterface()) {
+    const result = Either.all(type.getProperties().map((prop) => {
+      const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());
+      const nodes: Node[] = prop.getDeclarations();
+      const node = nodes[0];
+
+      const tsType = fromTsTypeInternal(type, visited);
+
+      if ((Node.isPropertySignature(node) || Node.isPropertyDeclaration(node)) && node.hasQuestionToken()) {
+        return Either.map(tsType, (analysedType) => {
+          return field(prop.getName(), option(analysedType))
+        });
       }
 
-      return Either.map(fromTsType(promiseDefType), option);
+      return Either.map(tsType, (analysedType) => {
+        return field(prop.getName(), analysedType)
+      })
+    }));
 
-    case TypeKind.ObjectType:
-      const obj = type as ObjectType;
-      const fields = Either.all(obj.getProperties().map(prop => {
-        return Either.map(fromTsType(prop.type), (result) => field(prop.name.toString(), result));
-      }));
-
-      return Either.map(fields, record);
-
-    case TypeKind.TupleDefinition:
-      const tupleTypes =
-          Either.all(type.getTypeArguments?.().map(fromTsType)) || Either.all([]);
-
-      return Either.map(tupleTypes, tuple);
-
-    case TypeKind.ArrayDefinition:
-      const arrayType = type.getTypeArguments?.()[0];
-
-      if (!arrayType) {
-        return Either.left("Array must have a type argument");
-      }
-      return Either.map(fromTsType(arrayType), list)
-
-    case TypeKind.ReadonlyArrayDefinition:
-      const elementType = type.getTypeArguments?.()[0];
-
-      if (!elementType) {
-        return Either.left("Array must have a type argument");
-      }
-      return Either.map(fromTsType(elementType), list)
-
-    default:
-      return Either.left(`The following type is not supported as argument or return type in agentic context. Type Display Name: ${type.displayName}. Type Name: ${type.name}, Type ID: ${type.id}. Please report this issue to Golem Cloud. \n Additional info: ${type}`);
+    return Either.map(result, (fields) => record(fields));
 
   }
+
+  if (type.isNull()) {
+    return Either.right(tuple([]))
+  }
+
+  if (type.isBigInt()) {
+    return Either.right(u64())
+  }
+
+
+  if (type.isUndefined()) {
+    return Either.right(tuple([]))
+  }
+
+  if (type.isNumber()) {
+    return Either.right(s32()) // For the same reason - as an example - Rust defaults to i32
+  }
+
+  if (type.isString()) {
+    return Either.right(str())
+  }
+
+  return Either.left(`The following type is not supported as argument or return type in agentic context. Type Name: ${name}. Please report this issue to Golem Cloud`);
+
+}
+
+
+export function unwrapAlias(type: TsType): TsType {
+  let current = type;
+
+  const visited = new Set<TsType>();
+
+  while (true) {
+    const aliasSymbol = current.getAliasSymbol();
+    if (!aliasSymbol || visited.has(current)) break;
+    visited.add(current);
+
+    const decl = aliasSymbol.getDeclarations()[0];
+    if (!decl) break;
+
+    const realType = decl.getType();
+
+    if (realType === current) break;
+    current = realType;
+  }
+
+    return current;
 }

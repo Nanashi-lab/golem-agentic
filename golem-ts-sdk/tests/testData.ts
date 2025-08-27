@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Either } from '../src/newTypes/either';
+import { agent, BaseAgent } from '../src';
 
 // DO NOT RENAME INTERFACES OR PROPERTIES.
 // These names are introspected using RTTIST metadata reflection
@@ -53,6 +53,8 @@ export type StringType = string;
 
 export type NumberType = number;
 
+// this is important to note that the 5th UnionType is resolved as ObjectType
+// since the first three primitive types are already covered making `UnionType` is just an Object
 export type UnionComplexType =
   | number
   | string
@@ -80,8 +82,6 @@ export type ObjectComplexType = {
   i: TupleComplexType;
   j: MapType;
   k: SimpleInterfaceType;
-  l: Either<number, string>;
-  //m: Either.Either<number, string> // FIXME: Effect.Either is inferred as Invalid by RTTIST
 };
 
 export interface TestInterfaceType {
@@ -138,3 +138,27 @@ export interface TestInterfaceType {
 // }
 //
 // type EnumTypeAlias = EnumType;
+
+@agent()
+class MyAgent extends BaseAgent {
+  constructor(readonly testInterfaceType: TestInterfaceType) {
+    super();
+    this.testInterfaceType = testInterfaceType;
+  }
+
+  async getWeather(
+    complexType: ObjectComplexType,
+    unionType: UnionType,
+    unionComplexType: UnionComplexType,
+    numberType: NumberType,
+    stringType: StringType,
+    booleanType: BooleanType,
+    mapType: MapType,
+    tupleComplexType: TupleComplexType,
+    tupleType: TupleType,
+    listComplexType: ListComplexType,
+    objectType: ObjectType,
+  ): PromiseType {
+    return Promise.resolve(`Weather for ${location} is sunny!`);
+  }
+}

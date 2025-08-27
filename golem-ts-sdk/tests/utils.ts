@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { PackageName } from '../src/typeMetadata';
-import { Metadata } from '../src';
-import { Type } from 'rttist';
+import { getTypeName, TypeMetadata } from '../src/typeMetadata';
+import { Type } from 'ts-morph';
 import './setup';
 import {
   AnalysedType,
@@ -22,9 +21,7 @@ import {
 } from '../src/internal/mapping/types/AnalysedType';
 
 export function getAll() {
-  return Metadata.getTypes().filter(
-    (type) => type.module.id == `@${PackageName}/tests/testData`,
-  );
+  return TypeMetadata.getAll();
 }
 
 export function getTestInterfaceType(): Type {
@@ -32,19 +29,15 @@ export function getTestInterfaceType(): Type {
 }
 
 export function getTestMapType(): Type {
-  return fetchType('MapType');
+  return fetchType('Map');
 }
 
 export function getTestObjectType(): Type {
   return fetchType('ObjectType');
 }
 
-export function getTestListType(): Type {
-  return fetchType('ListType');
-}
-
 export function getTestListOfObjectType(): Type {
-  return fetchType('ListComplexType');
+  return fetchType('Array');
 }
 
 export function getUnionType(): Type {
@@ -64,19 +57,19 @@ export function getTupleComplexType(): Type {
 }
 
 export function getBooleanType(): Type {
-  return fetchType('BooleanType');
+  return fetchType('boolean');
 }
 
 export function getStringType(): Type {
-  return fetchType('StringType');
+  return fetchType('string');
 }
 
 export function getNumberType(): Type {
-  return fetchType('NumberType');
+  return fetchType('number');
 }
 
 export function getPromiseType(): Type {
-  return fetchType('PromiseType');
+  return fetchType('Promise');
 }
 
 export function getRecordFieldsFromAnalysedType(
@@ -86,10 +79,38 @@ export function getRecordFieldsFromAnalysedType(
 }
 
 function fetchType(typeNameInTestData: string): Type {
-  const types = getAll().filter((type) => type.name == typeNameInTestData);
+  const classMetadata = Array.from(getAll()).map(([_, v]) => v);
 
-  if (types.length === 0) {
-    throw new Error(`Type ${typeNameInTestData} not found in test data`);
+  for (const type of classMetadata) {
+    const constructorArg = type.constructorArgs.find((arg) => {
+      const typeName = getTypeName(arg.type);
+      return typeName === typeNameInTestData;
+    });
+
+    if (constructorArg) {
+      return constructorArg.type;
+    }
+
+    const methods = Array.from(type.methods.values());
+
+    for (const method of methods) {
+      if (
+        method.returnType &&
+        getTypeName(method.returnType) === typeNameInTestData
+      ) {
+        return method.returnType;
+      }
+
+      const param = Array.from(method.methodParams.entries()).find(([_, t]) => {
+        const typeName = getTypeName(t);
+        return typeName === typeNameInTestData;
+      });
+
+      if (param) {
+        return param[1];
+      }
+    }
   }
-  return types[0];
+
+  throw new Error(`Type ${typeNameInTestData} not found in metadata`);
 }

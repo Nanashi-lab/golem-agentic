@@ -46,8 +46,6 @@ describe('AgentType look up', () => {
 
     AgentInitiatorRegistry.register(agentTypeName, FailingAgentInitiator);
 
-    console.log(AgentInitiatorRegistry.entries());
-
     const lookupResult = AgentInitiatorRegistry.lookup(
       new AgentTypeName('assistant-agent'),
     );
