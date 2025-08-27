@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TypeMetadata } from '../typeMetadata';
-import { ClassType, Type } from 'rttist';
+import { ClassMetadata, TypeMetadata } from '../typeMetadata';
 import { WasmRpc, WorkerId } from 'golem:rpc/types@0.2.2';
 import * as Either from 'effect/Either';
 import * as Value from './mapping/values/Value';
@@ -33,9 +32,7 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
     const agentClassName = new AgentClassName(ctor.name);
     const agentTypeName = AgentTypeName.fromAgentClassName(agentClassName);
 
-    const metadataOpt = TypeMetadata.lookupClassMetadata(
-      new AgentClassName(ctor.name),
-    );
+    const metadataOpt = TypeMetadata.get(new AgentClassName(ctor.name));
 
     if (Option.isNone(metadataOpt)) {
       throw new Error(
@@ -72,7 +69,7 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
 function initialiseClient(
   agentClassName: AgentClassName,
   constructorArgs: any[],
-  classMetadata: Type,
+  classMetadata: ClassMetadata,
 ): Either.Either<WorkerId, string> {
   const agentTypeName = AgentTypeName.fromAgentClassName(agentClassName);
 
@@ -86,9 +83,7 @@ function initialiseClient(
 
   const rpc = new WasmRpc(workerId);
 
-  const signature = (classMetadata as ClassType).getConstructors()[0];
-
-  const constructorParamInfo = signature.getParameters();
+  const constructorParamInfo = classMetadata.constructorArgs;
 
   const constructorParamTypes = constructorParamInfo.map((param) => param.type);
 
@@ -133,24 +128,34 @@ function initialiseClient(
 }
 
 function getMethodProxy(
-  classMetadata: Type,
+  classMetadata: ClassMetadata,
   prop: string | symbol,
   agentTypeName: AgentTypeName,
   workerId: WorkerId,
 ) {
-  const methodSignature = (classMetadata as ClassType)
-    .getMethod(prop)
-    ?.getSignatures()[0]!;
+  const methodSignature = classMetadata.methods.get(prop.toString());
 
-  const paramInfo = methodSignature.getParameters();
-  const returnType = methodSignature.returnType;
+  const methodParams = methodSignature?.methodParams;
+
+  if (!methodParams) {
+    throw new Error(
+      `Method ${String(
+        prop,
+      )} not found in metadata. Make sure this method exists and is not private/protected`,
+    );
+  }
+
+  const paramInfo = Array.from(methodParams);
+
+  const returnType = methodSignature?.returnType;
 
   return (...fnArgs: any[]) => {
     const functionName = `${agentTypeName.value}.{${prop.toString()}}`;
 
     const parameterWitValuesEither = Either.all(
       fnArgs.map((fnArg, index) => {
-        const typ = paramInfo[index].type;
+        const param = paramInfo[index];
+        const typ = param[1];
         return WitValue.fromTsValue(fnArg, typ);
       }),
     );
