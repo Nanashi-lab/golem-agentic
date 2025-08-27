@@ -42,23 +42,23 @@ import * as EffectEither from 'effect/Either';
 import * as WitValue from '../src/internal/mapping/values/WitValue';
 
 describe('typescript value to wit value round-trip conversions', () => {
-  // it('should correctly perform round-trip conversion for arbitrary values of interface type', () => {
-  //   fc.assert(
-  //     fc.property(interfaceArb, (arbData) => {
-  //       const type = getTestInterfaceType();
-  //       runRoundTripTest(arbData, type);
-  //     }),
-  //   );
-  // });
+  it('should correctly perform round-trip conversion for arbitrary values of interface type', () => {
+    fc.assert(
+      fc.property(interfaceArb, (arbData) => {
+        const type = getTestInterfaceType();
+        runRoundTripTest(arbData, type);
+      }),
+    );
+  });
 
-  // it('should correctly perform round-trip conversion for arbitrary values of promise type', () => {
-  //   fc.assert(
-  //     fc.property(fc.string(), (arbData) => {
-  //       const type = getPromiseType();
-  //       runRoundTripTest(arbData, type);
-  //     }),
-  //   );
-  // });
+  it('should correctly perform round-trip conversion for arbitrary values of promise type', () => {
+    fc.assert(
+      fc.property(fc.string(), (arbData) => {
+        const type = getPromiseType();
+        runRoundTripTest(arbData, type);
+      }),
+    );
+  });
   //
   it.skip('should correctly perform round-trip conversion for arbitrary values of object type', () => {
     fc.assert(
@@ -79,7 +79,7 @@ describe('typescript value to wit value round-trip conversions', () => {
   });
 
   //
-  it.skip('should correctly perform round-trip conversion for arbitrary values of list of object type', () => {
+  it('should correctly perform round-trip conversion for arbitrary values of list of object type', () => {
     fc.assert(
       fc.property(listComplexArb, (arbData) => {
         const type = getTestListOfObjectType();
@@ -88,7 +88,7 @@ describe('typescript value to wit value round-trip conversions', () => {
     );
   });
 
-  it.skip('should correctly perform round-trip conversion for arbitrary values of complex tuple', () => {
+  it('should correctly perform round-trip conversion for arbitrary values of complex tuple', () => {
     fc.assert(
       fc.property(tupleArb, tupleComplexArb, (tupleData, tupleComplexData) => {
         const simpleType = getTupleType();
@@ -100,7 +100,7 @@ describe('typescript value to wit value round-trip conversions', () => {
     );
   });
 
-  it.skip('should correctly perform round-trip conversion for arbitrary values of union', () => {
+  it('should correctly perform round-trip conversion for arbitrary values of union', () => {
     fc.assert(
       fc.property(unionArb, unionComplexArb, (unionData, unionComplexData) => {
         const simpleType = getUnionType();
@@ -112,7 +112,7 @@ describe('typescript value to wit value round-trip conversions', () => {
     );
   });
 
-  it.skip('should preserve values with only required properties (excluding optional)', () => {
+  it('should preserve values with only required properties (excluding optional)', () => {
     const defaultData: TestInterfaceType = {
       bigintProp: 0n,
       booleanProp: false,
@@ -165,7 +165,7 @@ describe('typescript value to wit value round-trip conversions', () => {
     runRoundTripTest(defaultData, type);
   });
 
-  it.skip('should preserve values including optional properties', () => {
+  it('should preserve values including optional properties', () => {
     const withOptionalValues: TestInterfaceType = {
       bigintProp: 0n,
       booleanProp: false,
@@ -218,7 +218,7 @@ describe('typescript value to wit value round-trip conversions', () => {
     runRoundTripTest(withOptionalValues, type);
   });
 
-  it.skip('should preserve union properties with complex object variants', () => {
+  it('should preserve union properties with complex object variants', () => {
     const withComplexUnionType: TestInterfaceType = {
       bigintProp: 0n,
       booleanProp: false,

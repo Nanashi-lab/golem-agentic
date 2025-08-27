@@ -291,62 +291,6 @@ export function fromTsValue(
 
   const name = getTypeName(type);
 
-  if (type.isNull()) {
-    return Either.right({ kind: 'tuple', value: [] });
-  }
-
-  if (type.isBoolean() || name == 'true' || name == 'false') {
-    return handleBooleanType(tsValue);
-  }
-
-  if (type.isNumber()) {
-    if (typeof tsValue === 'number') {
-      return Either.right({ kind: 's32', value: tsValue });
-    } else {
-      return Either.left(invalidTypeError(tsValue, 'number'));
-    }
-  }
-
-  if (type.isBigInt()) {
-    if (typeof tsValue === 'bigint' || typeof tsValue === 'number') {
-      return Either.right({ kind: 'u64', value: tsValue as any });
-    } else {
-      return Either.left(invalidTypeError(tsValue, 'bigint'));
-    }
-  }
-
-  if (type.isString()) {
-    if (typeof tsValue === 'string') {
-      return Either.right({ kind: 'string', value: tsValue });
-    } else {
-      return Either.left(invalidTypeError(tsValue, 'string'));
-    }
-  }
-
-  if (type.isArray()) return handleArrayType(tsValue, type);
-
-  if (name === 'Promise' && type.getTypeArguments().length === 1) {
-    const inner = type.getTypeArguments()[0];
-    return fromTsValue(tsValue, inner);
-  }
-
-  if (type.isTuple()) return handleTupleType(tsValue, type);
-
-  if (type.isUnion()) {
-    return handleUnion(tsValue, type);
-  }
-
-  if (name === 'Map') return handleKeyValuePairs(tsValue, type);
-
-
-  if (type.isObject()) {
-    return handleObject(tsValue, type);
-  }
-
-  if (type.isInterface()) {
-    return handleObject(tsValue, type);
-  }
-
   switch (name) {
     case 'Int8Array':
       const int8Array = handleTypedArray(tsValue, Int8Array);
@@ -392,7 +336,7 @@ export function fromTsValue(
         })),
       }));
 
-    case 'Unit8Array':
+    case 'Uint8Array':
       const uint8Array = handleTypedArray(tsValue, Uint8Array);
 
       return Either.map(uint8Array, (arr) => ({
@@ -457,6 +401,61 @@ export function fromTsValue(
           value: item,
         })),
       }));
+  }
+
+  if (type.isNull()) {
+    return Either.right({ kind: 'tuple', value: [] });
+  }
+
+  if (type.isBoolean() || name == 'true' || name == 'false') {
+    return handleBooleanType(tsValue);
+  }
+
+  if (type.isNumber()) {
+    if (typeof tsValue === 'number') {
+      return Either.right({ kind: 's32', value: tsValue });
+    } else {
+      return Either.left(invalidTypeError(tsValue, 'number'));
+    }
+  }
+
+  if (type.isBigInt()) {
+    if (typeof tsValue === 'bigint' || typeof tsValue === 'number') {
+      return Either.right({ kind: 'u64', value: tsValue as any });
+    } else {
+      return Either.left(invalidTypeError(tsValue, 'bigint'));
+    }
+  }
+
+  if (type.isString()) {
+    if (typeof tsValue === 'string') {
+      return Either.right({ kind: 'string', value: tsValue });
+    } else {
+      return Either.left(invalidTypeError(tsValue, 'string'));
+    }
+  }
+
+  if (type.isArray()) return handleArrayType(tsValue, type);
+
+  if (name === 'Promise' && type.getTypeArguments().length === 1) {
+    const inner = type.getTypeArguments()[0];
+    return fromTsValue(tsValue, inner);
+  }
+
+  if (type.isTuple()) return handleTupleType(tsValue, type);
+
+  if (type.isUnion()) {
+    return handleUnion(tsValue, type);
+  }
+
+  if (name === 'Map') return handleKeyValuePairs(tsValue, type);
+
+  if (type.isObject()) {
+    return handleObject(tsValue, type);
+  }
+
+  if (type.isInterface()) {
+    return handleObject(tsValue, type);
   }
 
   return Either.left(unexpectedTypeError(tsValue, type, Option.none()));
@@ -571,7 +570,6 @@ function handleKeyValuePairs(
 
 function handleObject(tsValue: any, type: Type): Either.Either<Value, string> {
   if (typeof tsValue !== 'object' || tsValue === null) {
-    const something = JSON.stringify(tsValue);
     return Either.left(invalidTypeError(tsValue, tsValue));
   }
   const innerProperties: Symbol[] = type.getProperties();
@@ -786,6 +784,20 @@ export function toTsValue(value: Value, type: Type): any {
 
   const name = getTypeName(expectedType);
 
+  if (value.kind === 'option') {
+    const caseValue = value.value;
+    if (!caseValue) {
+      return undefined;
+    }
+
+    return toTsValue(caseValue, expectedType);
+
+    // const unionTypes = expectedType.getUnionTypes();
+    // const matchingType = unionTypes[value.caseIdx];
+    //
+    // return toTsValue(caseValue, matchingType);
+  }
+
   if (expectedType.isNumber()) {
     return convertToNumber(value);
   }
@@ -841,6 +853,13 @@ export function toTsValue(value: Value, type: Type): any {
       } else {
         throw new Error(`Expected Uint8ClampedArray, obtained value ${value}`);
       }
+    case 'Int8Array':
+      if (value.kind === 'list') {
+        return new Int8Array(value.value.map((v) => convertToNumber(v)));
+      } else {
+        throw new Error(`Expected Int8Array, obtained value ${value}`);
+      }
+
     case 'Int16Array':
       if (value.kind === 'list') {
         return new Int16Array(value.value.map((v) => convertToNumber(v)));
@@ -891,6 +910,14 @@ export function toTsValue(value: Value, type: Type): any {
       }
   }
 
+  if (name == 'Promise') {
+    if (expectedType.getTypeArguments().length !== 1) {
+      throw new Error(`Expected Promise to have one type argument`);
+    }
+    const innerType = expectedType.getTypeArguments()[0];
+    return toTsValue(value, innerType);
+  }
+
   if (name === 'Map') {
     const typeArgs = expectedType.getTypeArguments();
 
@@ -902,7 +929,7 @@ export function toTsValue(value: Value, type: Type): any {
       const entries: [any, any][] = value.value.map((item: Value) => {
         if (item.kind !== 'tuple' || item.value.length !== 2) {
           throw new Error(
-              `Expected tuple of two items, obtained value ${item}`,
+            `Expected tuple of two items, obtained value ${item}`,
           );
         }
 
@@ -921,7 +948,7 @@ export function toTsValue(value: Value, type: Type): any {
     const typeArg = expectedType.getTypeArguments?.();
     if (value.kind === 'tuple') {
       return value.value.map((item: Value, idx: number) =>
-          toTsValue(item, typeArg[idx]),
+        toTsValue(item, typeArg[idx]),
       );
     } else {
       throw new Error(`Expected tuple, obtained value ${value}`);
@@ -931,13 +958,12 @@ export function toTsValue(value: Value, type: Type): any {
   if (expectedType.isArray()) {
     if (value.kind === 'list') {
       return value.value.map((item: Value) =>
-          toTsValue(item, expectedType.getTypeArguments?.()[0]),
+        toTsValue(item, expectedType.getTypeArguments?.()[0]),
       );
     } else {
       throw new Error(`Expected array, obtained value ${value}`);
     }
   }
-
 
   if (expectedType.isObject()) {
     if (value.kind === 'record') {
@@ -955,7 +981,9 @@ export function toTsValue(value: Value, type: Type): any {
         {} as Record<string, any>,
       );
     } else {
-      throw new Error(`Expected object, obtained value ${JSON.stringify(value)}`);
+      throw new Error(
+        `Expected object ${name}, obtained value ${JSON.stringify(value)}`,
+      );
     }
   }
 
@@ -991,18 +1019,11 @@ export function toTsValue(value: Value, type: Type): any {
 
       return toTsValue(caseValue, matchingType);
     } else {
-      throw new Error(`Expected union, obtained value ${value}`);
+      throw new Error(
+        `Expected union, obtained value ${JSON.stringify(value)}`,
+      );
     }
   }
-
-  if (name == 'Promise') {
-    if (expectedType.getTypeArguments().length !== 1) {
-      throw new Error(`Expected Promise to have one type argument`);
-    }
-    const innerType = expectedType.getTypeArguments()[0];
-    return toTsValue(value, innerType);
-  }
-
 
   throw new Error(`'Type ${name} is not supported in golem'`);
 }

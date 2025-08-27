@@ -72,7 +72,6 @@ export const TypeMetadata = {
         for (const method of classDecl.getMethods()) {
           const methodParams = new Map(
             method.getParameters().map((p) => {
-              console.log(getTypeName(p.getType()));
               return [p.getName(), p.getType()];
             }),
           );
