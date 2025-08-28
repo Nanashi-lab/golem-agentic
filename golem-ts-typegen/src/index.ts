@@ -13,7 +13,15 @@
 // limitations under the License.
 
 import {Type as TsMorphType, Node as TsMorphNode, SourceFile} from "ts-morph";
-import {Type, Symbol, Node, TypeMetadata, LiteTypeJSON} from "@golemcloud/golem-ts-types-core";
+import {
+  Type,
+  Symbol,
+  Node,
+  TypeMetadata,
+  LiteTypeJSON,
+  buildTypeFromJSON,
+  buildJSONFromType
+} from "@golemcloud/golem-ts-types-core";
 import * as fs from "node:fs";
 import path from "path";
 
@@ -309,7 +317,6 @@ export function generateMetadata(sourceFiles: SourceFile[]) {
 
 export function updateMetadataFromSourceFiles(sourceFiles: SourceFile[]) {
   for (const sourceFile of sourceFiles) {
-    console.log(`Processing file: ${sourceFile.getFilePath()}`);
     const classes = sourceFile.getClasses();
 
     for (const classDecl of classes) {
@@ -342,8 +349,6 @@ export function updateMetadataFromSourceFiles(sourceFiles: SourceFile[]) {
   }
 }
 
-
-
 const METADATA_DIR = ".metadata";
 const METADATA_FILE = "types.json";
 
@@ -354,34 +359,37 @@ export function saveTypeMetadata() {
 
   const json: Record<string, any> = {};
 
-  const metadata =
-      TypeMetadata.getAll();
+  for (const [className, meta] of TypeMetadata.getAll().entries()) {
+    const constructorArgsJSON = meta.constructorArgs.map(arg => ({
+      name: arg.name,
+      type: buildJSONFromType(arg.type),
+    }));
 
-  for (const [className, meta] of metadata.entries()) {
     const methodsObj: Record<string, any> = {};
     for (const [methodName, { methodParams, returnType }] of meta.methods) {
+      const paramsJSON: Record<string, LiteTypeJSON> = {};
+      for (const [paramName, paramType] of methodParams.entries()) {
+        paramsJSON[paramName] = buildJSONFromType(paramType);
+      }
+
       methodsObj[methodName] = {
-        methodParams: Object.fromEntries(
-            Array.from(methodParams.entries()).map(([name, type]) => [name, type])
-        ),
-        returnType,
+        methodParams: paramsJSON,
+        returnType: buildJSONFromType(returnType),
       };
     }
 
     json[className] = {
-      constructorArgs: meta.constructorArgs,
+      constructorArgs: constructorArgsJSON,
       methods: methodsObj,
     };
   }
 
   const filePath = path.join(METADATA_DIR, METADATA_FILE);
   fs.writeFileSync(filePath, JSON.stringify(json, null, 2), "utf-8");
-  console.log(`Type metadata saved to ${filePath}`);
 }
 
-export function loadTypeMetadata() {
-  // Ensuring we clear the metadata before loading new
 
+export function loadTypeMetadata() {
   TypeMetadata.clearMetadata();
 
   const filePath = path.join(METADATA_DIR, METADATA_FILE);
@@ -393,112 +401,40 @@ export function loadTypeMetadata() {
   const json = JSON.parse(raw);
 
   for (const [className, meta] of Object.entries(json)) {
-    const constructorArgs = (meta as any).constructorArgs;
-    const methodsMap = new Map<string, { methodParams: Map<string, Type>; returnType: Type }>();
+    const constructorArgsJSON = (meta as any).constructorArgs as Array<{
+      name: string;
+      type: LiteTypeJSON;
+    }>;
 
-    for (const [methodName, methodMeta] of Object.entries((meta as any).methods)) {
+    const constructorArgs = constructorArgsJSON.map(arg => ({
+      name: arg.name,
+      type: buildTypeFromJSON(arg.type),
+    }));
+
+    const methodsMap = new Map<
+        string,
+        { methodParams: Map<string, Type>; returnType: Type }
+    >();
+
+    for (const [methodName, methodMeta] of Object.entries(
+        (meta as any).methods
+    )) {
       const methodParamsMap = new Map<string, Type>();
-      for (const [paramName, paramType] of Object.entries((methodMeta as any).methodParams)) {
-        methodParamsMap.set(paramName, paramType as Type);
+      for (const [paramName, paramJSON] of Object.entries(
+          (methodMeta as any).methodParams
+      )) {
+        methodParamsMap.set(paramName, buildTypeFromJSON(paramJSON as LiteTypeJSON));
       }
 
       methodsMap.set(methodName, {
         methodParams: methodParamsMap,
-        returnType: (methodMeta as any).returnType as Type,
+        returnType: buildTypeFromJSON(
+            (methodMeta as any).returnType as LiteTypeJSON
+        ),
       });
     }
 
-    TypeMetadata.update(className, constructorArgs as any, methodsMap);
+    TypeMetadata.update(className, constructorArgs, methodsMap);
   }
 
-  console.log(`Type metadata loaded from ${filePath}`);
-}
-
-export function buildJSONFromType(liteType: Type): LiteTypeJSON {
-  // First, unwrap alias to get the underlying type
-  const type = unwrapAlias(liteType);
-
-  if (type.isBoolean()) {
-    return { kind: 'boolean', name: type.getName() };
-  }
-  if (type.isNumber()) {
-    return { kind: 'number', name: type.getName() };
-  }
-  if (type.isString()) {
-    return { kind: 'string', name: type.getName() };
-  }
-  if (type.isBigInt()) {
-    return { kind: 'bigint', name: type.getName() };
-  }
-  if (type.isNull()) {
-    return { kind: 'null', name: type.getName() };
-  }
-  if (type.isUndefined()) {
-    return { kind: 'undefined', name: type.getName() };
-  }
-  if (type.isArray()) {
-    const elem = type.getArrayElementType();
-    if (!elem) throw new Error('Array type without element type');
-    return {
-      kind: 'array',
-      name: type.getName(),
-      element: buildJSONFromType(elem),
-    };
-  }
-  if (type.isTuple()) {
-    return {
-      kind: 'tuple',
-      name: type.getName(),
-      elements: type.getTupleElements().map(buildJSONFromType),
-    };
-  }
-  if (type.isUnion()) {
-    return {
-      kind: 'union',
-      name: type.getName(),
-      types: type.getUnionTypes().map(buildJSONFromType),
-    };
-  }
-  if (type.isObject() || type.isInterface()) {
-    const props = type.getProperties().map((prop) => {
-      const decl = prop.getDeclarations()[0];
-      const optional = decl.hasQuestionToken?.() ?? false;
-      const propType = prop.getTypeAtLocation(decl);
-      return {
-        name: prop.getName(),
-        type: buildJSONFromType(propType),
-        optional: optional || undefined,
-      };
-    });
-
-    return {
-      kind: type.isObject() ? 'object' : 'interface',
-      name: type.getName(),
-      properties: props,
-    };
-  }
-
-  // Custom type with type arguments
-  const typeArgs = type.getTypeArguments();
-  if (typeArgs.length > 0) {
-    return {
-      kind: 'custom',
-      name: type.getName()!,
-      typeArgs: typeArgs.map(buildJSONFromType),
-    };
-  }
-
-  // Alias fallback
-  const aliasSymbol = type.getAliasSymbol();
-  if (aliasSymbol) {
-    const target = (aliasSymbol as any)._getAliasTarget?.() as Type;
-    if (!target) throw new Error('Alias type missing target');
-    return {
-      kind: 'alias',
-      name: type.getName()!,
-      target: buildJSONFromType(target),
-    };
-  }
-
-  throw new Error(`Unsupported type kind for JSON conversion: ${getTypeName(type)}`);
 }
