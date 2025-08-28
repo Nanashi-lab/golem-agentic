@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * This is essentially what CLI is doing,
+ * which is reading source file, creating metadata, serializing it to JSON
+ * and load it to .metadata directory.
+ * Every testing is performed on top of the metadata directory.
+ */
 import { Project } from "ts-morph";
 import { generateMetadata } from "../src/index";
 

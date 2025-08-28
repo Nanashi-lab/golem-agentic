@@ -101,7 +101,25 @@ export function buildTypeFromJSON(json: LiteTypeJSON): Type {
       });
     }
 
+    case 'promise':
+      const elemType = buildTypeFromJSON(json.element);
+      return new Type({
+        kind: 'promise',
+        name: json.name ?? 'Promise',
+        element: elemType,
+      });
+
+    case 'map':
+      const typeArgs = (json.typeArgs ?? []).map(buildTypeFromJSON);
+      return new Type({
+        kind: 'map',
+        name: json.name ?? 'Map',
+        typeArgs: typeArgs,
+      });
+
+
     default:
       throw new Error(`Unsupported type kind: ${(json as any).kind}`);
+
   }
 }

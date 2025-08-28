@@ -17,11 +17,17 @@ import {
   Type,
   TypeMetadata,
 } from "@golemcloud/golem-ts-types-core";
-import "./setup";
-import { loadTypeMetadata } from "../src";
 
+import "./setup";
+import {lazyLoadTypeMetadata, loadTypeMetadata} from "../src";
+
+/**
+ * getAll functionality reads the type metadata from .metadata directory
+ * using lazy loading. The type metadata is loaded to type metadata
+ * by `setup` module.
+ */
 export function getAll() {
-  loadTypeMetadata();
+  lazyLoadTypeMetadata();
   const result = TypeMetadata.getAll();
   console.log("Getting all of " + result);
   return result;

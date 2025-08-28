@@ -87,67 +87,25 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
     const promiseType = getFromTsMorph(inner);
 
     return new Type({
-      kind: "custom",
+      kind: "promise",
       name: "Promise",
       element: promiseType,
     });
   }
 
-  if (type.isBoolean() || name === "true" || name === "false") {
-    return new Type({ kind: "boolean", name });
-  }
-
   if (name === "Map" && type.getTypeArguments().length === 2) {
     const [keyT, valT] = type.getTypeArguments();
-
     const key = getFromTsMorph(keyT);
     const value = getFromTsMorph(valT);
-
     return new Type({
-      kind: "custom",
+      kind: "map",
       name: "Map",
       typeArgs: [key, value],
     });
   }
 
-  if (name === "Iterable" && type.getTypeArguments().length === 1) {
-    const inner = type.getTypeArguments()[0];
-    const elementType = getFromTsMorph(inner);
-    return new Type({
-      kind: "custom",
-      name: "Iterable",
-      element: elementType,
-    });
-  }
-
-  if (name === "AsyncIterable" && type.getTypeArguments().length === 1) {
-    const inner = type.getTypeArguments()[0];
-    const elementType = getFromTsMorph(inner);
-    return new Type({
-      kind: "custom",
-      name: "AsyncIterable",
-      element: elementType,
-    });
-  }
-
-  if (name === "Iterator" && type.getTypeArguments().length === 1) {
-    const inner = type.getTypeArguments()[0];
-    const elementType = getFromTsMorph(inner);
-    return new Type({
-      kind: "custom",
-      name: "Iterator",
-      element: elementType,
-    });
-  }
-
-  if (name === "AsyncIterator" && type.getTypeArguments().length === 1) {
-    const inner = type.getTypeArguments()[0];
-    const elementType = getFromTsMorph(inner);
-    return new Type({
-      kind: "custom",
-      name: "AsyncIterator",
-      element: elementType,
-    });
+  if (type.isBoolean() || name === "true" || name === "false") {
+    return new Type({ kind: "boolean", name });
   }
 
   if (type.isTuple()) {
@@ -386,6 +344,13 @@ export function saveTypeMetadata() {
 
   const filePath = path.join(METADATA_DIR, METADATA_FILE);
   fs.writeFileSync(filePath, JSON.stringify(json, null, 2), "utf-8");
+}
+
+export function lazyLoadTypeMetadata() {
+  if (TypeMetadata.getAll().size === 0) {
+    loadTypeMetadata()
+    console.log(TypeMetadata.getAll());
+  }
 }
 
 export function loadTypeMetadata() {

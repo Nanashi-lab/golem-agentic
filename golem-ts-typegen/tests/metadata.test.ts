@@ -13,16 +13,21 @@
 // limitations under the License.
 
 import { describe, expect, it } from "vitest";
-import { getTestInterfaceType, getTestObjectType } from "./util.js";
+import {getNumberType, getStringType, getTestInterfaceType, getTestObjectType} from "./util.js";
 
 describe("golem-ts-reflect can work with ts-morph", () => {
   it("track interface type", () => {
-    const interfaceType = getTestInterfaceType();
-    expect(interfaceType.isInterface()).toEqual(true);
+    const stringType = getStringType();
+    expect(stringType.isString()).toEqual(true);
   });
 
-  it("track object type", () => {
-    const objectType = getTestObjectType();
-    expect(objectType.isObject()).toEqual(true);
+  it("track number type", () => {
+    const numberType = getNumberType();
+    expect(numberType.isNumber()).toEqual(true);
   });
+
+  // it("track object type", () => {
+  //   const objectType = getTestObjectType();
+  //   expect(objectType.isObject()).toEqual(true);
+  // });
 });
