@@ -88,7 +88,7 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
 
     return new Type({
       kind: "promise",
-      name: "Promise",
+      name,
       element: promiseType,
     });
   }
@@ -99,7 +99,7 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
     const value = getFromTsMorph(valT);
     return new Type({
       kind: "map",
-      name: "Map",
+      name,
       typeArgs: [key, value],
     });
   }
@@ -113,7 +113,7 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
 
     return new Type({
       kind: "tuple",
-      name: "Tuple",
+      name,
       elements: tupleElems,
     });
   }
@@ -127,7 +127,7 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
 
     return new Type({
       kind: "array",
-      name: "Array",
+      name,
       element,
     });
   }
@@ -137,7 +137,7 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
 
     return new Type({
       kind: "union",
-      name: "Union",
+      name,
       unionTypes,
     });
   }

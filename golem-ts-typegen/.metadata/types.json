@@ -34,7 +34,7 @@
           },
           "tupleComplexType": {
             "kind": "tuple",
-            "name": "Tuple",
+            "name": "TupleComplexType",
             "elements": [
               {
                 "kind": "string"
@@ -70,7 +70,7 @@
           },
           "tupleType": {
             "kind": "tuple",
-            "name": "Tuple",
+            "name": "TupleType",
             "elements": [
               {
                 "kind": "string"

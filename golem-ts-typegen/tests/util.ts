@@ -39,6 +39,7 @@ export function getTestInterfaceType(): Type {
 }
 
 // Get a Map Type from .metadata directory
+// ts-morph discards type alias
 export function getTestMapType(): Type {
   return fetchType("Map");
 }
@@ -50,24 +51,27 @@ export function getTestObjectType(): Type {
 }
 
 // Get a List Type from .metadata directory
-// Here alias is discarded by ts-morph
+// ts-morph discards type alias
 export function getTestListOfObjectType(): Type {
   return fetchType("Array");
 }
 
 // Get a Union Type from .metadata directory
+// Here alias is kept intact by ts-morph
 export function getUnionType(): Type {
   return fetchType("UnionType");
 }
 
 // Get a Union Type from .metadata directory
+// Here alias is kept intact by ts-morph
 export function getUnionComplexType(): Type {
   return fetchType("UnionComplexType");
 }
 
 // Get a Tuple Type from .metadata directory
+// Here alias is kept intact by ts-morph
 export function getTupleType(): Type {
-  return fetchType("Tuple");
+  return fetchType("TupleType");
 }
 
 // Get a boolean Type from .metadata directory
