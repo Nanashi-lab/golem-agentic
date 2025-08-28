@@ -363,3 +363,83 @@ export function unwrapAlias(t: Type): Type {
   }
   return current;
 }
+
+
+export function buildJSONFromType(type: Type): LiteTypeJSON {
+  type = unwrapAlias(type);
+
+  if (type.isBoolean()) return { kind: 'boolean'};
+  if (type.isNumber()) return { kind: 'number' };
+  if (type.isString()) return { kind: 'string' };
+  if (type.isBigInt()) return { kind: 'bigint' };
+  if (type.isNull()) return { kind: 'null' };
+  if (type.isUndefined()) return { kind: 'undefined' };
+
+  if (type.isArray()) {
+    const elem = type.getArrayElementType();
+    if (!elem) throw new Error('Array type missing element type');
+    return {
+      kind: 'array',
+      name: type.getName(),
+      element: buildJSONFromType(elem),
+    };
+  }
+
+  if (type.isTuple()) {
+    return {
+      kind: 'tuple',
+      name: type.getName(),
+      elements: type.getTupleElements().map(buildJSONFromType),
+    };
+  }
+
+  if (type.isUnion()) {
+    return {
+      kind: 'union',
+      name: type.getName(),
+      types: type.getUnionTypes().map(buildJSONFromType),
+    };
+  }
+
+  if (type.isObject() || type.isInterface()) {
+    const props = type.getProperties().map((sym) => {
+      const decl = sym.getDeclarations()[0];
+      const optional = decl.hasQuestionToken?.() ?? false;
+      const propType = sym.getTypeAtLocation(decl);
+      return {
+        name: sym.getName(),
+        type: buildJSONFromType(propType),
+        optional: optional || undefined,
+      };
+    });
+
+    return {
+      kind: type.isObject() ? 'object' : 'interface',
+      name: type.getName(),
+      properties: props,
+    };
+  }
+
+  const typeArgs = type.getTypeArguments();
+  if (typeArgs.length > 0) {
+    return {
+      kind: 'custom',
+      name: type.getName()!,
+      typeArgs: typeArgs.map(buildJSONFromType),
+    };
+  }
+
+  const aliasSym = type.getAliasSymbol();
+  if (aliasSym) {
+    const target = (aliasSym as any)._getAliasTarget?.() as Type;
+    if (!target) throw new Error('Alias missing target');
+    return {
+      kind: 'alias',
+      name: type.getName()!,
+      target: buildJSONFromType(target),
+    };
+  }
+
+  throw new Error(`Unsupported type for JSON conversion: ${type.getName() ?? 'unknown'}`);
+}
+

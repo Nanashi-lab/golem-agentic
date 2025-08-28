@@ -3,7 +3,7 @@
 import path from "path";
 import { Command } from "commander";
 import { Project } from "ts-morph";
-import { updateMetadataFromSourceFiles } from "../index.js";
+import {saveTypeMetadata, updateMetadataFromSourceFiles} from "../index.js";
 import {TypeMetadata} from "@golemcloud/golem-ts-types-core";
 
 const program = new Command();
@@ -20,7 +20,9 @@ program
         updateMetadataFromSourceFiles(sourceFiles);
         const result = TypeMetadata.getAll();
         console.log("Metadata tracked for the following agent classes " +  Array.from(result.entries()).map(entry => entry[0]).join(", "));
-        console.log("Type Metadata successfully generated");
+        console.log("Saving metadata..");
+        saveTypeMetadata();
+
     });
 
 program.parse();

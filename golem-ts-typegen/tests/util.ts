@@ -18,9 +18,13 @@ import {
   TypeMetadata,
 } from "@golemcloud/golem-ts-types-core";
 import "./setup";
+import {loadTypeMetadata} from "../src";
 
 export function getAll() {
-  return TypeMetadata.getAll();
+  loadTypeMetadata()
+  const result = TypeMetadata.getAll();
+  console.log("Getting all of " + result);
+  return result;
 }
 
 export function getTestInterfaceType(): Type {
@@ -72,6 +76,7 @@ export function getPromiseType(): Type {
 }
 
 function fetchType(typeNameInTestData: string): Type {
+
   const classMetadata = Array.from(getAll()).map(([_, v]) => v);
 
   for (const type of classMetadata) {

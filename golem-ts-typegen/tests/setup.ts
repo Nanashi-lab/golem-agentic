@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { Project } from "ts-morph";
-import { updateMetadataFromSourceFiles} from "../src/index.js";
+import {generateMetadata} from "../src/index";
 
 const project = new Project({
   tsConfigFilePath: "tsconfig.json",
@@ -21,4 +21,4 @@ const project = new Project({
 
 const sourceFiles = project.getSourceFiles("tests/testData.ts");
 
-updateMetadataFromSourceFiles(sourceFiles);
+generateMetadata(sourceFiles);

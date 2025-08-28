@@ -48,7 +48,19 @@ export const TypeMetadata = {
     return Metadata.get(className);
   },
 
+  clearMetadata(): void {
+    Metadata.clear();
+    return
+  },
+
   getAll(): Map<ClassNameString, ClassMetadata> {
     return Metadata;
   },
+
+  clearAll(): void {
+    Metadata.clear();
+  }
+
+
+
 };
