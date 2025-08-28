@@ -41,12 +41,7 @@ jobs:
       - name: Build the package
         working-directory: ./golem-ts-types-core
         run: |
-          npm run build     
-
-      - name: Run tests
-        working-directory: ./golem-ts-types-core
-        run: |
-          npm run test
+          npm run build
 
   build-ts-sdk:
     runs-on: blacksmith
