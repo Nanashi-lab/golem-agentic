@@ -2,7 +2,9 @@ name: CI
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "golem-ts-sdk-v*.*.*"
+      - "golem-ts-typegen-v*.*.*"
+      - "golem-ts-types-core-v*.*.*"
     branches:
       - main
   pull_request:
@@ -142,7 +144,7 @@ jobs:
   publish-ts-types-core:
     needs: build-ts-types-core
     runs-on: blacksmith
-    if: ${{ always() && startsWith(github.ref, 'refs/tags/v') }}
+    if: startsWith(github.ref, 'refs/tags/golem-ts-types-core-v')
     permissions:
       contents: read
       id-token: write
@@ -174,7 +176,7 @@ jobs:
   publish-ts-typegen:
     needs: build-ts-typegen
     runs-on: blacksmith
-    if: ${{ always() && startsWith(github.ref, 'refs/tags/v') }}
+    if: startsWith(github.ref, 'refs/tags/golem-ts-typegen-v')
     permissions:
       contents: read
       id-token: write
@@ -206,7 +208,7 @@ jobs:
   publish-ts-sdk:
     needs: [build-ts-types-core, build-ts-sdk]
     runs-on: blacksmith
-    if: ${{ always() && startsWith(github.ref, 'refs/tags/v') }}
+    if: startsWith(github.ref, 'refs/tags/golem-ts-sdk-v')
     permissions:
       contents: read
       id-token: write
