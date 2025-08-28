@@ -1,5 +1,5 @@
-import { Type as TsMorphType, Node as TsMorphNode } from "ts-morph";
-import { Type, Symbol, Node } from "@golemcloud/golem-ts-types-core";
+import {Type as TsMorphType, Node as TsMorphNode, SourceFile} from "ts-morph";
+import {Type, Symbol, Node, TypeMetadata} from "@golemcloud/golem-ts-types-core";
 
 export function getFromTsMorph(tsMorphType: TsMorphType): Type {
   const type = unwrapAlias(tsMorphType);
@@ -284,4 +284,39 @@ export function unwrapAlias(type: TsMorphType): TsMorphType {
   }
 
   return current;
+}
+
+
+export function updateMetadataFromSourceFiles(sourceFiles: SourceFile[]) {
+  for (const sourceFile of sourceFiles) {
+    const classes = sourceFile.getClasses();
+
+    for (const classDecl of classes) {
+      const className = classDecl.getName();
+      if (!className) continue;
+
+      const constructorArgs =
+          classDecl
+              .getConstructors()[0]
+              ?.getParameters()
+              .map((p) => ({
+                name: p.getName(),
+                type: getFromTsMorph(p.getType()),
+              })) ?? [];
+
+      const methods = new Map();
+      for (const method of classDecl.getMethods()) {
+        const methodParams = new Map(
+            method.getParameters().map((p) => {
+              return [p.getName(), getFromTsMorph(p.getType())];
+            }),
+        );
+
+        const returnType = getFromTsMorph(method.getReturnType());
+        methods.set(method.getName(), { methodParams, returnType });
+      }
+
+      TypeMetadata.update(className, constructorArgs, methods);
+    }
+  }
 }

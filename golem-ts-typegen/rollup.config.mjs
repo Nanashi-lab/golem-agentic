@@ -33,6 +33,15 @@ export default defineConfig([
             }),
         ],
     },
+    {
+        input: 'src/bin/golem-typegen.ts',
+        output: {
+            file: 'dist/bin/golem-typegen.mjs',
+            format: 'esm',
+            banner: '#!/usr/bin/env node',
+        },
+        plugins: [resolve(), commonjs(), typescript()],
+    },
 
     {
         input: 'src/index.ts',

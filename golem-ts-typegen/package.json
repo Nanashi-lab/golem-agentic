@@ -6,6 +6,9 @@
     "access": "public",
     "tag": "test"
   },
+  "bin": {
+    "golem-typegen": "./dist/bin/golem-typegen.mjs"
+  },
   "files": [
     "types",
     "dist"
@@ -50,6 +53,7 @@
     "@eslint/js": "^9.33.0",
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-node-resolve": "^16.0.1",
+    "@types/node": "^24.3.0",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
     "eslint": "^9.33.0",
@@ -66,6 +70,7 @@
   "private": false,
   "dependencies": {
     "@golemcloud/golem-ts-types-core": "file:../golem-ts-types-core",
+    "commander": "^14.0.0",
     "ts-morph": "^26.0.0"
   }
 }
