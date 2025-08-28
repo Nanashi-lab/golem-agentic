@@ -1,6 +1,7 @@
 import js from '@eslint/js';
 import pluginTs from '@typescript-eslint/eslint-plugin';
 import parserTs from '@typescript-eslint/parser';
+import globals from 'globals';
 
 export default [
     {
@@ -13,6 +14,9 @@ export default [
             parserOptions: {
                 project: './tsconfig.json',
                 sourceType: 'module',
+            },
+            globals: {
+                ...globals.node,
             },
         },
         plugins: { '@typescript-eslint': pluginTs },
