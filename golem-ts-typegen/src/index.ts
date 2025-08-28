@@ -303,6 +303,7 @@ export function unwrapAlias(type: TsMorphType): TsMorphType {
 
 export function updateMetadataFromSourceFiles(sourceFiles: SourceFile[]) {
   for (const sourceFile of sourceFiles) {
+    console.log(`Processing file: ${sourceFile.getFilePath()}`);
     const classes = sourceFile.getClasses();
 
     for (const classDecl of classes) {

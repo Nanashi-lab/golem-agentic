@@ -4,6 +4,7 @@ import path from "path";
 import { Command } from "commander";
 import { Project } from "ts-morph";
 import { updateMetadataFromSourceFiles } from "../index.js";
+import {TypeMetadata} from "@golemcloud/golem-ts-types-core";
 
 const program = new Command();
 
@@ -15,7 +16,12 @@ program
     .action((tsconfig: string, options: { files: string[] }) => {
         const project = new Project({ tsConfigFilePath: path.resolve(tsconfig) });
         const sourceFiles = project.getSourceFiles(options.files);
+        console.log("Total source files " + sourceFiles.length);
+
         updateMetadataFromSourceFiles(sourceFiles);
+        const result = TypeMetadata.getAll();
+        console.log(result.size);
+        console.log("Metadata tracked for the following agent classes " +  Array.from(result.entries()).map(entry => entry[1]).join(", "));
         console.log("Type Metadata successfully generated");
     });
 

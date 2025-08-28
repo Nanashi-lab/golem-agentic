@@ -40,6 +40,7 @@ export const TypeMetadata = {
       { methodParams: MethodParams; returnType: Type }
     >,
   ) {
+    console.log(`Updating metadata for class: ${className}`);
     Metadata.set(className, { constructorArgs, methods });
   },
 
