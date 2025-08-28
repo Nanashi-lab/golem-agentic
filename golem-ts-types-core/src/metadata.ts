@@ -50,7 +50,7 @@ export const TypeMetadata = {
 
   clearMetadata(): void {
     Metadata.clear();
-    return
+    return;
   },
 
   getAll(): Map<ClassNameString, ClassMetadata> {
@@ -59,8 +59,5 @@ export const TypeMetadata = {
 
   clearAll(): void {
     Metadata.clear();
-  }
-
-
-
+  },
 };

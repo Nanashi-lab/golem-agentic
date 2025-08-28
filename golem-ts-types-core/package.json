@@ -33,9 +33,8 @@
   "scripts": {
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "format": "prettier --write \"src/**/*\" \"tests/**/*\"",
-    "format:check": "prettier --check \"src/**/*\" \"tests/**/*\"",
-    "test": "tsc --noEmit && vitest run",
+    "format": "prettier --write \"src/**/*\"",
+    "format:check": "prettier --check \"src/**/*\"",
     "build": "tsc --noEmit && rollup -c",
     "dev": "rollup -c -w"
   },

@@ -364,11 +364,10 @@ export function unwrapAlias(t: Type): Type {
   return current;
 }
 
-
 export function buildJSONFromType(type: Type): LiteTypeJSON {
   type = unwrapAlias(type);
 
-  if (type.isBoolean()) return { kind: 'boolean'};
+  if (type.isBoolean()) return { kind: 'boolean' };
   if (type.isNumber()) return { kind: 'number' };
   if (type.isString()) return { kind: 'string' };
   if (type.isBigInt()) return { kind: 'bigint' };
@@ -440,6 +439,7 @@ export function buildJSONFromType(type: Type): LiteTypeJSON {
     };
   }
 
-  throw new Error(`Unsupported type for JSON conversion: ${type.getName() ?? 'unknown'}`);
+  throw new Error(
+    `Unsupported type for JSON conversion: ${type.getName() ?? 'unknown'}`,
+  );
 }
-
