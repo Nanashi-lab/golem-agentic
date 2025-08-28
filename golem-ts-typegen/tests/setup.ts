@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { Project } from "ts-morph";
-import {generateMetadata} from "../src/index";
+import { generateMetadata } from "../src/index";
 
 const project = new Project({
   tsConfigFilePath: "tsconfig.json",

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Type as TsMorphType, Node as TsMorphNode, SourceFile} from "ts-morph";
+import { Type as TsMorphType, Node as TsMorphNode, SourceFile } from "ts-morph";
 import {
   Type,
   Symbol,
@@ -20,7 +20,7 @@ import {
   TypeMetadata,
   LiteTypeJSON,
   buildTypeFromJSON,
-  buildJSONFromType
+  buildJSONFromType,
 } from "@golemcloud/golem-ts-types-core";
 import * as fs from "node:fs";
 import path from "path";
@@ -312,7 +312,7 @@ export function unwrapAlias(type: TsMorphType): TsMorphType {
 
 export function generateMetadata(sourceFiles: SourceFile[]) {
   updateMetadataFromSourceFiles(sourceFiles);
-  saveTypeMetadata()
+  saveTypeMetadata();
 }
 
 export function updateMetadataFromSourceFiles(sourceFiles: SourceFile[]) {
@@ -324,20 +324,20 @@ export function updateMetadataFromSourceFiles(sourceFiles: SourceFile[]) {
       if (!className) continue;
 
       const constructorArgs =
-          classDecl
-              .getConstructors()[0]
-              ?.getParameters()
-              .map((p) => ({
-                name: p.getName(),
-                type: getFromTsMorph(p.getType()),
-              })) ?? [];
+        classDecl
+          .getConstructors()[0]
+          ?.getParameters()
+          .map((p) => ({
+            name: p.getName(),
+            type: getFromTsMorph(p.getType()),
+          })) ?? [];
 
       const methods = new Map();
       for (const method of classDecl.getMethods()) {
         const methodParams = new Map(
-            method.getParameters().map((p) => {
-              return [p.getName(), getFromTsMorph(p.getType())];
-            }),
+          method.getParameters().map((p) => {
+            return [p.getName(), getFromTsMorph(p.getType())];
+          }),
         );
 
         const returnType = getFromTsMorph(method.getReturnType());
@@ -360,7 +360,7 @@ export function saveTypeMetadata() {
   const json: Record<string, any> = {};
 
   for (const [className, meta] of TypeMetadata.getAll().entries()) {
-    const constructorArgsJSON = meta.constructorArgs.map(arg => ({
+    const constructorArgsJSON = meta.constructorArgs.map((arg) => ({
       name: arg.name,
       type: buildJSONFromType(arg.type),
     }));
@@ -388,7 +388,6 @@ export function saveTypeMetadata() {
   fs.writeFileSync(filePath, JSON.stringify(json, null, 2), "utf-8");
 }
 
-
 export function loadTypeMetadata() {
   TypeMetadata.clearMetadata();
 
@@ -406,35 +405,37 @@ export function loadTypeMetadata() {
       type: LiteTypeJSON;
     }>;
 
-    const constructorArgs = constructorArgsJSON.map(arg => ({
+    const constructorArgs = constructorArgsJSON.map((arg) => ({
       name: arg.name,
       type: buildTypeFromJSON(arg.type),
     }));
 
     const methodsMap = new Map<
-        string,
-        { methodParams: Map<string, Type>; returnType: Type }
+      string,
+      { methodParams: Map<string, Type>; returnType: Type }
     >();
 
     for (const [methodName, methodMeta] of Object.entries(
-        (meta as any).methods
+      (meta as any).methods,
     )) {
       const methodParamsMap = new Map<string, Type>();
       for (const [paramName, paramJSON] of Object.entries(
-          (methodMeta as any).methodParams
+        (methodMeta as any).methodParams,
       )) {
-        methodParamsMap.set(paramName, buildTypeFromJSON(paramJSON as LiteTypeJSON));
+        methodParamsMap.set(
+          paramName,
+          buildTypeFromJSON(paramJSON as LiteTypeJSON),
+        );
       }
 
       methodsMap.set(methodName, {
         methodParams: methodParamsMap,
         returnType: buildTypeFromJSON(
-            (methodMeta as any).returnType as LiteTypeJSON
+          (methodMeta as any).returnType as LiteTypeJSON,
         ),
       });
     }
 
     TypeMetadata.update(className, constructorArgs, methodsMap);
   }
-
 }
