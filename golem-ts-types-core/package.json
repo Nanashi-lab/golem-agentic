@@ -60,12 +60,8 @@
     "rollup-plugin-typescript2": "^0.36.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.39.0",
-    "vitest": "^3.2.4",
-    "ts-morph": "^26.0.0"
+    "vitest": "^3.2.4"
 
   },
-  "private": false,
-  "dependencies": {
-    "effect": "^3.17.6"
-  }
+  "private": false
 }

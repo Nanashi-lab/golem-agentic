@@ -80,22 +80,22 @@ export interface TestInterfaceType {
 }
 
 class MyAgent {
-  constructor(readonly testInterfaceType: TestInterfaceType) {
-    this.testInterfaceType = testInterfaceType;
+  constructor(readonly stringType: StringType) {
+    this.stringType = stringType;
   }
 
   async getWeather(
-    complexType: ObjectComplexType,
-    unionType: UnionType,
-    unionComplexType: UnionComplexType,
-    numberType: NumberType,
+    // complexType: ObjectComplexType,
+    // unionType: UnionType,
+    // unionComplexType: UnionComplexType,
+    // numberType: NumberType,
     stringType: StringType,
-    booleanType: BooleanType,
-    mapType: MapType,
-    tupleComplexType: TupleComplexType,
-    tupleType: TupleType,
-    listComplexType: ListComplexType,
-    objectType: ObjectType,
+    // booleanType: BooleanType,
+    // mapType: MapType,
+    // tupleComplexType: TupleComplexType,
+    // tupleType: TupleType,
+    // listComplexType: ListComplexType,
+    // objectType: ObjectType,
   ): PromiseType {
     return Promise.resolve(`Weather for ${location} is sunny!`);
   }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Type } from './shim';
+import { Type } from './type-lite';
 
 type ClassNameString = string;
 type MethodNameString = string;
