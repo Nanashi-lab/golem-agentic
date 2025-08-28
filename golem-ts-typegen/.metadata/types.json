@@ -34,6 +34,7 @@
           },
           "tupleComplexType": {
             "kind": "tuple",
+            "name": "Tuple",
             "elements": [
               {
                 "kind": "string"
@@ -69,6 +70,7 @@
           },
           "tupleType": {
             "kind": "tuple",
+            "name": "Tuple",
             "elements": [
               {
                 "kind": "string"
@@ -80,6 +82,34 @@
                 "kind": "boolean"
               }
             ]
+          },
+          "listComplexType": {
+            "kind": "array",
+            "name": "ObjectType",
+            "element": {
+              "kind": "object",
+              "name": "ObjectType",
+              "properties": [
+                {
+                  "name": "a",
+                  "type": {
+                    "kind": "string"
+                  }
+                },
+                {
+                  "name": "b",
+                  "type": {
+                    "kind": "number"
+                  }
+                },
+                {
+                  "name": "c",
+                  "type": {
+                    "kind": "boolean"
+                  }
+                }
+              ]
+            }
           },
           "objectType": {
             "kind": "object",

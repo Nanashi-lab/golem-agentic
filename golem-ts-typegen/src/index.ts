@@ -113,6 +113,7 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
 
     return new Type({
       kind: "tuple",
+      name: "Tuple",
       elements: tupleElems,
     });
   }
@@ -126,6 +127,7 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
 
     return new Type({
       kind: "array",
+      name: "Array",
       element,
     });
   }
@@ -135,6 +137,7 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
 
     return new Type({
       kind: "union",
+      name: "Union",
       unionTypes,
     });
   }
@@ -348,8 +351,7 @@ export function saveTypeMetadata() {
 
 export function lazyLoadTypeMetadata() {
   if (TypeMetadata.getAll().size === 0) {
-    loadTypeMetadata()
-    console.log(TypeMetadata.getAll());
+    loadTypeMetadata();
   }
 }
 

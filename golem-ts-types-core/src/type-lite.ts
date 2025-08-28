@@ -150,6 +150,8 @@ export function getTypeName(t: Type): string {
   if (t.isNull()) return 'null';
   if (t.isUndefined()) return 'undefined';
   if (t.isBigInt()) return 'bigint';
+  if (t.isMap()) return 'Map';
+  if (t.isPromise()) return 'Promise';
   return 'unknown';
 }
 

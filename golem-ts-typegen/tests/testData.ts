@@ -88,14 +88,14 @@ class MyAgent {
     // complexType: ObjectComplexType,
     // unionType: UnionType,
     // unionComplexType: UnionComplexType,
-       numberType: NumberType,
-       stringType: StringType,
-       booleanType: BooleanType,
-       mapType: MapType,
-       tupleComplexType: TupleComplexType,
-       tupleType: TupleType,
-    // listComplexType: ListComplexType,
-       objectType: ObjectType,
+    numberType: NumberType,
+    stringType: StringType,
+    booleanType: BooleanType,
+    mapType: MapType,
+    tupleComplexType: TupleComplexType,
+    tupleType: TupleType,
+    listComplexType: ListComplexType,
+    objectType: ObjectType,
   ): PromiseType {
     return Promise.resolve(`Weather for ${location} is sunny!`);
   }

@@ -13,9 +13,17 @@
 // limitations under the License.
 
 import { describe, expect, it } from "vitest";
-import {getNumberType, getStringType, getTestInterfaceType, getTestObjectType} from "./util.js";
+import {
+  getBooleanType,
+  getNumberType,
+  getStringType,
+  getTestListOfObjectType,
+  getTestMapType,
+  getTestObjectType,
+  getTupleType,
+} from "./util.js";
 
-describe("golem-ts-reflect can work with ts-morph", () => {
+describe("golem-ts-typegen can work correctly read types from .metadata directory", () => {
   it("track interface type", () => {
     const stringType = getStringType();
     expect(stringType.isString()).toEqual(true);
@@ -26,8 +34,28 @@ describe("golem-ts-reflect can work with ts-morph", () => {
     expect(numberType.isNumber()).toEqual(true);
   });
 
-  // it("track object type", () => {
-  //   const objectType = getTestObjectType();
-  //   expect(objectType.isObject()).toEqual(true);
-  // });
+  it("track boolean type", () => {
+    const booleanType = getBooleanType();
+    expect(booleanType.isBoolean()).toEqual(true);
+  });
+
+  it("track map type", () => {
+    const mapType = getTestMapType();
+    expect(mapType.isMap()).toEqual(true);
+  });
+
+  it("track tuple type", () => {
+    const tupleType = getTupleType();
+    expect(tupleType.isTuple()).toEqual(true);
+  });
+
+  it("track array type", () => {
+    const tupleType = getTestListOfObjectType();
+    expect(tupleType.isArray()).toEqual(true);
+  });
+
+  it("track object type", () => {
+    const objectType = getTestObjectType();
+    expect(objectType.isObject()).toEqual(true);
+  });
 });

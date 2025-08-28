@@ -19,7 +19,7 @@ import {
 } from "@golemcloud/golem-ts-types-core";
 
 import "./setup";
-import {lazyLoadTypeMetadata, loadTypeMetadata} from "../src";
+import { lazyLoadTypeMetadata, loadTypeMetadata } from "../src";
 
 /**
  * getAll functionality reads the type metadata from .metadata directory
@@ -27,60 +27,70 @@ import {lazyLoadTypeMetadata, loadTypeMetadata} from "../src";
  * by `setup` module.
  */
 export function getAll() {
+  // We don't need to load from .metadata directory again if already loaded
   lazyLoadTypeMetadata();
-  const result = TypeMetadata.getAll();
-  console.log("Getting all of " + result);
-  return result;
+
+  return TypeMetadata.getAll();
 }
 
+// Get an Interface Type from .metadata directory
 export function getTestInterfaceType(): Type {
   return fetchType("TestInterfaceType");
 }
 
+// Get a Map Type from .metadata directory
 export function getTestMapType(): Type {
   return fetchType("Map");
 }
 
+// Get a Object Type from .metadata directory
+// Note that alias for object is kept intact.
 export function getTestObjectType(): Type {
   return fetchType("ObjectType");
 }
 
+// Get a List Type from .metadata directory
+// Here alias is discarded by ts-morph
 export function getTestListOfObjectType(): Type {
   return fetchType("Array");
 }
 
+// Get a Union Type from .metadata directory
 export function getUnionType(): Type {
   return fetchType("UnionType");
 }
 
+// Get a Union Type from .metadata directory
 export function getUnionComplexType(): Type {
   return fetchType("UnionComplexType");
 }
 
+// Get a Tuple Type from .metadata directory
 export function getTupleType(): Type {
-  return fetchType("TupleType");
+  return fetchType("Tuple");
 }
 
-export function getTupleComplexType(): Type {
-  return fetchType("TupleComplexType");
-}
-
+// Get a boolean Type from .metadata directory
 export function getBooleanType(): Type {
   return fetchType("boolean");
 }
 
+// Get a string Type from .metadata directory
 export function getStringType(): Type {
   return fetchType("string");
 }
 
+// Get a number Type from .metadata directory
 export function getNumberType(): Type {
   return fetchType("number");
 }
 
+// Get a Promise Type from .metadata directory
 export function getPromiseType(): Type {
   return fetchType("Promise");
 }
 
+// Fetch a type by its name from the loaded metadata (loaded by setup module)
 function fetchType(typeNameInTestData: string): Type {
   const classMetadata = Array.from(getAll()).map(([_, v]) => v);
 

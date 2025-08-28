@@ -16,7 +16,6 @@ program
   .action((tsconfig: string, options: { files: string[] }) => {
     const project = new Project({ tsConfigFilePath: path.resolve(tsconfig) });
     const sourceFiles = project.getSourceFiles(options.files);
-    console.log("Total source files " + sourceFiles.length);
     updateMetadataFromSourceFiles(sourceFiles);
     const result = TypeMetadata.getAll();
     console.log(

@@ -30,7 +30,7 @@ export function buildJSONFromType(type: Type): LiteTypeJSON {
     if (!elem) throw new Error('Missing element type in Array');
     return {
       kind: 'array',
-      name: type.getName(),
+      name: getTypeName(elem),
       element: buildJSONFromType(elem),
     };
   }
@@ -38,7 +38,7 @@ export function buildJSONFromType(type: Type): LiteTypeJSON {
   if (type.isTuple()) {
     return {
       kind: 'tuple',
-      name: type.getName(),
+      name: getTypeName(type),
       elements: type.getTupleElements().map(buildJSONFromType),
     };
   }
