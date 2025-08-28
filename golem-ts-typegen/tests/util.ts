@@ -12,59 +12,63 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { getTypeName, Type, TypeMetadata } from '@golemcloud/golem-ts-types-core';
-import './setup';
+import {
+  getTypeName,
+  Type,
+  TypeMetadata,
+} from "@golemcloud/golem-ts-types-core";
+import "./setup";
 
 export function getAll() {
   return TypeMetadata.getAll();
 }
 
 export function getTestInterfaceType(): Type {
-  return fetchType('TestInterfaceType');
+  return fetchType("TestInterfaceType");
 }
 
 export function getTestMapType(): Type {
-  return fetchType('Map');
+  return fetchType("Map");
 }
 
 export function getTestObjectType(): Type {
-  return fetchType('ObjectType');
+  return fetchType("ObjectType");
 }
 
 export function getTestListOfObjectType(): Type {
-  return fetchType('Array');
+  return fetchType("Array");
 }
 
 export function getUnionType(): Type {
-  return fetchType('UnionType');
+  return fetchType("UnionType");
 }
 
 export function getUnionComplexType(): Type {
-  return fetchType('UnionComplexType');
+  return fetchType("UnionComplexType");
 }
 
 export function getTupleType(): Type {
-  return fetchType('TupleType');
+  return fetchType("TupleType");
 }
 
 export function getTupleComplexType(): Type {
-  return fetchType('TupleComplexType');
+  return fetchType("TupleComplexType");
 }
 
 export function getBooleanType(): Type {
-  return fetchType('boolean');
+  return fetchType("boolean");
 }
 
 export function getStringType(): Type {
-  return fetchType('string');
+  return fetchType("string");
 }
 
 export function getNumberType(): Type {
-  return fetchType('number');
+  return fetchType("number");
 }
 
 export function getPromiseType(): Type {
-  return fetchType('Promise');
+  return fetchType("Promise");
 }
 
 function fetchType(typeNameInTestData: string): Type {

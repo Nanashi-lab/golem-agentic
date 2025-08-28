@@ -17,9 +17,11 @@
   },
   "include": [
     "src/**/*",
-    "tests"
+    "tests/**/*",
+    "types",
+    "tests/support"
   ],
   "exclude": [
-    "./node_modules"
+    "node_modules"
   ]
 }

@@ -5,9 +5,7 @@ import typescript from 'rollup-plugin-typescript2';
 import dts from 'rollup-plugin-dts';
 import { defineConfig } from 'rollup';
 
-const external = [
-   'ts-morph'
-];
+const external = [];
 
 export default defineConfig([
     {

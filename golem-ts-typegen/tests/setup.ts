@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Project } from 'ts-morph';
-import { TypeMetadata } from '@golemcloud/golem-ts-types-core';
-import { getFromTsMorph } from '../src/index.js';
+import { Project } from "ts-morph";
+import { TypeMetadata } from "@golemcloud/golem-ts-types-core";
+import { getFromTsMorph } from "../src/index.js";
 
 const project = new Project({
-  tsConfigFilePath: 'packages/core/tsconfig.json',
+  tsConfigFilePath: "tsconfig.json",
 });
 
-const sourceFiles =
-  project.getSourceFiles('packages/core/tests/testData.ts');
+const sourceFiles = project.getSourceFiles("tests/testData.ts");
 
 for (const sourceFile of sourceFiles) {
   const classes = sourceFile.getClasses();
@@ -54,4 +53,3 @@ for (const sourceFile of sourceFiles) {
     TypeMetadata.update(className, constructorArgs, methods);
   }
 }
-
