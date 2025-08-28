@@ -6,7 +6,7 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "outDir": "./dist",
+    "outDir": "../../dist",
     "rootDir": ".",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -18,9 +18,8 @@
   "include": [
     "src/**/*",
     "tests",
-    "types",
   ],
   "exclude": [
-    "node_modules"
+    "../../node_modules"
   ]
 }

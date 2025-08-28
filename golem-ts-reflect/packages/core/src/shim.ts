@@ -37,8 +37,6 @@ export type LiteTypeJSON =
       target: LiteTypeJSON;
     };
 
-
-
 type NodeKind = 'PropertySignature' | 'PropertyDeclaration' | 'TypeAlias';
 
 export class Node {
@@ -106,11 +104,9 @@ export class Symbol {
     return this.valueDecl;
   }
 
-
   getTypeAtLocation(_node: Node): Type {
     return this._typeAtLocation;
   }
-
 
   _getAliasTarget(): Type | undefined {
     return this._aliasTarget;
@@ -133,7 +129,6 @@ type Kind =
   | 'alias';
 
 export class Type {
-
   public readonly compilerType: unknown = undefined;
 
   private readonly kind: Kind;
@@ -346,7 +341,6 @@ export function unwrapAlias(t: Type): Type {
 
     const decl = alias.getDeclarations()[0];
     if (!decl) break;
-
 
     const target = (alias as any)._getAliasTarget?.() as Type | undefined;
     if (!target || target === current) break;

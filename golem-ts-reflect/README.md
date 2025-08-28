@@ -1,4 +1,3 @@
-# Golem TypeScript SDK
+# Golem TypeScript Reflect
 
-A lightweight core structure that's based on the details emitted from ts-morph.
-It is up to the user to build this structure from the details of the TS morph code
+A lightweight reflection library that's geared to solve golem's reflection requirements for agent SDK

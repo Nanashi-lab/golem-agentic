@@ -15,7 +15,7 @@
 import { describe, expect, it } from 'vitest';
 import { getTestInterfaceType, getTestObjectType } from './util';
 
-describe('can work with ts-morph details', () => {
+describe('golem-ts-reflect can work with ts-morph', () => {
   it('track interface type', () => {
     const interfaceType = getTestInterfaceType();
     expect(interfaceType.isInterface()).toEqual(true);
@@ -23,7 +23,6 @@ describe('can work with ts-morph details', () => {
 
   it('track object type', () => {
     const objectType = getTestObjectType();
-    console.log(objectType);
     expect(objectType.isObject()).toEqual(true);
   });
 });

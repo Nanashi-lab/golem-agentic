@@ -17,15 +17,12 @@ import { TypeMetadata } from '../src/metadata';
 import { Type, Symbol, Node } from '../src/shim';
 import { Type as TsMorphType, Node as TsMorphNode } from 'ts-morph';
 
-console.log('Setting up test data');
-
 const project = new Project({
-  tsConfigFilePath: './tsconfig.json',
+  tsConfigFilePath: 'packages/core/tsconfig.json',
 });
 
-const sourceFiles = project.getSourceFiles('tests/testData.ts');
-
-console.log(sourceFiles.length);
+const sourceFiles =
+  project.getSourceFiles('packages/core/tests/testData.ts');
 
 for (const sourceFile of sourceFiles) {
   const classes = sourceFile.getClasses();
