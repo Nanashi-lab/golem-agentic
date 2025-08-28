@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { getTypeName, Type } from '../src/ts-morph-shim';
+import { getTypeName, Type } from '../src/shim';
 import { TypeMetadata } from '../src/metadata';
 import './setup';
 

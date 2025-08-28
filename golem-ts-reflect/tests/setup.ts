@@ -14,7 +14,7 @@
 
 import { Project } from 'ts-morph';
 import { TypeMetadata } from '../src/metadata';
-import { Type, Symbol, Node } from '../src/ts-morph-shim';
+import { Type, Symbol, Node } from '../src/shim';
 import { Type as TsMorphType, Node as TsMorphNode } from 'ts-morph';
 
 console.log('Setting up test data');

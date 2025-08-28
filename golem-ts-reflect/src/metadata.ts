@@ -1,11 +1,9 @@
-import { Type } from './ts-morph-shim';
+import { Type } from './shim';
 
 type ClassNameString = string;
 type MethodNameString = string;
 
 export type MethodParams = Map<string, Type>;
-
-export type ReturnType = Type;
 
 export type ConstructorArg = { name: string; type: Type };
 

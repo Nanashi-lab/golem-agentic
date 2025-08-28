@@ -1,1 +1,2 @@
-export * from './ts-morph-shim';
+export * from './shim';
+export * from './metadata';

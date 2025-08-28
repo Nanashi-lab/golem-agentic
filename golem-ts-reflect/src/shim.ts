@@ -37,7 +37,7 @@ export type LiteTypeJSON =
       target: LiteTypeJSON;
     };
 
-// ------------------------- Node -------------------------
+
 
 type NodeKind = 'PropertySignature' | 'PropertyDeclaration' | 'TypeAlias';
 
@@ -75,8 +75,8 @@ export class Symbol {
   private readonly name: string;
   private readonly decls: Node[];
   private readonly valueDecl?: Node;
-  private readonly _typeAtLocation: Type; // fixed type for property symbol
-  private readonly _aliasTarget?: Type; // for alias symbol only
+  private readonly _typeAtLocation: Type;
+  private readonly _aliasTarget?: Type;
 
   constructor(args: {
     name: string;
@@ -106,12 +106,12 @@ export class Symbol {
     return this.valueDecl;
   }
 
-  // For property symbols in objects/interfaces
+
   getTypeAtLocation(_node: Node): Type {
     return this._typeAtLocation;
   }
 
-  // For alias symbols, used by unwrapAlias => decl.getType()
+
   _getAliasTarget(): Type | undefined {
     return this._aliasTarget;
   }
@@ -133,7 +133,7 @@ type Kind =
   | 'alias';
 
 export class Type {
-  // present only to satisfy `tsType.compilerType` access in your code
+
   public readonly compilerType: unknown = undefined;
 
   private readonly kind: Kind;
@@ -143,7 +143,7 @@ export class Type {
   private readonly unionTypes?: Type[];
   private readonly properties?: Symbol[];
   private readonly typeArgs?: Type[];
-  private readonly aliasSymbol?: Symbol; // for unwrapAlias()
+  private readonly aliasSymbol?: Symbol;
 
   constructor(from: {
     kind: Kind;
@@ -347,7 +347,7 @@ export function unwrapAlias(t: Type): Type {
     const decl = alias.getDeclarations()[0];
     if (!decl) break;
 
-    // In this shim, alias symbol carries the target directly.
+
     const target = (alias as any)._getAliasTarget?.() as Type | undefined;
     if (!target || target === current) break;
 
