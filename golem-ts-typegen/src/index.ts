@@ -387,8 +387,8 @@ export function saveTypeMetadata() {
   }
 
   const filePath = path.join(METADATA_DIR, METADATA_FILE);
-  console.log(`Saved metadata file: ${filePath}`);
   fs.writeFileSync(filePath, JSON.stringify(json, null, 2), "utf-8");
+  return filePath
 }
 
 export function lazyLoadTypeMetadata() {
