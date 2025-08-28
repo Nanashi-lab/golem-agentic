@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Type} from "ts-morph";
+import {Type} from "@golemcloud/golem-ts-types-core";
 import {WitTypeBuilder} from "./witTypeBuilder";
 import * as Either from "effect/Either";
 import {WitType} from "golem:agent/common";

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Type } from 'ts-morph';
+import { Type } from '@golemcloud/golem-ts-types-core';
 import * as Either from 'effect/Either';
 import { AgentMethod, DataSchema, ElementSchema } from 'golem:agent/common';
 import * as WitType from './mapping/types/WitType';
@@ -22,8 +22,7 @@ import {
   ClassMetadata,
   ConstructorArg,
   MethodParams,
-  ReturnType,
-} from '../typeMetadata';
+} from '@golemcloud/golem-ts-types-core';
 
 export function getConstructorDataSchema(
   classType: ClassMetadata,
@@ -80,7 +79,7 @@ export function getAgentMethodSchema(
 
       const parameters: MethodParams = signature.methodParams;
 
-      const returnType: ReturnType = signature.returnType;
+      const returnType: Type = signature.returnType;
 
       const baseMeta =
         AgentMethodMetadataRegistry.lookup(agentClassName)?.get(methodName) ??

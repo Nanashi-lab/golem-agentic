@@ -37,7 +37,7 @@ import {
   unionComplexArb,
 } from './arbitraries';
 import * as fc from 'fast-check';
-import { Type } from 'ts-morph';
+import { Type } from '@golemcloud/golem-ts-types-core';
 import * as EffectEither from 'effect/Either';
 import * as WitValue from '../src/internal/mapping/values/WitValue';
 
