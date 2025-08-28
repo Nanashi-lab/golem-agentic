@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { getTypeName, Type } from '../src/shim';
-import { TypeMetadata } from '../src/metadata';
+import { getTypeName, Type, TypeMetadata } from '@golemcloud/golem-ts-types-core';
 import './setup';
 
 export function getAll() {

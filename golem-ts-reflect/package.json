@@ -1,13 +1,16 @@
 {
-  "name": "golem-reflect-monorepo",
+  "name": "golem-ts-reflectn",
   "private": true,
+  "type": "module",
+  "moduleResolution": "node16",
+  "module": "esnext",
+  "target": "esnext",
+  "baseUrl": ".",
   "version": "0.0.1-dev.1",
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": ["packages/*"],
   "scripts": {
-    "format" : "npm run format -w @golemcloud/golem-ts-reflect",
-    "build": "npm run build -w @golemcloud/golem-ts-reflect",
+    "format" : "npm run format -w @golemcloud/golem-ts-types-core && npm run format -w @golemcloud/golem-ts-typegen",
+    "build": "npm run build -w @golemcloud/golem-ts-types-core && npm run build -w @golemcloud/golem-ts-typegen",
     "test": "vitest run"
   },
   "devDependencies": {

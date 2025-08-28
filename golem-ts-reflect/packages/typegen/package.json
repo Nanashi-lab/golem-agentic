@@ -1,5 +1,5 @@
 {
-  "name": "@golemcloud/golem-ts-types-core",
+  "name": "@golemcloud/golem-ts-typegen",
   "type": "module",
   "version": "0.0.1-dev.1",
   "publishConfig": {
@@ -22,6 +22,7 @@
     "lint:fix": "../../node_modules/.bin/eslint . --ext .ts,.tsx --fix",
     "format": "../../node_modules/.bin/prettier --write \"src/**/*\" \"tests/**/*\"",
     "format:check": "../../node_modules/.bin/prettier --check \"src/**/*\" \"tests/**/*\"",
+    "test": "../../node_modules/.bin/tsc --noEmit && vitest run",
     "build": "../../node_modules/.bin/tsc --noEmit && rollup -c",
     "dev": "../../node_modules/.bin/rollup -c -w"
   },
@@ -44,10 +45,12 @@
     "rollup": "^4.46.2",
     "rollup-plugin-dts": "^6.2.1",
     "rollup-plugin-typescript2": "^0.36.0",
-    "ts-morph": "^26.0.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.39.0",
     "vitest": "^3.2.4"
   },
-  "private": false
+  "private": false,
+  "dependencies": {
+    "@golemcloud/golem-ts-types-core": "*"
+  }
 }

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { describe, expect, it } from 'vitest';
-import { getTestInterfaceType, getTestObjectType } from './util';
+import { getTestInterfaceType, getTestObjectType } from './util.js';
 
 describe('golem-ts-reflect can work with ts-morph', () => {
   it('track interface type', () => {
