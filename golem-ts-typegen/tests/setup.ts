@@ -13,8 +13,7 @@
 // limitations under the License.
 
 import { Project } from "ts-morph";
-import { TypeMetadata } from "@golemcloud/golem-ts-types-core";
-import { getFromTsMorph } from "../src/index.js";
+import { updateMetadataFromSourceFiles} from "../src/index.js";
 
 const project = new Project({
   tsConfigFilePath: "tsconfig.json",
@@ -22,34 +21,4 @@ const project = new Project({
 
 const sourceFiles = project.getSourceFiles("tests/testData.ts");
 
-for (const sourceFile of sourceFiles) {
-  const classes = sourceFile.getClasses();
-
-  for (const classDecl of classes) {
-    const className = classDecl.getName();
-    if (!className) continue;
-
-    const constructorArgs =
-      classDecl
-        .getConstructors()[0]
-        ?.getParameters()
-        .map((p) => ({
-          name: p.getName(),
-          type: getFromTsMorph(p.getType()),
-        })) ?? [];
-
-    const methods = new Map();
-    for (const method of classDecl.getMethods()) {
-      const methodParams = new Map(
-        method.getParameters().map((p) => {
-          return [p.getName(), getFromTsMorph(p.getType())];
-        }),
-      );
-
-      const returnType = getFromTsMorph(method.getReturnType());
-      methods.set(method.getName(), { methodParams, returnType });
-    }
-
-    TypeMetadata.update(className, constructorArgs, methods);
-  }
-}
+updateMetadataFromSourceFiles(sourceFiles);
