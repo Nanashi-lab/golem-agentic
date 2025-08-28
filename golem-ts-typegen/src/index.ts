@@ -34,51 +34,91 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
       return new Type({
         kind: "array",
         name: "Float64Array",
+        element: new Type({
+          kind: "number",
+          name: "number",
+        }),
       });
     case "Float32Array":
       return new Type({
         kind: "array",
         name: "Float32Array",
+        element: new Type({
+          kind: "number",
+          name: "number",
+        }),
       });
     case "Int8Array":
       return new Type({
         kind: "array",
         name: "Int8Array",
+        element: new Type({
+          kind: "number",
+          name: "number",
+        }),
       });
     case "Uint8Array":
       return new Type({
         kind: "array",
         name: "Uint8Array",
+        element: new Type({
+          kind: "number",
+          name: "number",
+        }),
       });
     case "Int16Array":
       return new Type({
         kind: "array",
         name: "Int16Array",
+        element: new Type({
+          kind: "number",
+          name: "number",
+        }),
       });
     case "Uint16Array":
       return new Type({
         kind: "array",
         name: "Uint16Array",
+        element: new Type({
+          kind: "number",
+          name: "number",
+        }),
       });
     case "Int32Array":
       return new Type({
         kind: "array",
         name: "Int32Array",
+        element: new Type({
+          kind: "number",
+          name: "number",
+        }),
       });
     case "Uint32Array":
       return new Type({
         kind: "array",
         name: "Uint32Array",
+        element: new Type({
+          kind: "number",
+          name: "number",
+        }),
       });
     case "BigInt64Array":
       return new Type({
         kind: "array",
         name: "BigInt64Array",
+        element: new Type({
+          kind: "number",
+          name: "number",
+        }),
       });
     case "BigUint64Array":
       return new Type({
         kind: "array",
         name: "BigUint64Array",
+        element: new Type({
+          kind: "number",
+          name: "number",
+        }),
       });
   }
 
@@ -123,6 +163,7 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
     if (!elementType) {
       throw new Error("Array type without element type");
     }
+
     const element = getFromTsMorph(elementType);
 
     return new Type({

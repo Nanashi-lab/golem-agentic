@@ -4,13 +4,1528 @@
       {
         "name": "testInterfaceType",
         "type": {
-          "kind": "string"
+          "kind": "interface",
+          "name": "TestInterfaceType",
+          "properties": [
+            {
+              "name": "numberProp",
+              "type": {
+                "kind": "number"
+              }
+            },
+            {
+              "name": "stringProp",
+              "type": {
+                "kind": "string"
+              }
+            },
+            {
+              "name": "booleanProp",
+              "type": {
+                "kind": "boolean"
+              }
+            },
+            {
+              "name": "bigintProp",
+              "type": {
+                "kind": "bigint"
+              }
+            },
+            {
+              "name": "nullProp",
+              "type": {
+                "kind": "null"
+              }
+            },
+            {
+              "name": "trueProp",
+              "type": {
+                "kind": "boolean"
+              }
+            },
+            {
+              "name": "falseProp",
+              "type": {
+                "kind": "boolean"
+              }
+            },
+            {
+              "name": "optionalProp",
+              "type": {
+                "kind": "union",
+                "name": "number | undefined",
+                "types": [
+                  {
+                    "kind": "undefined"
+                  },
+                  {
+                    "kind": "number"
+                  }
+                ]
+              },
+              "optional": true
+            },
+            {
+              "name": "nestedProp",
+              "type": {
+                "kind": "interface",
+                "name": "SimpleInterfaceType",
+                "properties": [
+                  {
+                    "name": "n",
+                    "type": {
+                      "kind": "number"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "name": "unionProp",
+              "type": {
+                "kind": "union",
+                "name": "UnionType",
+                "types": [
+                  {
+                    "kind": "string"
+                  },
+                  {
+                    "kind": "number"
+                  },
+                  {
+                    "kind": "boolean"
+                  },
+                  {
+                    "kind": "boolean"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "ObjectType",
+                    "properties": [
+                      {
+                        "name": "a",
+                        "type": {
+                          "kind": "string"
+                        }
+                      },
+                      {
+                        "name": "b",
+                        "type": {
+                          "kind": "number"
+                        }
+                      },
+                      {
+                        "name": "c",
+                        "type": {
+                          "kind": "boolean"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "unionComplexProp",
+              "type": {
+                "kind": "union",
+                "name": "UnionComplexType",
+                "types": [
+                  {
+                    "kind": "string"
+                  },
+                  {
+                    "kind": "number"
+                  },
+                  {
+                    "kind": "boolean"
+                  },
+                  {
+                    "kind": "boolean"
+                  },
+                  {
+                    "kind": "interface",
+                    "name": "SimpleInterfaceType",
+                    "properties": [
+                      {
+                        "name": "n",
+                        "type": {
+                          "kind": "number"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "object",
+                    "name": "ObjectType",
+                    "properties": [
+                      {
+                        "name": "a",
+                        "type": {
+                          "kind": "string"
+                        }
+                      },
+                      {
+                        "name": "b",
+                        "type": {
+                          "kind": "number"
+                        }
+                      },
+                      {
+                        "name": "c",
+                        "type": {
+                          "kind": "boolean"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "object",
+                    "name": "ObjectComplexType",
+                    "properties": [
+                      {
+                        "name": "a",
+                        "type": {
+                          "kind": "string"
+                        }
+                      },
+                      {
+                        "name": "b",
+                        "type": {
+                          "kind": "number"
+                        }
+                      },
+                      {
+                        "name": "c",
+                        "type": {
+                          "kind": "boolean"
+                        }
+                      },
+                      {
+                        "name": "d",
+                        "type": {
+                          "kind": "object",
+                          "name": "ObjectType",
+                          "properties": [
+                            {
+                              "name": "a",
+                              "type": {
+                                "kind": "string"
+                              }
+                            },
+                            {
+                              "name": "b",
+                              "type": {
+                                "kind": "number"
+                              }
+                            },
+                            {
+                              "name": "c",
+                              "type": {
+                                "kind": "boolean"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "name": "e",
+                        "type": {
+                          "kind": "union",
+                          "name": "UnionType",
+                          "types": [
+                            {
+                              "kind": "string"
+                            },
+                            {
+                              "kind": "number"
+                            },
+                            {
+                              "kind": "boolean"
+                            },
+                            {
+                              "kind": "boolean"
+                            },
+                            {
+                              "kind": "object",
+                              "name": "ObjectType",
+                              "properties": [
+                                {
+                                  "name": "a",
+                                  "type": {
+                                    "kind": "string"
+                                  }
+                                },
+                                {
+                                  "name": "b",
+                                  "type": {
+                                    "kind": "number"
+                                  }
+                                },
+                                {
+                                  "name": "c",
+                                  "type": {
+                                    "kind": "boolean"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "name": "f",
+                        "type": {
+                          "kind": "array",
+                          "name": "string",
+                          "element": {
+                            "kind": "string"
+                          }
+                        }
+                      },
+                      {
+                        "name": "g",
+                        "type": {
+                          "kind": "array",
+                          "name": "ObjectType",
+                          "element": {
+                            "kind": "object",
+                            "name": "ObjectType",
+                            "properties": [
+                              {
+                                "name": "a",
+                                "type": {
+                                  "kind": "string"
+                                }
+                              },
+                              {
+                                "name": "b",
+                                "type": {
+                                  "kind": "number"
+                                }
+                              },
+                              {
+                                "name": "c",
+                                "type": {
+                                  "kind": "boolean"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "name": "h",
+                        "type": {
+                          "kind": "tuple",
+                          "name": "TupleType",
+                          "elements": [
+                            {
+                              "kind": "string"
+                            },
+                            {
+                              "kind": "number"
+                            },
+                            {
+                              "kind": "boolean"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "name": "i",
+                        "type": {
+                          "kind": "tuple",
+                          "name": "TupleComplexType",
+                          "elements": [
+                            {
+                              "kind": "string"
+                            },
+                            {
+                              "kind": "number"
+                            },
+                            {
+                              "kind": "object",
+                              "name": "ObjectType",
+                              "properties": [
+                                {
+                                  "name": "a",
+                                  "type": {
+                                    "kind": "string"
+                                  }
+                                },
+                                {
+                                  "name": "b",
+                                  "type": {
+                                    "kind": "number"
+                                  }
+                                },
+                                {
+                                  "name": "c",
+                                  "type": {
+                                    "kind": "boolean"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "name": "j",
+                        "type": {
+                          "kind": "map",
+                          "name": "Map",
+                          "typeArgs": [
+                            {
+                              "kind": "string"
+                            },
+                            {
+                              "kind": "number"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "name": "k",
+                        "type": {
+                          "kind": "interface",
+                          "name": "SimpleInterfaceType",
+                          "properties": [
+                            {
+                              "name": "n",
+                              "type": {
+                                "kind": "number"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "tuple",
+                    "name": "TupleType",
+                    "elements": [
+                      {
+                        "kind": "string"
+                      },
+                      {
+                        "kind": "number"
+                      },
+                      {
+                        "kind": "boolean"
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "tuple",
+                    "name": "TupleComplexType",
+                    "elements": [
+                      {
+                        "kind": "string"
+                      },
+                      {
+                        "kind": "number"
+                      },
+                      {
+                        "kind": "object",
+                        "name": "ObjectType",
+                        "properties": [
+                          {
+                            "name": "a",
+                            "type": {
+                              "kind": "string"
+                            }
+                          },
+                          {
+                            "name": "b",
+                            "type": {
+                              "kind": "number"
+                            }
+                          },
+                          {
+                            "name": "c",
+                            "type": {
+                              "kind": "boolean"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "objectProp",
+              "type": {
+                "kind": "object",
+                "name": "ObjectType",
+                "properties": [
+                  {
+                    "name": "a",
+                    "type": {
+                      "kind": "string"
+                    }
+                  },
+                  {
+                    "name": "b",
+                    "type": {
+                      "kind": "number"
+                    }
+                  },
+                  {
+                    "name": "c",
+                    "type": {
+                      "kind": "boolean"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "name": "objectComplexProp",
+              "type": {
+                "kind": "object",
+                "name": "ObjectComplexType",
+                "properties": [
+                  {
+                    "name": "a",
+                    "type": {
+                      "kind": "string"
+                    }
+                  },
+                  {
+                    "name": "b",
+                    "type": {
+                      "kind": "number"
+                    }
+                  },
+                  {
+                    "name": "c",
+                    "type": {
+                      "kind": "boolean"
+                    }
+                  },
+                  {
+                    "name": "d",
+                    "type": {
+                      "kind": "object",
+                      "name": "ObjectType",
+                      "properties": [
+                        {
+                          "name": "a",
+                          "type": {
+                            "kind": "string"
+                          }
+                        },
+                        {
+                          "name": "b",
+                          "type": {
+                            "kind": "number"
+                          }
+                        },
+                        {
+                          "name": "c",
+                          "type": {
+                            "kind": "boolean"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "e",
+                    "type": {
+                      "kind": "union",
+                      "name": "UnionType",
+                      "types": [
+                        {
+                          "kind": "string"
+                        },
+                        {
+                          "kind": "number"
+                        },
+                        {
+                          "kind": "boolean"
+                        },
+                        {
+                          "kind": "boolean"
+                        },
+                        {
+                          "kind": "object",
+                          "name": "ObjectType",
+                          "properties": [
+                            {
+                              "name": "a",
+                              "type": {
+                                "kind": "string"
+                              }
+                            },
+                            {
+                              "name": "b",
+                              "type": {
+                                "kind": "number"
+                              }
+                            },
+                            {
+                              "name": "c",
+                              "type": {
+                                "kind": "boolean"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "f",
+                    "type": {
+                      "kind": "array",
+                      "name": "string",
+                      "element": {
+                        "kind": "string"
+                      }
+                    }
+                  },
+                  {
+                    "name": "g",
+                    "type": {
+                      "kind": "array",
+                      "name": "ObjectType",
+                      "element": {
+                        "kind": "object",
+                        "name": "ObjectType",
+                        "properties": [
+                          {
+                            "name": "a",
+                            "type": {
+                              "kind": "string"
+                            }
+                          },
+                          {
+                            "name": "b",
+                            "type": {
+                              "kind": "number"
+                            }
+                          },
+                          {
+                            "name": "c",
+                            "type": {
+                              "kind": "boolean"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "name": "h",
+                    "type": {
+                      "kind": "tuple",
+                      "name": "TupleType",
+                      "elements": [
+                        {
+                          "kind": "string"
+                        },
+                        {
+                          "kind": "number"
+                        },
+                        {
+                          "kind": "boolean"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "i",
+                    "type": {
+                      "kind": "tuple",
+                      "name": "TupleComplexType",
+                      "elements": [
+                        {
+                          "kind": "string"
+                        },
+                        {
+                          "kind": "number"
+                        },
+                        {
+                          "kind": "object",
+                          "name": "ObjectType",
+                          "properties": [
+                            {
+                              "name": "a",
+                              "type": {
+                                "kind": "string"
+                              }
+                            },
+                            {
+                              "name": "b",
+                              "type": {
+                                "kind": "number"
+                              }
+                            },
+                            {
+                              "name": "c",
+                              "type": {
+                                "kind": "boolean"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "j",
+                    "type": {
+                      "kind": "map",
+                      "name": "Map",
+                      "typeArgs": [
+                        {
+                          "kind": "string"
+                        },
+                        {
+                          "kind": "number"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "k",
+                    "type": {
+                      "kind": "interface",
+                      "name": "SimpleInterfaceType",
+                      "properties": [
+                        {
+                          "name": "n",
+                          "type": {
+                            "kind": "number"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "name": "listProp",
+              "type": {
+                "kind": "array",
+                "name": "string",
+                "element": {
+                  "kind": "string"
+                }
+              }
+            },
+            {
+              "name": "listObjectProp",
+              "type": {
+                "kind": "array",
+                "name": "ObjectType",
+                "element": {
+                  "kind": "object",
+                  "name": "ObjectType",
+                  "properties": [
+                    {
+                      "name": "a",
+                      "type": {
+                        "kind": "string"
+                      }
+                    },
+                    {
+                      "name": "b",
+                      "type": {
+                        "kind": "number"
+                      }
+                    },
+                    {
+                      "name": "c",
+                      "type": {
+                        "kind": "boolean"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "tupleProp",
+              "type": {
+                "kind": "tuple",
+                "name": "TupleType",
+                "elements": [
+                  {
+                    "kind": "string"
+                  },
+                  {
+                    "kind": "number"
+                  },
+                  {
+                    "kind": "boolean"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "tupleObjectProp",
+              "type": {
+                "kind": "tuple",
+                "name": "TupleComplexType",
+                "elements": [
+                  {
+                    "kind": "string"
+                  },
+                  {
+                    "kind": "number"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "ObjectType",
+                    "properties": [
+                      {
+                        "name": "a",
+                        "type": {
+                          "kind": "string"
+                        }
+                      },
+                      {
+                        "name": "b",
+                        "type": {
+                          "kind": "number"
+                        }
+                      },
+                      {
+                        "name": "c",
+                        "type": {
+                          "kind": "boolean"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "mapProp",
+              "type": {
+                "kind": "map",
+                "name": "Map",
+                "typeArgs": [
+                  {
+                    "kind": "string"
+                  },
+                  {
+                    "kind": "number"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "uint8ArrayProp",
+              "type": {
+                "kind": "array",
+                "name": "number",
+                "element": {
+                  "kind": "number"
+                }
+              }
+            },
+            {
+              "name": "uint16ArrayProp",
+              "type": {
+                "kind": "array",
+                "name": "number",
+                "element": {
+                  "kind": "number"
+                }
+              }
+            },
+            {
+              "name": "uint32ArrayProp",
+              "type": {
+                "kind": "array",
+                "name": "number",
+                "element": {
+                  "kind": "number"
+                }
+              }
+            },
+            {
+              "name": "uint64ArrayProp",
+              "type": {
+                "kind": "array",
+                "name": "number",
+                "element": {
+                  "kind": "number"
+                }
+              }
+            },
+            {
+              "name": "int8ArrayProp",
+              "type": {
+                "kind": "array",
+                "name": "number",
+                "element": {
+                  "kind": "number"
+                }
+              }
+            },
+            {
+              "name": "int16ArrayProp",
+              "type": {
+                "kind": "array",
+                "name": "number",
+                "element": {
+                  "kind": "number"
+                }
+              }
+            },
+            {
+              "name": "int32ArrayProp",
+              "type": {
+                "kind": "array",
+                "name": "number",
+                "element": {
+                  "kind": "number"
+                }
+              }
+            },
+            {
+              "name": "int64ArrayProp",
+              "type": {
+                "kind": "array",
+                "name": "number",
+                "element": {
+                  "kind": "number"
+                }
+              }
+            },
+            {
+              "name": "float32ArrayProp",
+              "type": {
+                "kind": "array",
+                "name": "number",
+                "element": {
+                  "kind": "number"
+                }
+              }
+            },
+            {
+              "name": "float64ArrayProp",
+              "type": {
+                "kind": "array",
+                "name": "number",
+                "element": {
+                  "kind": "number"
+                }
+              }
+            }
+          ]
         }
       }
     ],
     "methods": {
       "getWeather": {
         "methodParams": {
+          "complexType": {
+            "kind": "object",
+            "name": "ObjectComplexType",
+            "properties": [
+              {
+                "name": "a",
+                "type": {
+                  "kind": "string"
+                }
+              },
+              {
+                "name": "b",
+                "type": {
+                  "kind": "number"
+                }
+              },
+              {
+                "name": "c",
+                "type": {
+                  "kind": "boolean"
+                }
+              },
+              {
+                "name": "d",
+                "type": {
+                  "kind": "object",
+                  "name": "ObjectType",
+                  "properties": [
+                    {
+                      "name": "a",
+                      "type": {
+                        "kind": "string"
+                      }
+                    },
+                    {
+                      "name": "b",
+                      "type": {
+                        "kind": "number"
+                      }
+                    },
+                    {
+                      "name": "c",
+                      "type": {
+                        "kind": "boolean"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "e",
+                "type": {
+                  "kind": "union",
+                  "name": "UnionType",
+                  "types": [
+                    {
+                      "kind": "string"
+                    },
+                    {
+                      "kind": "number"
+                    },
+                    {
+                      "kind": "boolean"
+                    },
+                    {
+                      "kind": "boolean"
+                    },
+                    {
+                      "kind": "object",
+                      "name": "ObjectType",
+                      "properties": [
+                        {
+                          "name": "a",
+                          "type": {
+                            "kind": "string"
+                          }
+                        },
+                        {
+                          "name": "b",
+                          "type": {
+                            "kind": "number"
+                          }
+                        },
+                        {
+                          "name": "c",
+                          "type": {
+                            "kind": "boolean"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "f",
+                "type": {
+                  "kind": "array",
+                  "name": "string",
+                  "element": {
+                    "kind": "string"
+                  }
+                }
+              },
+              {
+                "name": "g",
+                "type": {
+                  "kind": "array",
+                  "name": "ObjectType",
+                  "element": {
+                    "kind": "object",
+                    "name": "ObjectType",
+                    "properties": [
+                      {
+                        "name": "a",
+                        "type": {
+                          "kind": "string"
+                        }
+                      },
+                      {
+                        "name": "b",
+                        "type": {
+                          "kind": "number"
+                        }
+                      },
+                      {
+                        "name": "c",
+                        "type": {
+                          "kind": "boolean"
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "name": "h",
+                "type": {
+                  "kind": "tuple",
+                  "name": "TupleType",
+                  "elements": [
+                    {
+                      "kind": "string"
+                    },
+                    {
+                      "kind": "number"
+                    },
+                    {
+                      "kind": "boolean"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "i",
+                "type": {
+                  "kind": "tuple",
+                  "name": "TupleComplexType",
+                  "elements": [
+                    {
+                      "kind": "string"
+                    },
+                    {
+                      "kind": "number"
+                    },
+                    {
+                      "kind": "object",
+                      "name": "ObjectType",
+                      "properties": [
+                        {
+                          "name": "a",
+                          "type": {
+                            "kind": "string"
+                          }
+                        },
+                        {
+                          "name": "b",
+                          "type": {
+                            "kind": "number"
+                          }
+                        },
+                        {
+                          "name": "c",
+                          "type": {
+                            "kind": "boolean"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "j",
+                "type": {
+                  "kind": "map",
+                  "name": "Map",
+                  "typeArgs": [
+                    {
+                      "kind": "string"
+                    },
+                    {
+                      "kind": "number"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "k",
+                "type": {
+                  "kind": "interface",
+                  "name": "SimpleInterfaceType",
+                  "properties": [
+                    {
+                      "name": "n",
+                      "type": {
+                        "kind": "number"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "unionType": {
+            "kind": "union",
+            "name": "UnionType",
+            "types": [
+              {
+                "kind": "string"
+              },
+              {
+                "kind": "number"
+              },
+              {
+                "kind": "boolean"
+              },
+              {
+                "kind": "boolean"
+              },
+              {
+                "kind": "object",
+                "name": "ObjectType",
+                "properties": [
+                  {
+                    "name": "a",
+                    "type": {
+                      "kind": "string"
+                    }
+                  },
+                  {
+                    "name": "b",
+                    "type": {
+                      "kind": "number"
+                    }
+                  },
+                  {
+                    "name": "c",
+                    "type": {
+                      "kind": "boolean"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "unionComplexType": {
+            "kind": "union",
+            "name": "UnionComplexType",
+            "types": [
+              {
+                "kind": "string"
+              },
+              {
+                "kind": "number"
+              },
+              {
+                "kind": "boolean"
+              },
+              {
+                "kind": "boolean"
+              },
+              {
+                "kind": "interface",
+                "name": "SimpleInterfaceType",
+                "properties": [
+                  {
+                    "name": "n",
+                    "type": {
+                      "kind": "number"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "object",
+                "name": "ObjectType",
+                "properties": [
+                  {
+                    "name": "a",
+                    "type": {
+                      "kind": "string"
+                    }
+                  },
+                  {
+                    "name": "b",
+                    "type": {
+                      "kind": "number"
+                    }
+                  },
+                  {
+                    "name": "c",
+                    "type": {
+                      "kind": "boolean"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "object",
+                "name": "ObjectComplexType",
+                "properties": [
+                  {
+                    "name": "a",
+                    "type": {
+                      "kind": "string"
+                    }
+                  },
+                  {
+                    "name": "b",
+                    "type": {
+                      "kind": "number"
+                    }
+                  },
+                  {
+                    "name": "c",
+                    "type": {
+                      "kind": "boolean"
+                    }
+                  },
+                  {
+                    "name": "d",
+                    "type": {
+                      "kind": "object",
+                      "name": "ObjectType",
+                      "properties": [
+                        {
+                          "name": "a",
+                          "type": {
+                            "kind": "string"
+                          }
+                        },
+                        {
+                          "name": "b",
+                          "type": {
+                            "kind": "number"
+                          }
+                        },
+                        {
+                          "name": "c",
+                          "type": {
+                            "kind": "boolean"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "e",
+                    "type": {
+                      "kind": "union",
+                      "name": "UnionType",
+                      "types": [
+                        {
+                          "kind": "string"
+                        },
+                        {
+                          "kind": "number"
+                        },
+                        {
+                          "kind": "boolean"
+                        },
+                        {
+                          "kind": "boolean"
+                        },
+                        {
+                          "kind": "object",
+                          "name": "ObjectType",
+                          "properties": [
+                            {
+                              "name": "a",
+                              "type": {
+                                "kind": "string"
+                              }
+                            },
+                            {
+                              "name": "b",
+                              "type": {
+                                "kind": "number"
+                              }
+                            },
+                            {
+                              "name": "c",
+                              "type": {
+                                "kind": "boolean"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "f",
+                    "type": {
+                      "kind": "array",
+                      "name": "string",
+                      "element": {
+                        "kind": "string"
+                      }
+                    }
+                  },
+                  {
+                    "name": "g",
+                    "type": {
+                      "kind": "array",
+                      "name": "ObjectType",
+                      "element": {
+                        "kind": "object",
+                        "name": "ObjectType",
+                        "properties": [
+                          {
+                            "name": "a",
+                            "type": {
+                              "kind": "string"
+                            }
+                          },
+                          {
+                            "name": "b",
+                            "type": {
+                              "kind": "number"
+                            }
+                          },
+                          {
+                            "name": "c",
+                            "type": {
+                              "kind": "boolean"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "name": "h",
+                    "type": {
+                      "kind": "tuple",
+                      "name": "TupleType",
+                      "elements": [
+                        {
+                          "kind": "string"
+                        },
+                        {
+                          "kind": "number"
+                        },
+                        {
+                          "kind": "boolean"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "i",
+                    "type": {
+                      "kind": "tuple",
+                      "name": "TupleComplexType",
+                      "elements": [
+                        {
+                          "kind": "string"
+                        },
+                        {
+                          "kind": "number"
+                        },
+                        {
+                          "kind": "object",
+                          "name": "ObjectType",
+                          "properties": [
+                            {
+                              "name": "a",
+                              "type": {
+                                "kind": "string"
+                              }
+                            },
+                            {
+                              "name": "b",
+                              "type": {
+                                "kind": "number"
+                              }
+                            },
+                            {
+                              "name": "c",
+                              "type": {
+                                "kind": "boolean"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "j",
+                    "type": {
+                      "kind": "map",
+                      "name": "Map",
+                      "typeArgs": [
+                        {
+                          "kind": "string"
+                        },
+                        {
+                          "kind": "number"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "k",
+                    "type": {
+                      "kind": "interface",
+                      "name": "SimpleInterfaceType",
+                      "properties": [
+                        {
+                          "name": "n",
+                          "type": {
+                            "kind": "number"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "tuple",
+                "name": "TupleType",
+                "elements": [
+                  {
+                    "kind": "string"
+                  },
+                  {
+                    "kind": "number"
+                  },
+                  {
+                    "kind": "boolean"
+                  }
+                ]
+              },
+              {
+                "kind": "tuple",
+                "name": "TupleComplexType",
+                "elements": [
+                  {
+                    "kind": "string"
+                  },
+                  {
+                    "kind": "number"
+                  },
+                  {
+                    "kind": "object",
+                    "name": "ObjectType",
+                    "properties": [
+                      {
+                        "name": "a",
+                        "type": {
+                          "kind": "string"
+                        }
+                      },
+                      {
+                        "name": "b",
+                        "type": {
+                          "kind": "number"
+                        }
+                      },
+                      {
+                        "name": "c",
+                        "type": {
+                          "kind": "boolean"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
           "numberType": {
             "kind": "number"
           },

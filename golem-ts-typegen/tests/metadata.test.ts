@@ -19,8 +19,12 @@ import {
   getStringType,
   getTestListOfObjectType,
   getTestMapType,
-  getTestObjectType,
+  getObjectType,
   getTupleType,
+  getUnionComplexType,
+  getUnionType,
+  getComplexObjectType,
+  getInterfaceType,
 } from "./util.js";
 
 describe("golem-ts-typegen can work correctly read types from .metadata directory", () => {
@@ -55,7 +59,23 @@ describe("golem-ts-typegen can work correctly read types from .metadata director
   });
 
   it("track object type", () => {
-    const objectType = getTestObjectType();
-    expect(objectType.isObject()).toEqual(true);
+    const objectType1 = getObjectType();
+    expect(objectType1.isObject()).toEqual(true);
+
+    const objectType2 = getComplexObjectType();
+    expect(objectType2.isObject()).toEqual(true);
+  });
+
+  it("track union type", () => {
+    const unionType1 = getUnionComplexType();
+    expect(unionType1.isUnion()).toEqual(true);
+
+    const unionType2 = getUnionType();
+    expect(unionType2.isUnion()).toEqual(true);
+  });
+
+  it("track interface type", () => {
+    const tupleType = getInterfaceType();
+    expect(tupleType.isInterface()).toEqual(true);
   });
 });

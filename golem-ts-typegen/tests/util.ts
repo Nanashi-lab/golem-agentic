@@ -19,7 +19,7 @@ import {
 } from "@golemcloud/golem-ts-types-core";
 
 import "./setup";
-import { lazyLoadTypeMetadata, loadTypeMetadata } from "../src";
+import { lazyLoadTypeMetadata } from "../src";
 
 /**
  * getAll functionality reads the type metadata from .metadata directory
@@ -34,7 +34,7 @@ export function getAll() {
 }
 
 // Get an Interface Type from .metadata directory
-export function getTestInterfaceType(): Type {
+export function getInterfaceType(): Type {
   return fetchType("TestInterfaceType");
 }
 
@@ -44,10 +44,15 @@ export function getTestMapType(): Type {
   return fetchType("Map");
 }
 
-// Get a Object Type from .metadata directory
+// Get an Object Type from .metadata directory
 // Note that alias for object is kept intact.
-export function getTestObjectType(): Type {
+export function getObjectType(): Type {
   return fetchType("ObjectType");
+}
+
+// Get a complex Object Type from .metadata directory
+export function getComplexObjectType(): Type {
+  return fetchType("ObjectComplexType");
 }
 
 // Get a List Type from .metadata directory

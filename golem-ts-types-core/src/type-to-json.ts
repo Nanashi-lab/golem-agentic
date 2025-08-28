@@ -27,7 +27,9 @@ export function buildJSONFromType(type: Type): LiteTypeJSON {
 
   if (type.isArray()) {
     const elem = type.getArrayElementType();
+
     if (!elem) throw new Error('Missing element type in Array');
+
     return {
       kind: 'array',
       name: getTypeName(elem),

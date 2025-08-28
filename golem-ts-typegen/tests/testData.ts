@@ -80,14 +80,14 @@ export interface TestInterfaceType {
 }
 
 class MyAgent {
-  constructor(readonly testInterfaceType: StringType) {
+  constructor(readonly testInterfaceType: TestInterfaceType) {
     this.testInterfaceType = testInterfaceType;
   }
 
   async getWeather(
-    // complexType: ObjectComplexType,
-    // unionType: UnionType,
-    // unionComplexType: UnionComplexType,
+    complexType: ObjectComplexType,
+    unionType: UnionType,
+    unionComplexType: UnionComplexType,
     numberType: NumberType,
     stringType: StringType,
     booleanType: BooleanType,
