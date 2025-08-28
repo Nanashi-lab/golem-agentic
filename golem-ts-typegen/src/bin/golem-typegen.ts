@@ -21,7 +21,7 @@ program
         updateMetadataFromSourceFiles(sourceFiles);
         const result = TypeMetadata.getAll();
         console.log(result.size);
-        console.log("Metadata tracked for the following agent classes " +  Array.from(result.entries()).map(entry => entry[1]).join(", "));
+        console.log("Metadata tracked for the following agent classes " +  Array.from(result.entries()).map(entry => entry[0]).join(", "));
         console.log("Type Metadata successfully generated");
     });
 
