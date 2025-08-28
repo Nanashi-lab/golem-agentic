@@ -6,9 +6,6 @@
     "access": "public",
     "tag": "test"
   },
-  "bin": {
-    "golem-typegen": "./dist/bin/golem-typegen.mjs"
-  },
   "files": [
     "types",
     "dist"
@@ -39,8 +36,13 @@
     "format": "prettier --write \"src/**/*\" \"tests/**/*\"",
     "format:check": "prettier --check \"src/**/*\" \"tests/**/*\"",
     "test": "tsc --noEmit && vitest run",
-    "build": "tsc --noEmit && rollup -c",
+    "build": "npm run build:lib && npm run build:cli",
+    "build:lib": "tsc --noEmit && rollup -c",
+    "build:cli": "tsc src/bin/golem-typegen.ts --outDir dist --module node16 --target ES2020 --esModuleInterop",
     "dev": "rollup -c -w"
+  },
+  "bin": {
+    "golem-typegen": "./dist/bin/golem-typegen.js"
   },
   "keywords": [],
   "sideEffects": [

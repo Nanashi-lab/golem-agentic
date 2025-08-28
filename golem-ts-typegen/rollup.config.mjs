@@ -16,38 +16,18 @@ export default defineConfig([
         },
         external,
         plugins: [
-            resolve({
-                extensions: ['.js', '.ts'],
-            }),
+            resolve({ extensions: ['.js', '.ts'] }),
             commonjs(),
             typescript({
                 tsconfig: './tsconfig.json',
                 useTsconfigDeclarationDir: true,
-                tsconfigOverride: {
-                    compilerOptions: {
-                        declaration: true,
-                        declarationDir: 'dist',
-                    }
-                }
+                tsconfigOverride: { compilerOptions: { declaration: true, declarationDir: 'dist' } }
             }),
         ],
     },
     {
-        input: 'src/bin/golem-typegen.ts',
-        output: {
-            file: 'dist/bin/golem-typegen.mjs',
-            format: 'esm',
-            banner: '#!/usr/bin/env node',
-        },
-        plugins: [resolve(), commonjs(), typescript()],
-    },
-
-    {
         input: 'src/index.ts',
-        output: {
-            file: 'dist/index.d.mts',
-            format: 'esm',
-        },
+        output: { file: 'dist/index.d.mts', format: 'esm' },
         external,
         plugins: [dts()],
     }
