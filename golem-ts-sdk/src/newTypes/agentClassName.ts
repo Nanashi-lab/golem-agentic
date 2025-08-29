@@ -13,5 +13,9 @@
 // limitations under the License.
 
 export class AgentClassName {
-  constructor(readonly value: string) {}
+  readonly value: string;
+
+  constructor(agentClassName: string) {
+    this.value = agentClassName;
+  }
 }
