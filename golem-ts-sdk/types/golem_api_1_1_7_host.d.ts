@@ -201,7 +201,7 @@ declare module 'golem:api/host@1.1.7' {
    */
   export type UpdateMode = "automatic" | "snapshot-based";
   export type FilterComparator = "equal" | "not-equal" | "greater-equal" | "greater" | "less-equal" | "less";
-  export type StringFilterComparator = "equal" | "not-equal" | "like" | "not-like";
+  export type StringFilterComparator = "equal" | "not-equal" | "like" | "not-like" | "starts-with";
   export type WorkerStatus = "running" | "idle" | "suspended" | "interrupted" | "retrying" | "failed" | "exited";
   export type WorkerNameFilter = {
     comparator: StringFilterComparator;

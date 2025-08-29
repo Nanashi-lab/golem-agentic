@@ -1,7 +1,7 @@
 {
   "name": "@golemcloud/golem-ts-sdk",
   "type": "module",
-  "version": "0.0.1-dev.26",
+  "version": "0.0.1-dev.27",
   "publishConfig": {
     "access": "public",
     "tag": "test"

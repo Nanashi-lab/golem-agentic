@@ -13,7 +13,6 @@ declare module 'golem:rpc/types@0.2.2' {
   export function extractType(vnt: ValueAndType): WitType;
   export class WasmRpc {
     constructor(workerId: WorkerId);
-    static ephemeral(componentId: ComponentId): WasmRpc;
     invokeAndAwait(functionName: string, functionParams: WitValue[]): Result<WitValue, RpcError>;
     invoke(functionName: string, functionParams: WitValue[]): Result<void, RpcError>;
     asyncInvokeAndAwait(functionName: string, functionParams: WitValue[]): FutureInvokeResult;
