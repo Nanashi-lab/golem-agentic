@@ -12,14 +12,67 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TypeMetadata } from '../src/typeMetadata';
+// Load type metadata loads the type-metadata that was saved into .metadata directory
+// when running `npm run test`
 
-import { Project } from 'ts-morph';
+import {
+  buildTypeFromJSON,
+  LiteTypeJSON,
+  Type,
+  TypeMetadata,
+} from '@golemcloud/golem-ts-types-core';
+import path from 'path';
+import * as fs from 'node:fs';
+const METADATA_DIR = '.metadata';
+const METADATA_FILE = 'types.json';
 
-const project = new Project({
-  tsConfigFilePath: './tsconfig.json',
-});
+// To be moved to SDK
+TypeMetadata.clearMetadata();
 
-const sourceFiles = project.getSourceFiles('tests/testData.ts');
+const filePath = path.join(METADATA_DIR, METADATA_FILE);
+if (!fs.existsSync(filePath)) {
+  throw new Error(`${filePath} does not exist`);
+}
 
-TypeMetadata.updateFromSourceFiles(sourceFiles);
+const raw = fs.readFileSync(filePath, 'utf-8');
+const json = JSON.parse(raw);
+
+for (const [className, meta] of Object.entries(json)) {
+  const constructorArgsJSON = (meta as any).constructorArgs as Array<{
+    name: string;
+    type: LiteTypeJSON;
+  }>;
+
+  const constructorArgs = constructorArgsJSON.map((arg) => ({
+    name: arg.name,
+    type: buildTypeFromJSON(arg.type),
+  }));
+
+  const methodsMap = new Map<
+    string,
+    { methodParams: Map<string, Type>; returnType: Type }
+  >();
+
+  for (const [methodName, methodMeta] of Object.entries(
+    (meta as any).methods,
+  )) {
+    const methodParamsMap = new Map<string, Type>();
+    for (const [paramName, paramJSON] of Object.entries(
+      (methodMeta as any).methodParams,
+    )) {
+      methodParamsMap.set(
+        paramName,
+        buildTypeFromJSON(paramJSON as LiteTypeJSON),
+      );
+    }
+
+    methodsMap.set(methodName, {
+      methodParams: methodParamsMap,
+      returnType: buildTypeFromJSON(
+        (methodMeta as any).returnType as LiteTypeJSON,
+      ),
+    });
+  }
+
+  TypeMetadata.update(className, constructorArgs, methodsMap);
+}

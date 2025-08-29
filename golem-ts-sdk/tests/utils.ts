@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { getTypeName, TypeMetadata } from '../src/typeMetadata';
-import { Type } from 'ts-morph';
+import { getTypeName, TypeMetadata } from '@golemcloud/golem-ts-types-core';
+import { Type } from '@golemcloud/golem-ts-types-core';
 import './setup';
 import {
   AnalysedType,
@@ -84,6 +84,7 @@ function fetchType(typeNameInTestData: string): Type {
   for (const type of classMetadata) {
     const constructorArg = type.constructorArgs.find((arg) => {
       const typeName = getTypeName(arg.type);
+      console.log(typeName + ' ' + arg.type.getName());
       return typeName === typeNameInTestData;
     });
 

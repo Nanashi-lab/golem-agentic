@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ClassMetadata, TypeMetadata } from '../typeMetadata';
+import { ClassMetadata, TypeMetadata } from '@golemcloud/golem-ts-types-core';
 import { WasmRpc, WorkerId } from 'golem:rpc/types@0.2.2';
 import * as Either from 'effect/Either';
 import * as Value from './mapping/values/Value';
@@ -32,7 +32,7 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
     const agentClassName = new AgentClassName(ctor.name);
     const agentTypeName = AgentTypeName.fromAgentClassName(agentClassName);
 
-    const metadataOpt = TypeMetadata.get(new AgentClassName(ctor.name));
+    const metadataOpt = Option.fromNullable(TypeMetadata.get(ctor.name));
 
     if (Option.isNone(metadataOpt)) {
       throw new Error(
