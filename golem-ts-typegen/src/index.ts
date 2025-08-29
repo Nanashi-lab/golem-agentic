@@ -19,8 +19,8 @@ import {
   Node,
   TypeMetadata,
   LiteTypeJSON,
-  buildTypeFromJSON,
   buildJSONFromType,
+  buildTypeFromJSON,
 } from "@golemcloud/golem-ts-types-core";
 import * as fs from "node:fs";
 import path from "path";
@@ -314,7 +314,7 @@ export function unwrapAlias(type: TsMorphType): TsMorphType {
 
 export function generateMetadata(sourceFiles: SourceFile[]) {
   updateMetadataFromSourceFiles(sourceFiles);
-  saveTypeMetadata();
+  return saveAndClearInMemoryMetadata();
 }
 
 export function updateMetadataFromSourceFiles(sourceFiles: SourceFile[]) {
@@ -352,9 +352,10 @@ export function updateMetadataFromSourceFiles(sourceFiles: SourceFile[]) {
 }
 
 const METADATA_DIR = ".metadata";
-const METADATA_FILE = "types.json";
+const METADATA_TS_FILE = "generated-types.ts";
+const METADATA_JSON_FILE = "generated-types.json";
 
-export function saveTypeMetadata() {
+export function saveAndClearInMemoryMetadata() {
   if (!fs.existsSync(METADATA_DIR)) {
     fs.mkdirSync(METADATA_DIR);
   }
@@ -386,21 +387,30 @@ export function saveTypeMetadata() {
     };
   }
 
-  const filePath = path.join(METADATA_DIR, METADATA_FILE);
-  fs.writeFileSync(filePath, JSON.stringify(json, null, 2), "utf-8");
-  return filePath;
+  const tsFilePath = path.join(METADATA_DIR, METADATA_TS_FILE);
+  const jsonFilePath = path.join(METADATA_DIR, METADATA_JSON_FILE);
+
+  const tsContent = `export const Metadata = ${JSON.stringify(json, null, 2)};`;
+  const jsonContent = JSON.stringify(json, null, 2);
+
+  fs.writeFileSync(tsFilePath, tsContent, "utf-8");
+  fs.writeFileSync(jsonFilePath, jsonContent, "utf-8");
+
+  TypeMetadata.clearAll();
+
+  return tsFilePath;
 }
 
 export function lazyLoadTypeMetadata() {
   if (TypeMetadata.getAll().size === 0) {
-    loadTypeMetadata();
+    loadTypeMetadataFromJsonFile();
   }
 }
 
-export function loadTypeMetadata() {
+export function loadTypeMetadataFromJsonFile() {
   TypeMetadata.clearMetadata();
 
-  const filePath = path.join(METADATA_DIR, METADATA_FILE);
+  const filePath = path.join(METADATA_DIR, METADATA_JSON_FILE);
   if (!fs.existsSync(filePath)) {
     throw new Error(`${filePath} does not exist`);
   }
@@ -408,43 +418,5 @@ export function loadTypeMetadata() {
   const raw = fs.readFileSync(filePath, "utf-8");
   const json = JSON.parse(raw);
 
-  for (const [className, meta] of Object.entries(json)) {
-    const constructorArgsJSON = (meta as any).constructorArgs as Array<{
-      name: string;
-      type: LiteTypeJSON;
-    }>;
-
-    const constructorArgs = constructorArgsJSON.map((arg) => ({
-      name: arg.name,
-      type: buildTypeFromJSON(arg.type),
-    }));
-
-    const methodsMap = new Map<
-      string,
-      { methodParams: Map<string, Type>; returnType: Type }
-    >();
-
-    for (const [methodName, methodMeta] of Object.entries(
-      (meta as any).methods,
-    )) {
-      const methodParamsMap = new Map<string, Type>();
-      for (const [paramName, paramJSON] of Object.entries(
-        (methodMeta as any).methodParams,
-      )) {
-        methodParamsMap.set(
-          paramName,
-          buildTypeFromJSON(paramJSON as LiteTypeJSON),
-        );
-      }
-
-      methodsMap.set(methodName, {
-        methodParams: methodParamsMap,
-        returnType: buildTypeFromJSON(
-          (methodMeta as any).returnType as LiteTypeJSON,
-        ),
-      });
-    }
-
-    TypeMetadata.update(className, constructorArgs, methodsMap);
-  }
+  TypeMetadata.loadFromJson(json);
 }

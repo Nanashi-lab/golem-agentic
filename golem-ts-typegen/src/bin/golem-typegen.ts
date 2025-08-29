@@ -4,7 +4,10 @@ import { Command } from "commander";
 import { Project } from "ts-morph";
 import chalk from "chalk";
 import logSymbols from "log-symbols";
-import { saveTypeMetadata, updateMetadataFromSourceFiles } from "../index.js";
+import {
+  saveAndClearInMemoryMetadata,
+  updateMetadataFromSourceFiles,
+} from "../index.js";
 import { TypeMetadata } from "@golemcloud/golem-ts-types-core";
 import path from "path";
 
@@ -41,7 +44,7 @@ program
     );
 
     console.log(logSymbols.info, chalk.yellow("Saving metadata…"));
-    const filePath = saveTypeMetadata();
+    const filePath = saveAndClearInMemoryMetadata();
 
     console.log(
       logSymbols.success,
