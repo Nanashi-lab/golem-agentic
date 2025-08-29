@@ -678,12 +678,13 @@ function matchesType(value: any, type: Type): boolean {
   }
 
   if (type.isArray()) {
-    const elemType = type.getTypeArguments?.()[0];
+    const elemType = type.getArrayElementType();
+
     return matchesArray(value, elemType);
   }
 
   if (type.isTuple()) {
-    return matchesTuple(value, type.getTypeArguments?.());
+    return matchesTuple(value, type.getTupleElements());
   }
 
   if (name === 'Map' && type.getTypeArguments().length === 2) {

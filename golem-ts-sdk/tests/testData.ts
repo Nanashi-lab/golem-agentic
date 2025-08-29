@@ -63,12 +63,10 @@ export type UnionComplexType =
   | UnionType
   | TupleType
   | TupleComplexType
-  | SimpleInterfaceType;
-// FIXME: RTTIST don't support these types to be part of union yet - fails at type-gen
-//| Result<String, string>
-// | MapType
-// | ListType
-// | ListComplexType
+  | SimpleInterfaceType
+  | MapType
+  | ListType
+  | ListComplexType;
 
 export type ObjectComplexType = {
   a: string;
@@ -113,17 +111,16 @@ export interface TestInterfaceType {
   int64ArrayProp: BigInt64Array;
   float32ArrayProp: Float32Array;
   float64ArrayProp: Float64Array;
-  // FIXME, `RTTIST` bug or not supported yet
-  // mapAlternativeProp: MapTypeAlternative,
-  // unionPropInlined: string | number;
+  objectPropInlined: {
+    a: string;
+    b: number;
+    c: boolean;
+  };
+  unionPropInlined: string | number;
   // recordProp: RecordType;
   // enumType: EnumTypeAlias;
   // enumTypeInlined: EnumType,
-  // objectPropInlined: {
-  //     a: string,
-  //     b: number,
-  //     c: boolean
-  // }
+
   // enumProp: EnumTypeAlias,
   // enumPropInlined: EnumTypeAlias,
 }

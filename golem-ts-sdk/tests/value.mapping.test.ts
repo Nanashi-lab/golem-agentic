@@ -158,6 +158,12 @@ describe('typescript value to wit value round-trip conversions', () => {
       int64ArrayProp: new BigInt64Array([1n, 2n, 3n]),
       float32ArrayProp: new Float32Array([1.1, 2.2, 3.3]),
       float64ArrayProp: new Float64Array([1.1, 2.2, 3.3]),
+      objectPropInlined: {
+        a: '',
+        b: 0,
+        c: false,
+      },
+      unionPropInlined: 'foo',
     };
 
     const type = getTestInterfaceType();
@@ -211,6 +217,12 @@ describe('typescript value to wit value round-trip conversions', () => {
         j: new Map<string, number>(),
         k: { n: 0 },
       },
+      objectPropInlined: {
+        a: '',
+        b: 0,
+        c: false,
+      },
+      unionPropInlined: 'foo',
     };
 
     const type = getTestInterfaceType();
@@ -264,6 +276,12 @@ describe('typescript value to wit value round-trip conversions', () => {
         j: new Map<string, number>(),
         k: { n: 0 },
       },
+      objectPropInlined: {
+        a: '',
+        b: 0,
+        c: false,
+      },
+      unionPropInlined: 'foo',
     };
 
     const type = getTestInterfaceType();

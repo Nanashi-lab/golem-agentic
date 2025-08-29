@@ -475,6 +475,81 @@ function checkUnionComplexFields(fields: NameTypePair[]) {
               },
             },
           },
+          {
+            name: 'type-ninth',
+            typ: {
+              kind: 'list',
+              value: {
+                inner: {
+                  kind: 'tuple',
+                  value: {
+                    items: [
+                      {
+                        kind: 'string',
+                      },
+                      {
+                        kind: 's32',
+                      },
+                    ],
+                    name: undefined,
+                    owner: undefined,
+                  },
+                },
+                name: undefined,
+                owner: undefined,
+              },
+            },
+          },
+          {
+            name: 'type-tenth',
+            typ: {
+              kind: 'list',
+              value: {
+                inner: {
+                  kind: 'string',
+                },
+                name: undefined,
+                owner: undefined,
+              },
+            },
+          },
+          {
+            name: 'type-eleventh',
+            typ: {
+              kind: 'list',
+              value: {
+                inner: {
+                  kind: 'record',
+                  value: {
+                    fields: [
+                      {
+                        name: 'a',
+                        typ: {
+                          kind: 'string',
+                        },
+                      },
+                      {
+                        name: 'b',
+                        typ: {
+                          kind: 's32',
+                        },
+                      },
+                      {
+                        name: 'c',
+                        typ: {
+                          kind: 'bool',
+                        },
+                      },
+                    ],
+                    name: undefined,
+                    owner: undefined,
+                  },
+                },
+                name: undefined,
+                owner: undefined,
+              },
+            },
+          },
         ],
         name: undefined,
         owner: undefined,
