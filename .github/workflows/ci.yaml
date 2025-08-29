@@ -114,6 +114,11 @@ jobs:
             echo "Failed to update WIT dependencies"
             exit 1
           )
+          # Check if wit/deps changed
+          if ! git diff --exit-code -- wit/deps; then
+            echo "WIT dependencies are outdated. Please run 'wit-deps update' and commit changes."
+            exit 1
+          fi
 
       - name: Check code quality for golem-ts-sdk
         working-directory: ./golem-ts-sdk
