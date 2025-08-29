@@ -20,6 +20,7 @@ import {
   TypeMetadata,
   LiteTypeJSON,
   buildJSONFromType,
+  buildTypeFromJSON,
 } from "@golemcloud/golem-ts-types-core";
 import * as fs from "node:fs";
 import path from "path";
@@ -313,7 +314,7 @@ export function unwrapAlias(type: TsMorphType): TsMorphType {
 
 export function generateMetadata(sourceFiles: SourceFile[]) {
   updateMetadataFromSourceFiles(sourceFiles);
-  return drainMetadataAsTsFile();
+  return saveAndClearInMemoryMetadata();
 }
 
 export function updateMetadataFromSourceFiles(sourceFiles: SourceFile[]) {
@@ -351,9 +352,10 @@ export function updateMetadataFromSourceFiles(sourceFiles: SourceFile[]) {
 }
 
 const METADATA_DIR = ".metadata";
-const METADATA_FILE = "generated-types.js";
+const METADATA_TS_FILE = "generated-types.ts";
+const METADATA_JSON_FILE = "generated-types.json";
 
-export function drainMetadataAsTsFile() {
+export function saveAndClearInMemoryMetadata() {
   if (!fs.existsSync(METADATA_DIR)) {
     fs.mkdirSync(METADATA_DIR);
   }
@@ -385,13 +387,36 @@ export function drainMetadataAsTsFile() {
     };
   }
 
-  const filePath = path.join(METADATA_DIR, METADATA_FILE);
+  const tsFilePath = path.join(METADATA_DIR, METADATA_TS_FILE);
+  const jsonFilePath = path.join(METADATA_DIR, METADATA_JSON_FILE);
 
   const tsContent = `export const Metadata = ${JSON.stringify(json, null, 2)};`;
+  const jsonContent = JSON.stringify(json, null, 2);
 
-  fs.writeFileSync(filePath, tsContent, "utf-8");
+  fs.writeFileSync(tsFilePath, tsContent, "utf-8");
+  fs.writeFileSync(jsonFilePath, jsonContent, "utf-8");
 
   TypeMetadata.clearAll();
 
-  return filePath;
+  return tsFilePath;
+}
+
+export function lazyLoadTypeMetadata() {
+  if (TypeMetadata.getAll().size === 0) {
+    loadTypeMetadataFromJsonFile();
+  }
+}
+
+export function loadTypeMetadataFromJsonFile() {
+  TypeMetadata.clearMetadata();
+
+  const filePath = path.join(METADATA_DIR, METADATA_JSON_FILE);
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`${filePath} does not exist`);
+  }
+
+  const raw = fs.readFileSync(filePath, "utf-8");
+  const json = JSON.parse(raw);
+
+  TypeMetadata.loadFromJson(json);
 }
