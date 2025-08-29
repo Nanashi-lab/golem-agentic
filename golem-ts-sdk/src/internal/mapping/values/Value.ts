@@ -780,6 +780,10 @@ function unexpectedTypeError(
 }
 
 export function toTsValue(value: Value, type: Type): any {
+  if (!type) {
+    console.log('damn ' + JSON.stringify(value));
+  }
+
   const name = type.getName();
 
   if (value.kind === 'option') {
@@ -947,9 +951,12 @@ export function toTsValue(value: Value, type: Type): any {
 
   if (type.isArray()) {
     if (value.kind === 'list') {
-      return value.value.map((item: Value) =>
-        toTsValue(item, type.getTypeArguments?.()[0]),
-      );
+      const elemType = type.getArrayElementType();
+
+      if (!elemType) {
+        throw new Error(`Unable to infer the type of Array`);
+      }
+      return value.value.map((item: Value) => toTsValue(item, elemType));
     } else {
       throw new Error(`Expected array, obtained value ${value}`);
     }
