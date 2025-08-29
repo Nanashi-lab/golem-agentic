@@ -64,6 +64,10 @@ export class Type {
     return this.name;
   }
 
+  getKind(): Kind {
+    return this.kind;
+  }
+
   getTypeArguments(): Type[] {
     return this.typeArgs ?? [];
   }

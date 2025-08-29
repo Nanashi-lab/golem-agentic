@@ -18,12 +18,12 @@ import { LiteTypeJSON } from './type-json';
 export function buildJSONFromType(type: Type): LiteTypeJSON {
   type = unwrapAlias(type);
 
-  if (type.isBoolean()) return { kind: 'boolean' };
-  if (type.isNumber()) return { kind: 'number' };
-  if (type.isString()) return { kind: 'string' };
-  if (type.isBigInt()) return { kind: 'bigint' };
-  if (type.isNull()) return { kind: 'null' };
-  if (type.isUndefined()) return { kind: 'undefined' };
+  if (type.isBoolean()) return { kind: 'boolean', name: 'boolean' };
+  if (type.isNumber()) return { kind: 'number', name: 'number' };
+  if (type.isString()) return { kind: 'string', name: 'string' };
+  if (type.isBigInt()) return { kind: 'bigint', name: 'bigint' };
+  if (type.isNull()) return { kind: 'null', name: 'null' };
+  if (type.isUndefined()) return { kind: 'undefined', name: 'undefined' };
 
   if (type.isArray()) {
     const elem = type.getArrayElementType();

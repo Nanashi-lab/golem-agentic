@@ -26,6 +26,7 @@ import * as fs from 'node:fs';
 const METADATA_DIR = '.metadata';
 const METADATA_FILE = 'types.json';
 
+// To be moved to SDK
 TypeMetadata.clearMetadata();
 
 const filePath = path.join(METADATA_DIR, METADATA_FILE);
