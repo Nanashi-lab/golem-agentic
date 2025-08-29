@@ -432,8 +432,18 @@ export function fromTsValue(
 
   if (type.isArray()) return handleArrayType(tsValue, type);
 
-  if (name === 'Promise' && type.getTypeArguments().length === 1) {
-    const inner = type.getTypeArguments()[0];
+  if (name === 'Promise') {
+    const inner = type.getPromiseElementType();
+
+    if (!inner) {
+      return Either.left(
+        unexpectedTypeError(
+          tsValue,
+          type,
+          Option.some('Unable to infer the type of promise'),
+        ),
+      );
+    }
     return fromTsValue(tsValue, inner);
   }
 
@@ -486,7 +496,8 @@ function handleArrayType(
   tsValue: any,
   type: Type,
 ): Either.Either<Value, string> {
-  const typeArg = type.getTypeArguments?.()[0];
+  const typeArg = type.getArrayElementType();
+
   if (!typeArg) {
     return Either.left(
       unexpectedTypeError(
@@ -890,10 +901,10 @@ export function toTsValue(value: Value, type: Type): any {
   }
 
   if (name === 'Promise') {
-    if (type.getTypeArguments().length !== 1) {
+    const innerType = type.getPromiseElementType();
+    if (!innerType) {
       throw new Error(`Expected Promise to have one type argument`);
     }
-    const innerType = type.getTypeArguments()[0];
     return toTsValue(value, innerType);
   }
 
