@@ -284,10 +284,6 @@ export function fromTsValue(
   tsValue: any,
   type: Type,
 ): Either.Either<Value, string> {
-  if (!type) {
-    console.log('damn ' + tsValue + 'here');
-  }
-
   const name = type.getName();
 
   switch (name) {
