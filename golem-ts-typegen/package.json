@@ -1,7 +1,7 @@
 {
   "name": "@golemcloud/golem-ts-typegen",
   "type": "module",
-  "version": "0.0.1-dev.3",
+  "version": "0.0.1-dev.4",
   "publishConfig": {
     "access": "public",
     "tag": "test"
@@ -74,6 +74,7 @@
     "@golemcloud/golem-ts-types-core": "^0.0.1-dev.3",
     "commander": "^14.0.0",
     "log-symbols": "^7.0.1",
-    "ts-morph": "^26.0.0"
+    "ts-morph": "^26.0.0",
+    "chalk": "^5.3.0"
   }
 }
