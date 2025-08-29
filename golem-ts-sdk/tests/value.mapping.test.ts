@@ -42,7 +42,7 @@ import * as EffectEither from 'effect/Either';
 import * as WitValue from '../src/internal/mapping/values/WitValue';
 
 describe('typescript value to wit value round-trip conversions', () => {
-  it.skip('should correctly perform round-trip conversion for arbitrary values of interface type', () => {
+  it('should correctly perform round-trip conversion for arbitrary values of interface type', () => {
     fc.assert(
       fc.property(interfaceArb, (arbData) => {
         const type = getTestInterfaceType();
@@ -112,7 +112,7 @@ describe('typescript value to wit value round-trip conversions', () => {
     );
   });
 
-  it.skip('should preserve values with only required properties (excluding optional)', () => {
+  it('should preserve values with only required properties (excluding optional)', () => {
     const defaultData: TestInterfaceType = {
       bigintProp: 0n,
       booleanProp: false,
@@ -165,7 +165,7 @@ describe('typescript value to wit value round-trip conversions', () => {
     runRoundTripTest(defaultData, type);
   });
 
-  it.skip('should preserve values including optional properties', () => {
+  it('should preserve values including optional properties', () => {
     const withOptionalValues: TestInterfaceType = {
       bigintProp: 0n,
       booleanProp: false,
@@ -218,7 +218,7 @@ describe('typescript value to wit value round-trip conversions', () => {
     runRoundTripTest(withOptionalValues, type);
   });
 
-  it.skip('should preserve union properties with complex object variants', () => {
+  it('should preserve union properties with complex object variants', () => {
     const withComplexUnionType: TestInterfaceType = {
       bigintProp: 0n,
       booleanProp: false,

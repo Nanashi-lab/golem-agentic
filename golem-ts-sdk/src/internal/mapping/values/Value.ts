@@ -284,6 +284,10 @@ export function fromTsValue(
   tsValue: any,
   type: Type,
 ): Either.Either<Value, string> {
+  if (!type) {
+    console.log('damn ' + tsValue + 'here');
+  }
+
   const name = type.getName();
 
   switch (name) {
@@ -521,7 +525,8 @@ function handleTupleType(
   tsValue: any,
   type: Type,
 ): Either.Either<Value, string> {
-  const typeArgs = type.getTypeArguments?.();
+  const typeArgs = type.getTupleElements();
+
   if (!Array.isArray(tsValue)) {
     return Either.left(invalidTypeError(tsValue, 'tuple'));
   }
@@ -780,10 +785,6 @@ function unexpectedTypeError(
 }
 
 export function toTsValue(value: Value, type: Type): any {
-  if (!type) {
-    console.log('damn ' + JSON.stringify(value));
-  }
-
   const name = type.getName();
 
   if (value.kind === 'option') {
@@ -939,7 +940,7 @@ export function toTsValue(value: Value, type: Type): any {
   }
 
   if (type.isTuple()) {
-    const typeArg = type.getTypeArguments?.();
+    const typeArg = type.getTupleElements();
     if (value.kind === 'tuple') {
       return value.value.map((item: Value, idx: number) =>
         toTsValue(item, typeArg[idx]),
