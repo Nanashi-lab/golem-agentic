@@ -227,8 +227,13 @@ export function fromTsTypeInternal(type: TsType, visited: Set<TsType>): Either.E
     case "BigUint64Array": return Either.right(list(u64()));
   }
 
-  if (name === "Promise" && type.getTypeArguments().length === 1) {
-    const inner = type.getTypeArguments()[0];
+  if (type.isPromise()) {
+    const inner = type.getPromiseElementType();
+
+    if (!inner) {
+      return Either.left(`Unable to infer the type of promise`)
+    }
+
     return fromTsTypeInternal(inner, visited);
   }
 

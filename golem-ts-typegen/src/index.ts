@@ -145,7 +145,7 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
   }
 
   if (type.isBoolean() || name === "true" || name === "false") {
-    return new Type({ kind: "boolean", name: 'boolean' });
+    return new Type({ kind: "boolean", name: "boolean" });
   }
 
   if (type.isTuple()) {
@@ -399,7 +399,6 @@ export function lazyLoadTypeMetadata() {
 
 export function loadTypeMetadata() {
   TypeMetadata.clearMetadata();
-
 
   const filePath = path.join(METADATA_DIR, METADATA_FILE);
   if (!fs.existsSync(filePath)) {

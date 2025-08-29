@@ -84,7 +84,6 @@ function fetchType(typeNameInTestData: string): Type {
   for (const type of classMetadata) {
     const constructorArg = type.constructorArgs.find((arg) => {
       const typeName = getTypeName(arg.type);
-      console.log(typeName + ' ' + arg.type.getName());
       return typeName === typeNameInTestData;
     });
 

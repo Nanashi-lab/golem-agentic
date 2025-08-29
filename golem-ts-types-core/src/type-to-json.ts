@@ -32,7 +32,7 @@ export function buildJSONFromType(type: Type): LiteTypeJSON {
 
     return {
       kind: 'array',
-      name: getTypeName(elem),
+      name: getTypeName(type),
       element: buildJSONFromType(elem),
     };
   }
