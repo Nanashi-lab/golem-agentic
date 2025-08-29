@@ -14,12 +14,9 @@
 
 import { WitNode, WitValue } from 'golem:rpc/types@0.2.2';
 
-import { Type, Symbol, Node } from 'ts-morph';
+import { Type, Symbol, Node } from '@golemcloud/golem-ts-types-core';
 import * as Either from 'effect/Either';
 import * as Option from 'effect/Option';
-import { getTypeName } from '../../../typeMetadata';
-import { unwrapAlias } from '../types/AnalysedType';
-import { expect } from 'vitest';
 
 export type Value =
   | { kind: 'bool'; value: boolean }
@@ -285,11 +282,9 @@ function buildNodes(value: Value, nodes: WitNode[]): number {
 // as `Type` holds more information, and can be used to determine the error messages for wrong `tsValue` more accurately.
 export function fromTsValue(
   tsValue: any,
-  expectedType: Type,
+  type: Type,
 ): Either.Either<Value, string> {
-  const type = unwrapAlias(expectedType);
-
-  const name = getTypeName(type);
+  const name = type.getName();
 
   switch (name) {
     case 'Int8Array':
@@ -437,8 +432,18 @@ export function fromTsValue(
 
   if (type.isArray()) return handleArrayType(tsValue, type);
 
-  if (name === 'Promise' && type.getTypeArguments().length === 1) {
-    const inner = type.getTypeArguments()[0];
+  if (name === 'Promise') {
+    const inner = type.getPromiseElementType();
+
+    if (!inner) {
+      return Either.left(
+        unexpectedTypeError(
+          tsValue,
+          type,
+          Option.some('Unable to infer the type of promise'),
+        ),
+      );
+    }
     return fromTsValue(tsValue, inner);
   }
 
@@ -491,7 +496,8 @@ function handleArrayType(
   tsValue: any,
   type: Type,
 ): Either.Either<Value, string> {
-  const typeArg = type.getTypeArguments?.()[0];
+  const typeArg = type.getArrayElementType();
+
   if (!typeArg) {
     return Either.left(
       unexpectedTypeError(
@@ -515,7 +521,8 @@ function handleTupleType(
   tsValue: any,
   type: Type,
 ): Either.Either<Value, string> {
-  const typeArgs = type.getTypeArguments?.();
+  const typeArgs = type.getTupleElements();
+
   if (!Array.isArray(tsValue)) {
     return Either.left(invalidTypeError(tsValue, 'tuple'));
   }
@@ -643,10 +650,8 @@ function findTypeOfAny(
   return undefined;
 }
 
-function matchesType(value: any, expectedType: Type): boolean {
-  const type = unwrapAlias(expectedType);
-
-  const name = getTypeName(type);
+function matchesType(value: any, type: Type): boolean {
+  const name = type.getName();
 
   if (type.isNumber()) {
     return typeof value === 'number';
@@ -668,17 +673,14 @@ function matchesType(value: any, expectedType: Type): boolean {
     return value === undefined;
   }
 
-  if (type.isAny()) {
-    return true;
-  }
-
   if (type.isArray()) {
-    const elemType = type.getTypeArguments?.()[0];
+    const elemType = type.getArrayElementType();
+
     return matchesArray(value, elemType);
   }
 
   if (type.isTuple()) {
-    return matchesTuple(value, type.getTypeArguments?.());
+    return matchesTuple(value, type.getTupleElements());
   }
 
   if (name === 'Map' && type.getTypeArguments().length === 2) {
@@ -767,7 +769,7 @@ function missingValueForKey(key: string, tsValue: any): string {
 }
 
 function unionTypeMatchError(unionTypes: Type[], tsValue: any): string {
-  return `Value '${tsValue}' does not match any of the union types: ${unionTypes.map((t) => t.getSymbol()?.getName()).join(', ')}`;
+  return `Value '${tsValue}' does not match any of the union types: ${unionTypes.map((t) => t.getName()).join(', ')}`;
 }
 
 function unexpectedTypeError(
@@ -775,14 +777,12 @@ function unexpectedTypeError(
   expectedType: Type,
   message: Option.Option<string>,
 ): string {
-  const error = `Value ${JSON.stringify(tsValue)} cannot be handled. Type of this value is inferred to be ${expectedType.getSymbol()?.getName()}`;
+  const error = `Value ${JSON.stringify(tsValue)} cannot be handled. Type of this value is inferred to be ${expectedType.getName()}`;
   return error + (Option.isSome(message) ? ` Reason: ${message.value}` : '');
 }
 
 export function toTsValue(value: Value, type: Type): any {
-  const expectedType = unwrapAlias(type);
-
-  const name = getTypeName(expectedType);
+  const name = type.getName();
 
   if (value.kind === 'option') {
     const caseValue = value.value;
@@ -790,7 +790,7 @@ export function toTsValue(value: Value, type: Type): any {
       return undefined;
     }
 
-    return toTsValue(caseValue, expectedType);
+    return toTsValue(caseValue, type);
 
     // const unionTypes = expectedType.getUnionTypes();
     // const matchingType = unionTypes[value.caseIdx];
@@ -798,11 +798,11 @@ export function toTsValue(value: Value, type: Type): any {
     // return toTsValue(caseValue, matchingType);
   }
 
-  if (expectedType.isNumber()) {
+  if (type.isNumber()) {
     return convertToNumber(value);
   }
 
-  if (expectedType.isString()) {
+  if (type.isString()) {
     if (value.kind === 'string') {
       return value.value;
     } else {
@@ -810,11 +810,11 @@ export function toTsValue(value: Value, type: Type): any {
     }
   }
 
-  if (expectedType.isBigInt()) {
+  if (type.isBigInt()) {
     return convertToBigInt(value);
   }
 
-  if (expectedType.isNull()) {
+  if (type.isNull()) {
     if (value.kind === 'tuple' && value.value.length === 0) {
       return null;
     } else {
@@ -822,15 +822,7 @@ export function toTsValue(value: Value, type: Type): any {
     }
   }
 
-  if (expectedType.isVoid()) {
-    if (value.kind === 'tuple' && value.value.length === 0) {
-      return undefined;
-    } else {
-      throw new Error(`Expected void (unit), obtained value ${value}`);
-    }
-  }
-
-  if (expectedType.isBoolean() || name === 'true' || name === 'false') {
+  if (type.isBoolean() || name === 'true' || name === 'false') {
     if (value.kind === 'bool') {
       return value.value;
     } else {
@@ -911,15 +903,15 @@ export function toTsValue(value: Value, type: Type): any {
   }
 
   if (name === 'Promise') {
-    if (expectedType.getTypeArguments().length !== 1) {
+    const innerType = type.getPromiseElementType();
+    if (!innerType) {
       throw new Error(`Expected Promise to have one type argument`);
     }
-    const innerType = expectedType.getTypeArguments()[0];
     return toTsValue(value, innerType);
   }
 
   if (name === 'Map') {
-    const typeArgs = expectedType.getTypeArguments();
+    const typeArgs = type.getTypeArguments();
 
     if (typeArgs.length !== 2) {
       throw new Error('Map must have two type arguments');
@@ -944,8 +936,8 @@ export function toTsValue(value: Value, type: Type): any {
     }
   }
 
-  if (expectedType.isTuple()) {
-    const typeArg = expectedType.getTypeArguments?.();
+  if (type.isTuple()) {
+    const typeArg = type.getTupleElements();
     if (value.kind === 'tuple') {
       return value.value.map((item: Value, idx: number) =>
         toTsValue(item, typeArg[idx]),
@@ -955,20 +947,23 @@ export function toTsValue(value: Value, type: Type): any {
     }
   }
 
-  if (expectedType.isArray()) {
+  if (type.isArray()) {
     if (value.kind === 'list') {
-      return value.value.map((item: Value) =>
-        toTsValue(item, expectedType.getTypeArguments?.()[0]),
-      );
+      const elemType = type.getArrayElementType();
+
+      if (!elemType) {
+        throw new Error(`Unable to infer the type of Array`);
+      }
+      return value.value.map((item: Value) => toTsValue(item, elemType));
     } else {
       throw new Error(`Expected array, obtained value ${value}`);
     }
   }
 
-  if (expectedType.isObject()) {
+  if (type.isObject()) {
     if (value.kind === 'record') {
       const fieldValues = value.value;
-      const expectedTypeFields = expectedType.getProperties();
+      const expectedTypeFields = type.getProperties();
       return expectedTypeFields.reduce(
         (acc, field, idx) => {
           const name = field.getName();
@@ -987,10 +982,10 @@ export function toTsValue(value: Value, type: Type): any {
     }
   }
 
-  if (expectedType.isInterface()) {
+  if (type.isInterface()) {
     if (value.kind === 'record') {
       const fieldValues = value.value;
-      const expectedTypeFields = expectedType.getProperties();
+      const expectedTypeFields = type.getProperties();
       return expectedTypeFields.reduce(
         (acc, field, idx) => {
           const name = field.getName();
@@ -1007,14 +1002,14 @@ export function toTsValue(value: Value, type: Type): any {
     }
   }
 
-  if (expectedType.isUnion()) {
+  if (type.isUnion()) {
     if (value.kind === 'variant') {
       const caseValue = value.caseValue;
       if (!caseValue) {
         throw new Error(`Expected value, obtained value ${value}`);
       }
 
-      const unionTypes = expectedType.getUnionTypes();
+      const unionTypes = type.getUnionTypes();
       const matchingType = unionTypes[value.caseIdx];
 
       return toTsValue(caseValue, matchingType);

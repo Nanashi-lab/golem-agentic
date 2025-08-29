@@ -15,8 +15,8 @@
 import { AgentType, DataValue, AgentError } from 'golem:agent/common';
 import { AgentInternal } from './internal/agentInternal';
 import { ResolvedAgent } from './internal/resolvedAgent';
-import { MethodParams, TypeMetadata } from './typeMetadata';
-import { Type } from 'ts-morph';
+import { MethodParams, TypeMetadata } from '@golemcloud/golem-ts-types-core';
+import { Type } from '@golemcloud/golem-ts-types-core';
 import { getRemoteClient } from './internal/clientGeneration';
 import { BaseAgent } from './baseAgent';
 import { AgentTypeRegistry } from './internal/registry/agentTypeRegistry';
@@ -126,7 +126,7 @@ export function agent() {
     }
 
     let classMetadata = Option.getOrElse(
-      TypeMetadata.get(agentClassName),
+      Option.fromNullable(TypeMetadata.get(ctor.name)),
       () => {
         throw new Error(
           `Agent class ${agentClassName.value} is not registered in TypeMetadata. Please ensure the class is decorated with @agent()`,

@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Node, Type, Type as TsType} from "ts-morph";
+import {Node, Type as TsType} from "@golemcloud/golem-ts-types-core";
 import * as Either from "effect/Either";
 import {numberToOrdinalKebab} from "./typeIndexOrdinal";
-import {getTypeName} from "../../../typeMetadata";
 
 export interface NameTypePair {
   name: string;
@@ -209,13 +208,11 @@ export function fromTsType(tsType: TsType): Either.Either<AnalysedType, string> 
 }
 
 
-export function fromTsTypeInternal(tsType: TsType, visited: Set<TsType>): Either.Either<AnalysedType, string> {
-
-  const type = unwrapAlias(tsType);
+export function fromTsTypeInternal(type: TsType, visited: Set<TsType>): Either.Either<AnalysedType, string> {
 
 
   const name =
-      getTypeName(type)
+     type.getName();
 
   switch (name) {
     case "Float64Array": return Either.right(list(f64()));
@@ -230,8 +227,13 @@ export function fromTsTypeInternal(tsType: TsType, visited: Set<TsType>): Either
     case "BigUint64Array": return Either.right(list(u64()));
   }
 
-  if (name === "Promise" && type.getTypeArguments().length === 1) {
-    const inner = type.getTypeArguments()[0];
+  if (type.isPromise()) {
+    const inner = type.getPromiseElementType();
+
+    if (!inner) {
+      return Either.left(`Unable to infer the type of promise`)
+    }
+
     return fromTsTypeInternal(inner, visited);
   }
 
@@ -292,7 +294,7 @@ export function fromTsTypeInternal(tsType: TsType, visited: Set<TsType>): Either
     let boolTracked = false;
 
     for (const t of type.getUnionTypes()) {
-      if (t.isBoolean() || getTypeName(t) === "false" || getTypeName(t) === "true") {
+      if (t.isBoolean() || t.getName() === "false" || t.getName() === "true") {
         if (boolTracked) {
           continue;
         }
@@ -383,27 +385,4 @@ export function fromTsTypeInternal(tsType: TsType, visited: Set<TsType>): Either
 
   return Either.left(`The following type is not supported as argument or return type in agentic context. Type Name: ${name}. Please report this issue to Golem Cloud`);
 
-}
-
-
-export function unwrapAlias(type: TsType): TsType {
-  let current = type;
-
-  const visited = new Set<TsType>();
-
-  while (true) {
-    const aliasSymbol = current.getAliasSymbol();
-    if (!aliasSymbol || visited.has(current)) break;
-    visited.add(current);
-
-    const decl = aliasSymbol.getDeclarations()[0];
-    if (!decl) break;
-
-    const realType = decl.getType();
-
-    if (realType === current) break;
-    current = realType;
-  }
-
-    return current;
 }

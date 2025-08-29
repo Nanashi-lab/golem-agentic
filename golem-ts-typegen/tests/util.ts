@@ -12,72 +12,94 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { getTypeName, TypeMetadata } from '@golemcloud/golem-ts-types-core';
-import { Type } from '@golemcloud/golem-ts-types-core';
-import './setup';
 import {
-  AnalysedType,
-  NameTypePair,
-} from '../src/internal/mapping/types/AnalysedType';
+  getTypeName,
+  Type,
+  TypeMetadata,
+} from "@golemcloud/golem-ts-types-core";
 
+import "./setup";
+import { lazyLoadTypeMetadata } from "../src";
+
+/**
+ * getAll functionality reads the type metadata from .metadata directory
+ * using lazy loading. The type metadata is loaded to type metadata
+ * by `setup` module.
+ */
 export function getAll() {
+  // We don't need to load from .metadata directory again if already loaded
+  lazyLoadTypeMetadata();
+
   return TypeMetadata.getAll();
 }
 
-export function getTestInterfaceType(): Type {
-  return fetchType('TestInterfaceType');
+// Get an Interface Type from .metadata directory
+export function getInterfaceType(): Type {
+  return fetchType("TestInterfaceType");
 }
 
+// Get a Map Type from .metadata directory
+// ts-morph discards type alias
 export function getTestMapType(): Type {
-  return fetchType('Map');
+  return fetchType("Map");
 }
 
-export function getTestObjectType(): Type {
-  return fetchType('ObjectType');
+// Get an Object Type from .metadata directory
+// Note that alias for object is kept intact.
+export function getObjectType(): Type {
+  return fetchType("ObjectType");
 }
 
+// Get a complex Object Type from .metadata directory
+export function getComplexObjectType(): Type {
+  return fetchType("ObjectComplexType");
+}
+
+// Get a List Type from .metadata directory
+// ts-morph discards type alias
 export function getTestListOfObjectType(): Type {
-  return fetchType('Array');
+  return fetchType("Array");
 }
 
+// Get a Union Type from .metadata directory
+// Here alias is kept intact by ts-morph
 export function getUnionType(): Type {
-  return fetchType('UnionType');
+  return fetchType("UnionType");
 }
 
+// Get a Union Type from .metadata directory
+// Here alias is kept intact by ts-morph
 export function getUnionComplexType(): Type {
-  return fetchType('UnionComplexType');
+  return fetchType("UnionComplexType");
 }
 
+// Get a Tuple Type from .metadata directory
+// Here alias is kept intact by ts-morph
 export function getTupleType(): Type {
-  return fetchType('TupleType');
+  return fetchType("TupleType");
 }
 
-export function getTupleComplexType(): Type {
-  return fetchType('TupleComplexType');
-}
-
+// Get a boolean Type from .metadata directory
 export function getBooleanType(): Type {
-  return fetchType('boolean');
+  return fetchType("boolean");
 }
 
+// Get a string Type from .metadata directory
 export function getStringType(): Type {
-  return fetchType('string');
+  return fetchType("string");
 }
 
+// Get a number Type from .metadata directory
 export function getNumberType(): Type {
-  return fetchType('number');
+  return fetchType("number");
 }
 
+// Get a Promise Type from .metadata directory
 export function getPromiseType(): Type {
-  return fetchType('Promise');
+  return fetchType("Promise");
 }
 
-export function getRecordFieldsFromAnalysedType(
-  analysedType: AnalysedType,
-): NameTypePair[] | undefined {
-  return analysedType.kind === 'record' ? analysedType.value.fields : undefined;
-}
-
+// Fetch a type by its name from the loaded metadata (loaded by setup module)
 function fetchType(typeNameInTestData: string): Type {
   const classMetadata = Array.from(getAll()).map(([_, v]) => v);
 

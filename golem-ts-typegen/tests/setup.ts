@@ -12,10 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export class AgentClassName {
-  readonly value: string;
+/**
+ * This is essentially what CLI is doing,
+ * which is reading source file, creating metadata, serializing it to JSON
+ * and load it to .metadata directory.
+ * Every testing is performed on top of the metadata directory.
+ */
+import { Project } from "ts-morph";
+import { generateMetadata } from "../src/index";
 
-  constructor(agentClassName: string) {
-    this.value = agentClassName;
-  }
-}
+const project = new Project({
+  tsConfigFilePath: "tsconfig.json",
+});
+
+const sourceFiles = project.getSourceFiles("tests/testData.ts");
+
+generateMetadata(sourceFiles);

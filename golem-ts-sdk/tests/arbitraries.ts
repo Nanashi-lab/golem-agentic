@@ -120,19 +120,19 @@ export const objectComplexArb: fc.Arbitrary<ObjectComplexType> = fc.record({
 });
 
 export const unionComplexArb: fc.Arbitrary<UnionComplexType> = fc.oneof(
-  // fc.integer(),
-  // fc.string(),
-  // fc.boolean(),
-  //  objectComplexArb,
+  fc.integer(),
+  fc.string(),
+  fc.boolean(),
+  objectComplexArb,
   unionArb,
-  // listArb,
-  // listComplexArb,
-  // tupleArb,
-  // tupleComplexArb,
-  // mapArb,
-  // fc.record({
-  //   n: fc.integer(),
-  // }),
+  listArb,
+  listComplexArb,
+  tupleArb,
+  tupleComplexArb,
+  mapArb,
+  fc.record({
+    n: fc.integer(),
+  }),
 );
 
 export const baseArb = fc.record({
@@ -163,6 +163,12 @@ export const baseArb = fc.record({
   int64ArrayProp: fc.bigInt64Array({ minLength: 0, maxLength: 10 }),
   float32ArrayProp: fc.float32Array({ minLength: 0, maxLength: 10 }),
   float64ArrayProp: fc.float64Array({ minLength: 0, maxLength: 10 }),
+  objectPropInlined: fc.record({
+    a: fc.string(),
+    b: fc.integer(),
+    c: fc.boolean(),
+  }),
+  unionPropInlined: fc.oneof(fc.string(), fc.integer()),
 });
 
 const optionalPropArb = fc

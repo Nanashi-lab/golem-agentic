@@ -1,7 +1,7 @@
 {
-  "name": "@golemcloud/golem-ts-sdk",
+  "name": "@golemcloud/golem-ts-typegen",
   "type": "module",
-  "version": "0.0.1-dev.26",
+  "version": "0.0.1-dev.3",
   "publishConfig": {
     "access": "public",
     "tag": "test"
@@ -35,10 +35,14 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write \"src/**/*\" \"tests/**/*\"",
     "format:check": "prettier --check \"src/**/*\" \"tests/**/*\"",
-    "test": "npx golem-typegen ./tsconfig.json --files tests/testData.ts && tsc --noEmit && vitest run",
-    "prebuild": "wasm-rquickjs generate-dts --wit ../wit --output types",
-    "build": "npm run prebuild && tsc --noEmit && rollup -c",
+    "test": "tsc --noEmit && vitest run",
+    "build": "npm run build:lib && npm run build:cli",
+    "build:lib": "tsc --noEmit && rollup -c",
+    "build:cli": "tsc src/bin/golem-typegen.ts --outDir dist --module node16 --target ES2020 --esModuleInterop",
     "dev": "rollup -c -w"
+  },
+  "bin": {
+    "golem-typegen": "./dist/bin/golem-typegen.js"
   },
   "keywords": [],
   "sideEffects": [
@@ -49,7 +53,6 @@
   "description": "",
   "devDependencies": {
     "@eslint/js": "^9.33.0",
-    "@golemcloud/golem-ts-typegen": "^0.0.1-dev.3",
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@types/node": "^24.3.0",
@@ -62,7 +65,6 @@
     "rollup": "^4.46.2",
     "rollup-plugin-dts": "^6.2.1",
     "rollup-plugin-typescript2": "^0.36.0",
-    "ts-morph": "^26.0.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.39.0",
     "vitest": "^3.2.4"
@@ -70,6 +72,8 @@
   "private": false,
   "dependencies": {
     "@golemcloud/golem-ts-types-core": "^0.0.1-dev.3",
-    "effect": "^3.17.6"
+    "commander": "^14.0.0",
+    "log-symbols": "^7.0.1",
+    "ts-morph": "^26.0.0"
   }
 }

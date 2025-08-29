@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export class AgentClassName {
-  readonly value: string;
-
-  constructor(agentClassName: string) {
-    this.value = agentClassName;
-  }
-}
+export * from './type-lite';
+export * from './node';
+export * from './symbol';
+export * from './type-json';
+export * from './json-to-type';
+export * from './type-to-json';
+export * from './metadata';

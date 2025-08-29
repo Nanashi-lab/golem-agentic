@@ -12,14 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TypeMetadata } from '../src/typeMetadata';
+// Load type metadata loads the type-metadata that was saved into .metadata directory
+// when running `npm run test`
 
-import { Project } from 'ts-morph';
+import { TypeMetadata } from '@golemcloud/golem-ts-types-core';
+import path from 'path';
+import * as fs from 'node:fs';
+const METADATA_DIR = '.metadata';
+const METADATA_FILE = 'types.json';
 
-const project = new Project({
-  tsConfigFilePath: './tsconfig.json',
-});
+// To be moved to SDK
+TypeMetadata.clearMetadata();
 
-const sourceFiles = project.getSourceFiles('tests/testData.ts');
+const filePath = path.join(METADATA_DIR, METADATA_FILE);
+if (!fs.existsSync(filePath)) {
+  throw new Error(`${filePath} does not exist`);
+}
 
-TypeMetadata.updateFromSourceFiles(sourceFiles);
+const raw = fs.readFileSync(filePath, 'utf-8');
+const json = JSON.parse(raw);
+
+TypeMetadata.loadFromJson(json);
