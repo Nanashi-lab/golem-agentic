@@ -88,7 +88,7 @@ describe('typescript value to wit value round-trip conversions', () => {
     );
   });
 
-  it.skip('should correctly perform round-trip conversion for arbitrary values of complex tuple', () => {
+  it('should correctly perform round-trip conversion for arbitrary values of complex tuple', () => {
     fc.assert(
       fc.property(tupleArb, tupleComplexArb, (tupleData, tupleComplexData) => {
         const simpleType = getTupleType();
