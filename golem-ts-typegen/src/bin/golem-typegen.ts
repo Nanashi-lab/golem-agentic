@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-import path from "path";
 import { Command } from "commander";
 import { Project } from "ts-morph";
 import chalk from "chalk";
 import logSymbols from "log-symbols";
 import { saveTypeMetadata, updateMetadataFromSourceFiles } from "../index.js";
 import { TypeMetadata } from "@golemcloud/golem-ts-types-core";
+import path from "path";
 
 const program = new Command();
 
