@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "introspect": "ts-node scripts/introspect.ts",
-    "prebuild": "ts-node bootstrap/prebuild.ts",
-    "build": "npm run prebuild && tsc --noEmit && rollup -c"
+    "generate-types": "ts-node bootstrap/prebuild.ts",
+    "build": "npm run generate-types && tsc --noEmit && rollup -c"
   },
   "type": "module",
   "keywords": [],
@@ -13,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@golemcloud/golem-ts-typegen": "^0.0.1-dev.5",
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.1",
@@ -25,7 +25,7 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "@golemcloud/golem-ts-sdk": "^0.0.1-dev.25",
+    "@golemcloud/golem-ts-sdk": "^0.0.1-dev.27",
     "effect": "^3.17.9",
     "tslib": "^2.0.0"
   }

@@ -16,6 +16,16 @@ const __dirname = path.dirname(__filename)
 const configPath = path.resolve(__dirname, '../.buildrc.json');
 const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 
+try {
+    // !!! npx should come in as part of node js- that's what I found
+    // so this may not be needed.
+    execSync('npx --version', { stdio: 'ignore' });
+    execSync('npx golem-typegen ./tsconfig.json', { stdio: 'inherit' });
+} catch (e) {
+    console.error('npx is not available. Please install Node.js with npm >= 5.2.0');
+    process.exit(1);
+}
+
 const outputDir = path.resolve(__dirname, '../.generated');
 fs.mkdirSync(outputDir, { recursive: true });
 
@@ -23,22 +33,12 @@ const wrapperPath = path.join(outputDir, 'index.ts');
 
 const userEntryModule  = config.entry.replace(/\.ts$/, '');
 
-// FIXME: Remove irrelevant comments
 const wrapperContent = `
-import {Project, Type} from "ts-morph";
-import { TypeMetadata } from "@golemcloud/golem-ts-sdk";
+import { TypeMetadata } from '@golemcloud/golem-ts-types-core';
+import { Metadata } from '../.metadata/generated-types';
 
-const project = new Project({
-  tsConfigFilePath: "./tsconfig.json",
-});
+TypeMetadata.loadFromJson(Metadata);
 
-const sourceFiles = project.getSourceFiles("src/**/*.ts");
-
-TypeMetadata.updateFromSourceFiles(sourceFiles)
-
-// Import the user module after metadata is ready
-// this is to be done this way otherwise rollup ends up generating the module,
-// where loading the metadata comes after the user module is loaded - resulting in errors.
 export default (async () => {
   return await import("../${userEntryModule}");
 })();
