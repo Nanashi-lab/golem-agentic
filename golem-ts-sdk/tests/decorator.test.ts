@@ -1,15 +1,28 @@
-import { AgentClassName } from '../src';
-import * as Option from 'effect/Option';
-
-// Set up is required to register types and metadata
-// This is parallel to the entry point of a real application
 import { AgentTypeRegistry } from '../src/internal/registry/agentTypeRegistry';
+import { AgentClassName } from '../src';
+import { AgentMethodMetadataRegistry } from '../src/internal/registry/agentMethodMetadataRegistry';
+import * as Option from 'effect/Option';
+import { expect } from 'vitest';
 
+const AssistantAgentClassName = new AgentClassName('AssistantAgent');
+const WeatherAgentClassName = new AgentClassName('WeatherAgent');
+
+// See testAgents.ts for the agent classes with decorators, which is imported before every test suite via testSetup.ts
 it('Agent decorator should register the agent class and its methods into AgentTypeRegistry', () => {
-  const agentType =
-    AgentTypeRegistry.lookup(new AgentClassName('AssistantAgent'))
+  const assistantAgent = Option.getOrThrowWith(
+    AgentTypeRegistry.lookup(AssistantAgentClassName),
+    () => new Error('AssistantAgent not found in AgentTypeRegistry'),
+  );
 
-  expect(Option.isSome(agentType)).toBeTruthy();
-})
+  const weatherAgent = Option.getOrThrowWith(
+    AgentTypeRegistry.lookup(WeatherAgentClassName),
+    () => new Error('WeatherAgent not found in AgentTypeRegistry'),
+  );
 
+  console.log(AgentMethodMetadataRegistry);
 
+  expect(assistantAgent.methods.length).toEqual(1);
+  expect(assistantAgent.constructor.inputSchema.val.length).toEqual(1);
+  expect(weatherAgent.methods.length).toEqual(1);
+  expect(weatherAgent.constructor.inputSchema.val.length).toEqual(1);
+});

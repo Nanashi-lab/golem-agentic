@@ -35,7 +35,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write \"src/**/*\" \"tests/**/*\"",
     "format:check": "prettier --check \"src/**/*\" \"tests/**/*\"",
-    "test": "npx golem-typegen ./tsconfig.json --files tests/**/*.ts && tsc --noEmit && vitest run",
+    "test": "rm -rf .metadata && npx golem-typegen ./tsconfig.json --files tests/**/*.ts && tsc --noEmit && vitest run",
     "prebuild": "wasm-rquickjs generate-dts --wit ../wit --output types",
     "build": "npm run prebuild && tsc --noEmit && rollup -c",
     "dev": "rollup -c -w"
