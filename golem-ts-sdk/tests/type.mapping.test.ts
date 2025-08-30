@@ -22,7 +22,7 @@ import {
   getNumberType,
   getStringType,
   getPromiseType,
-} from './utils';
+} from './testAgents';
 
 import * as AnalysedType from '../src/internal/mapping/types/AnalysedType';
 

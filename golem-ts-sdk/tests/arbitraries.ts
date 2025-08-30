@@ -25,7 +25,7 @@ import {
   TupleType,
   UnionComplexType,
   UnionType,
-} from './testData';
+} from './testAgents';
 
 import { AgentClassName } from '../src';
 
