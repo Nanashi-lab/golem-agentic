@@ -1,7 +1,7 @@
 {
   "name": "@golemcloud/golem-ts-sdk",
   "type": "module",
-  "version": "0.0.1-dev.28",
+  "version": "0.0.1-dev.29",
   "publishConfig": {
     "access": "public",
     "tag": "test"
@@ -40,7 +40,7 @@
     "generate-test-types-metadata": "npx golem-typegen ./tsconfig.json --files tests/**/*.ts",
     "prebuild": "npm run clean-test-data && npm run generate-dts && npm run generate-test-types-metadata",
     "build": "tsc --noEmit && rollup -c",
-    "test": "npm run build && vitest run",
+    "test": "npm run clean-test-data && npm run generate-test-types-metadata && tsc --noEmit && vitest run",
     "dev": "rollup -c -w"
   },
   "keywords": [],
