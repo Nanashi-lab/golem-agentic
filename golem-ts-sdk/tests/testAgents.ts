@@ -17,8 +17,6 @@
 import { agent, BaseAgent } from '../src';
 import * as Types from './testTypes';
 
-console.log('Loading Agents');
-
 @agent()
 class WeatherAgent extends BaseAgent {
   constructor(readonly testInterfaceType: Types.TestInterfaceType) {
