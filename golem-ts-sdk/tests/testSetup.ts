@@ -1,6 +1,6 @@
 import { TypeMetadata } from '@golemcloud/golem-ts-types-core';
 import { Metadata } from '../.metadata/generated-types';
-import { TypescriptTypeRegistry } from '../src/typescriptTypeRegistry';
+import { TypescriptTypeRegistry } from '../src';
 
 // This setup is ran before every test suite (vitest worker)
 // and represents the entry point of any code-first user code
