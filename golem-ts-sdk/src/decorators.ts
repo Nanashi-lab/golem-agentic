@@ -128,8 +128,11 @@ export function agent() {
     let classMetadata = Option.getOrElse(
       Option.fromNullable(TypeMetadata.get(ctor.name)),
       () => {
+        const availableAgents = Array.from(TypeMetadata.getAll().entries())
+          .map(([key, _]) => key)
+          .join(', ');
         throw new Error(
-          `Agent class ${agentClassName.value} is not registered in TypeMetadata. Please ensure the class is decorated with @agent()`,
+          `Agent class ${agentClassName.value} is not registered in TypeMetadata. Available agents are ${availableAgents}. Please ensure the class ${ctor.name} is decorated with @agent()`,
         );
       },
     );

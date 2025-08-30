@@ -23,8 +23,9 @@ import {
   getUnionType,
   getUnionComplexType,
   getPromiseType,
-} from './utils';
-import { TestInterfaceType } from './testData';
+} from './testUtils';
+
+import { TestInterfaceType } from './testTypes';
 import * as Value from '../src/internal/mapping/values/Value';
 import {
   interfaceArb,

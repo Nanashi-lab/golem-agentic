@@ -1,3 +1,0 @@
-package golem:agent-guest-exports;
-
-interface agent-guest-inline-functions {}
