@@ -1,6 +1,6 @@
 package golem:agent-guest;
 
-world golem-agent {
+world agent-guest {
   import golem:agent/host;
   include golem:agent/agent-guest;
 }
