@@ -28,7 +28,9 @@ export { prompt, description, agent } from './decorators';
 export * from './newTypes/either';
 export * from './newTypes/agentClassName';
 export * from './newTypes/textInput';
+
 export { AgentClassName } from './newTypes/agentClassName';
+export { TypescriptTypeRegistry } from './typescriptTypeRegistry';
 
 let resolvedAgent: Option.Option<ResolvedAgent> = Option.none();
 
