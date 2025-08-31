@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TypeMetadata } from '@golemcloud/golem-ts-types-core';
+import { ClassMetadata, TypeMetadata } from '@golemcloud/golem-ts-types-core';
 import * as Either from 'effect/Either';
 import {
   getDataValueFromWitValue,
@@ -31,6 +31,7 @@ import {
 import * as WitValue from '../src/internal/mapping/values/WitValue';
 import * as fc from 'fast-check';
 import { interfaceArb } from './arbitraries';
+import { ResolvedAgent } from '../src/internal/resolvedAgent';
 
 it("AssistantAgent can be successfully initiated and the methods can be invoked'", () => {
   fc.assert(
@@ -74,87 +75,129 @@ it("AssistantAgent can be successfully initiated and the methods can be invoked'
 
 it('WeatherAgent can be successfully initiated and the methods can be invoked', () => {
   fc.assert(
-    fc.property(fc.string(), fc.string(), (arbData, locationValue) => {
-      overrideSelfMetadataImpl();
+    fc.property(
+      fc.string(),
+      fc.string(),
+      fc.integer(),
+      (arbData, locationValue, number) => {
+        overrideSelfMetadataImpl();
 
-      const typeRegistry = TypeMetadata.get(WeatherAgentClassName.value);
+        const typeRegistry = TypeMetadata.get(WeatherAgentClassName.value);
 
-      if (!typeRegistry) {
-        throw new Error('WeatherAgent type metadata not found');
-      }
+        if (!typeRegistry) {
+          throw new Error('WeatherAgent type metadata not found');
+        }
 
-      const constructorInfo = typeRegistry.constructorArgs[0].type;
+        const constructorInfo = typeRegistry.constructorArgs[0].type;
 
-      const witValue = Either.getOrThrowWith(
-        WitValue.fromTsValue(arbData, constructorInfo),
-        (error) =>
-          new Error(`Failed to convert constructor arg to WitValue. ${error}`),
-      );
-
-      const constructorParams = getDataValueFromWitValue(witValue);
-
-      const agentInitiator = Option.getOrThrowWith(
-        AgentInitiatorRegistry.lookup(WeatherAgentName),
-        () => new Error('WeatherAgent not found in AgentInitiatorRegistry'),
-      );
-
-      const result = agentInitiator.initiate(
-        WeatherAgentName.value,
-        constructorParams,
-      );
-
-      expect(result.tag).toEqual('ok');
-
-      const resolvedAgent =
-        result.tag === 'ok'
-          ? result.val
-          : (() => {
-              throw new Error('Agent initiation failed');
-            })();
-
-      const methodSignature = typeRegistry.methods.get('getWeather');
-      const parametersInfo = methodSignature?.methodParams;
-      const returnTypeInfo = typeRegistry.methods.get('getWeather')?.returnType;
-
-      if (!parametersInfo) {
-        throw new Error('Method getWeather not found in metadata');
-      }
-
-      if (!returnTypeInfo) {
-        throw new Error('Method getWeather not found in metadata');
-      }
-
-      const locationType = parametersInfo.get('location');
-
-      if (!locationType) {
-        throw new Error(
-          'Parameter location not found in method getWeather metadata',
+        const witValue = Either.getOrThrowWith(
+          WitValue.fromTsValue(arbData, constructorInfo),
+          (error) =>
+            new Error(
+              `Failed to convert constructor arg to WitValue. ${error}`,
+            ),
         );
-      }
 
-      const locationWitValue = Either.getOrThrowWith(
-        WitValue.fromTsValue(locationValue, locationType),
-        (error) =>
-          new Error(`Failed to convert method arg to WitValue. ${error}`),
-      );
+        const constructorParams = getDataValueFromWitValue(witValue);
 
-      resolvedAgent
-        .invoke('getWeather', getDataValueFromWitValue(locationWitValue))
-        .then((invokeResult) => {
-          const invokeDataValue =
-            invokeResult.tag === 'ok'
-              ? invokeResult.val
-              : (() => {
-                  throw new Error('Failed to convert method arg to WitValue. ');
-                })();
-          const witValue = getWitValueFromDataValue(invokeDataValue)[0];
-          const result = WitValue.toTsValue(witValue, returnTypeInfo);
+        const agentInitiator = Option.getOrThrowWith(
+          AgentInitiatorRegistry.lookup(WeatherAgentName),
+          () => new Error('WeatherAgent not found in AgentInitiatorRegistry'),
+        );
 
-          expect(result).toEqual('Weather in ' + locationValue + ' is sunny!');
-        });
-    }),
+        const result = agentInitiator.initiate(
+          WeatherAgentName.value,
+          constructorParams,
+        );
+
+        expect(result.tag).toEqual('ok');
+
+        const resolvedAgent =
+          result.tag === 'ok'
+            ? result.val
+            : (() => {
+                throw new Error('Agent initiation failed');
+              })();
+
+        testInvoke(
+          typeRegistry,
+          'getWeather',
+          'location',
+          locationValue,
+          resolvedAgent,
+          'Weather in ' + locationValue + ' is sunny!',
+        );
+
+        testInvoke(
+          typeRegistry,
+          'getWeatherV2',
+          'data',
+          { value: number, data: locationValue },
+          resolvedAgent,
+          `Weather in ${locationValue} is sunny!`,
+        );
+
+        testInvoke(
+          typeRegistry,
+          'getWeatherV3',
+          'param2',
+          { data: locationValue, value: number },
+          resolvedAgent,
+          `Weather in ${locationValue} is sunny!`,
+        );
+      },
+    ),
   );
 });
+
+function testInvoke(
+  typeRegistry: ClassMetadata,
+  methodName: string,
+  parameterName: string,
+  arbInput: any,
+  resolvedAgent: ResolvedAgent,
+  expectedOutput: string,
+) {
+  const methodSignature = typeRegistry.methods.get(methodName);
+  const parametersInfo = methodSignature?.methodParams;
+  const returnTypeInfo = methodSignature?.returnType;
+
+  if (!parametersInfo) {
+    throw new Error('Method getWeather not found in metadata');
+  }
+
+  if (!returnTypeInfo) {
+    throw new Error('Method getWeather not found in metadata');
+  }
+
+  const parameterType = parametersInfo.get(parameterName);
+
+  if (!parameterType) {
+    throw new Error(
+      'Parameter location not found in method getWeather metadata',
+    );
+  }
+
+  const parameterWitValue = Either.getOrThrowWith(
+    WitValue.fromTsValue(arbInput, parameterType),
+    (error) => new Error(`Failed to convert method arg to WitValue. ${error}`),
+  );
+
+  resolvedAgent
+    .invoke(methodName, getDataValueFromWitValue(parameterWitValue))
+    .then((invokeResult) => {
+      const invokeDataValue =
+        invokeResult.tag === 'ok'
+          ? invokeResult.val
+          : (() => {
+              throw new Error('Failed to convert method arg to WitValue. ');
+            })();
+      const witValue = getWitValueFromDataValue(invokeDataValue)[0];
+      const result = WitValue.toTsValue(witValue, returnTypeInfo);
+
+      expect(result).toEqual(expectedOutput);
+    });
+}
 
 function overrideSelfMetadataImpl() {
   vi.spyOn(GolemApiHostModule, 'getSelfMetadata').mockImplementation(() => ({

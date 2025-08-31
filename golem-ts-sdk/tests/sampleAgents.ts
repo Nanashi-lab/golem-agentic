@@ -25,6 +25,19 @@ class WeatherAgent extends BaseAgent {
   async getWeather(location: string): Types.PromiseType {
     return Promise.resolve(`Weather in ${location} is sunny!`);
   }
+
+  async getWeatherV2(data: { value: number; data: string }): Types.PromiseType {
+    return Promise.resolve(`Weather in ${data.data} is sunny!`);
+  }
+
+  async getWeatherV3(param2: CustomData): Types.PromiseType {
+    return Promise.resolve(`Weather in ${param2.data} is sunny!`);
+  }
+}
+
+export interface CustomData {
+  data: string;
+  value: number;
 }
 
 @agent()

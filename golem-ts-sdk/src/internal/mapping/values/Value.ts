@@ -770,7 +770,7 @@ function invalidTypeError(tsValue: any, expectedType: Type): string {
 }
 
 function missingValueForKey(key: string, tsValue: any): string {
-  return `Missing property '${key}' in ${tsValue}`;
+  return `Missing key '${key}' in ${JSON.stringify(tsValue)}`;
 }
 
 function unionTypeMatchError(unionTypes: Type[], tsValue: any): string {
