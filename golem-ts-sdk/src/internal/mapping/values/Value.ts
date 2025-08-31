@@ -796,11 +796,6 @@ export function toTsValue(value: Value, type: Type): any {
     }
 
     return toTsValue(caseValue, type);
-
-    // const unionTypes = expectedType.getUnionTypes();
-    // const matchingType = unionTypes[value.caseIdx];
-    //
-    // return toTsValue(caseValue, matchingType);
   }
 
   if (type.isNumber()) {
@@ -937,7 +932,7 @@ export function toTsValue(value: Value, type: Type): any {
       });
       return new Map(entries);
     } else {
-      throw new Error(`Expected Map, obtained value ${value}`);
+      throw new Error(`Unable to convert ${JSON.stringify(value)} to Map`);
     }
   }
 
@@ -948,7 +943,7 @@ export function toTsValue(value: Value, type: Type): any {
         toTsValue(item, typeArg[idx]),
       );
     } else {
-      throw new Error(`Expected tuple, obtained value ${value}`);
+      throw new Error(`Unable to convert ${JSON.stringify(value)} to tuple`);
     }
   }
 
@@ -961,7 +956,7 @@ export function toTsValue(value: Value, type: Type): any {
       }
       return value.value.map((item: Value) => toTsValue(item, elemType));
     } else {
-      throw new Error(`Expected array, obtained value ${value}`);
+      throw new Error(`Unable to convert ${JSON.stringify(value)} to array`);
     }
   }
 
@@ -981,9 +976,7 @@ export function toTsValue(value: Value, type: Type): any {
         {} as Record<string, any>,
       );
     } else {
-      throw new Error(
-        `Expected object ${name}, obtained value ${JSON.stringify(value)}`,
-      );
+      throw new Error(`Unable to convert ${JSON.stringify(value)} to object`);
     }
   }
 
@@ -1003,7 +996,9 @@ export function toTsValue(value: Value, type: Type): any {
         {} as Record<string, any>,
       );
     } else {
-      throw new Error(`Expected object, obtained value ${value}`);
+      throw new Error(
+        `Unable to convert ${JSON.stringify(value)} to interface`,
+      );
     }
   }
 
@@ -1011,7 +1006,7 @@ export function toTsValue(value: Value, type: Type): any {
     if (value.kind === 'variant') {
       const caseValue = value.caseValue;
       if (!caseValue) {
-        throw new Error(`Expected value, obtained value ${value}`);
+        throw new Error(`Expected union, obtained value ${value}`);
       }
 
       const unionTypes = type.getUnionTypes();
@@ -1019,9 +1014,7 @@ export function toTsValue(value: Value, type: Type): any {
 
       return toTsValue(caseValue, matchingType);
     } else {
-      throw new Error(
-        `Expected union, obtained value ${JSON.stringify(value)}`,
-      );
+      throw new Error(`Unable to convert ${JSON.stringify(value)} to union`);
     }
   }
 
@@ -1043,7 +1036,7 @@ function convertToNumber(value: Value): any {
   ) {
     return value.value;
   } else {
-    throw new Error(`Expected number, obtained value ${value}`);
+    throw new Error(`Unable to convert the ${JSON.stringify(value)} to number`);
   }
 }
 
@@ -1051,6 +1044,6 @@ function convertToBigInt(value: Value): any {
   if (value.kind === 'u64' || value.kind === 's64') {
     return value.value;
   } else {
-    throw new Error(`Expected bigint, obtained value ${value}`);
+    throw new Error(`Unable to convert the ${JSON.stringify(value)} to bigint`);
   }
 }
