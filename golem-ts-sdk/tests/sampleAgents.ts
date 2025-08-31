@@ -22,8 +22,8 @@ class WeatherAgent extends BaseAgent {
     this.input = input;
   }
 
-  async getWeather(value: string): Types.PromiseType {
-    return Promise.resolve(`Weather for ${location} is sunny!`);
+  async getWeather(location: string): Types.PromiseType {
+    return Promise.resolve(`Weather in ${location} is sunny!`);
   }
 }
 
