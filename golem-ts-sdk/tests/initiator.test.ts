@@ -3,43 +3,88 @@ import * as Either from 'effect/Either';
 import { getDataValueFromWitValue } from '../src/decorators';
 import * as Option from 'effect/Option';
 import { AgentInitiatorRegistry } from '../src/internal/registry/agentInitiatorRegistry';
-import { expect } from 'vitest';
+import { expect, it } from 'vitest';
 import * as GolemApiHostModule from 'golem:api/host@1.1.7';
-import { WeatherAgentClassName, WeatherAgentName } from './testUtils';
+import {
+  AssistantAgentClassName,
+  AssistantAgentName,
+  WeatherAgentClassName,
+  WeatherAgentName,
+} from './testUtils';
 import * as WitValue from '../src/internal/mapping/values/WitValue';
+import * as fc from 'fast-check';
+import { interfaceArb } from './arbitraries';
 
 it('WeatherAgent can be successfully initiated', () => {
-  overrideSelfMetadataImpl();
+  fc.assert(
+    fc.property(fc.string(), (arbData) => {
+      overrideSelfMetadataImpl();
 
-  const typeRegistry = TypeMetadata.get(WeatherAgentClassName.value);
+      const typeRegistry = TypeMetadata.get(WeatherAgentClassName.value);
 
-  if (!typeRegistry) {
-    throw new Error('WeatherAgent type metadata not found');
-  }
+      if (!typeRegistry) {
+        throw new Error('WeatherAgent type metadata not found');
+      }
 
-  const constructorInfo = typeRegistry.constructorArgs[0].type;
+      const constructorInfo = typeRegistry.constructorArgs[0].type;
 
-  const constructorArg = 'foo';
+      const witValue = Either.getOrThrowWith(
+        WitValue.fromTsValue(arbData, constructorInfo),
+        (error) =>
+          new Error(`Failed to convert constructor arg to WitValue. ${error}`),
+      );
 
-  const witValue = Either.getOrThrowWith(
-    WitValue.fromTsValue(constructorArg, constructorInfo),
-    (error) =>
-      new Error(`Failed to convert constructor arg to WitValue. ${error}`),
+      const constructorParams = getDataValueFromWitValue(witValue);
+
+      const agentInitiator = Option.getOrThrowWith(
+        AgentInitiatorRegistry.lookup(WeatherAgentName),
+        () => new Error('WeatherAgent not found in AgentInitiatorRegistry'),
+      );
+
+      const result = agentInitiator.initiate(
+        WeatherAgentName.value,
+        constructorParams,
+      );
+
+      expect(result.tag).toEqual('ok');
+    }),
   );
+});
 
-  const constructorParams = getDataValueFromWitValue(witValue);
+it('should correctly perform round-trip conversion for arbitrary values of interface type', () => {
+  fc.assert(
+    fc.property(interfaceArb, (arbData) => {
+      overrideSelfMetadataImpl();
 
-  const agentInitiator = Option.getOrThrowWith(
-    AgentInitiatorRegistry.lookup(WeatherAgentName),
-    () => new Error('WeatherAgent not found in AgentInitiatorRegistry'),
+      const typeRegistry = TypeMetadata.get(AssistantAgentClassName.value);
+
+      if (!typeRegistry) {
+        throw new Error('WeatherAgent type metadata not found');
+      }
+
+      const constructorInfo = typeRegistry.constructorArgs[0].type;
+
+      const witValue = Either.getOrThrowWith(
+        WitValue.fromTsValue(arbData, constructorInfo),
+        (error) =>
+          new Error(`Failed to convert constructor arg to WitValue. ${error}`),
+      );
+
+      const constructorParams = getDataValueFromWitValue(witValue);
+
+      const agentInitiator = Option.getOrThrowWith(
+        AgentInitiatorRegistry.lookup(AssistantAgentName),
+        () => new Error('WeatherAgent not found in AgentInitiatorRegistry'),
+      );
+
+      const result = agentInitiator.initiate(
+        WeatherAgentName.value,
+        constructorParams,
+      );
+
+      expect(result.tag).toEqual('ok');
+    }),
   );
-
-  const result = agentInitiator.initiate(
-    WeatherAgentName.value,
-    constructorParams,
-  );
-
-  expect(1).toEqual(1);
 });
 
 function overrideSelfMetadataImpl() {
