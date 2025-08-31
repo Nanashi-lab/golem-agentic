@@ -323,7 +323,7 @@ export function agent() {
 
               return {
                 tag: 'ok',
-                val: getDataValueFromWitValueReturned(returnValue.right),
+                val: getDataValueFromWitValue(returnValue.right),
               };
             },
           };
@@ -361,7 +361,9 @@ export function description(desc: string) {
 }
 
 // FIXME: in the next version, handle all dataValues
-function getWitValueFromDataValue(dataValue: DataValue): WitValue.WitValue[] {
+export function getWitValueFromDataValue(
+  dataValue: DataValue,
+): WitValue.WitValue[] {
   if (dataValue.tag === 'tuple') {
     return dataValue.val.map((elem) => {
       if (elem.tag === 'component-model') {
@@ -377,7 +379,7 @@ function getWitValueFromDataValue(dataValue: DataValue): WitValue.WitValue[] {
 
 // Why is return value a tuple with a single element?
 // why should it have a name?
-function getDataValueFromWitValueReturned(
+export function getDataValueFromWitValue(
   witValues: WitValue.WitValue,
 ): DataValue {
   return {

@@ -410,7 +410,7 @@ export function fromTsValue(
     if (typeof tsValue === 'number') {
       return Either.right({ kind: 's32', value: tsValue });
     } else {
-      return Either.left(invalidTypeError(tsValue, 'number'));
+      return Either.left(invalidTypeError(tsValue, type));
     }
   }
 
@@ -418,7 +418,7 @@ export function fromTsValue(
     if (typeof tsValue === 'bigint' || typeof tsValue === 'number') {
       return Either.right({ kind: 'u64', value: tsValue as any });
     } else {
-      return Either.left(invalidTypeError(tsValue, 'bigint'));
+      return Either.left(invalidTypeError(tsValue, type));
     }
   }
 
@@ -426,7 +426,7 @@ export function fromTsValue(
     if (typeof tsValue === 'string') {
       return Either.right({ kind: 'string', value: tsValue });
     } else {
-      return Either.left(invalidTypeError(tsValue, 'string'));
+      return Either.left(invalidTypeError(tsValue, type));
     }
   }
 
@@ -481,14 +481,18 @@ function handleTypedArray<
 >(tsValue: unknown, ctor: { new (_: number): A }): Either.Either<A, string> {
   return tsValue instanceof ctor
     ? Either.right(tsValue)
-    : Either.left(invalidTypeError(tsValue, ctor.name));
+    : Either.left(
+        invalidTypeError(tsValue, new Type({ kind: 'array', name: ctor.name })),
+      );
 }
 
 function handleBooleanType(tsValue: any): Either.Either<Value, string> {
   if (typeof tsValue === 'boolean') {
     return Either.right({ kind: 'bool', value: tsValue });
   } else {
-    return Either.left(invalidTypeError(tsValue, 'boolean'));
+    return Either.left(
+      invalidTypeError(tsValue, new Type({ kind: 'boolean' })),
+    );
   }
 }
 
@@ -508,7 +512,7 @@ function handleArrayType(
     );
   }
   if (!Array.isArray(tsValue)) {
-    return Either.left(invalidTypeError(tsValue, 'array'));
+    return Either.left(invalidTypeError(tsValue, new Type({ kind: 'array' })));
   }
 
   return Either.map(
@@ -524,7 +528,7 @@ function handleTupleType(
   const typeArgs = type.getTupleElements();
 
   if (!Array.isArray(tsValue)) {
-    return Either.left(invalidTypeError(tsValue, 'tuple'));
+    return Either.left(invalidTypeError(tsValue, new Type({ kind: 'tuple' })));
   }
 
   return Either.map(
@@ -548,7 +552,7 @@ function handleKeyValuePairs(
     );
   }
   if (!(tsValue instanceof Map)) {
-    return Either.left(invalidTypeError(tsValue, 'Map'));
+    return Either.left(invalidTypeError(tsValue, type));
   }
 
   const [keyType, valueType] = typeArgs;
@@ -577,7 +581,7 @@ function handleKeyValuePairs(
 
 function handleObject(tsValue: any, type: Type): Either.Either<Value, string> {
   if (typeof tsValue !== 'object' || tsValue === null) {
-    return Either.left(invalidTypeError(tsValue, tsValue));
+    return Either.left(invalidTypeError(tsValue, type));
   }
   const innerProperties: Symbol[] = type.getProperties();
   const values: Value[] = [];
@@ -760,8 +764,9 @@ function handleObjectMatch(value: any, type: Type): boolean {
   return true;
 }
 
-function invalidTypeError(tsValue: any, expectedType: string): string {
-  return `Expected ${expectedType}, but got ${tsValue} which is of type ${typeof tsValue}`;
+function invalidTypeError(tsValue: any, expectedType: Type): string {
+  const nameOrKind = expectedType.getName() ?? expectedType.getKind();
+  return `Expected ${nameOrKind}, but got ${tsValue} which is of type ${typeof tsValue}`;
 }
 
 function missingValueForKey(key: string, tsValue: any): string {

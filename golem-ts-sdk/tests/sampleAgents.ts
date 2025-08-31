@@ -12,32 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Test Setup configured in vitest.config.ts
-
 import { agent, BaseAgent } from '../src';
 import * as Types from './testTypes';
 
 @agent()
 class WeatherAgent extends BaseAgent {
-  constructor(readonly testInterfaceType: Types.TestInterfaceType) {
+  constructor(readonly input: string) {
     super();
-    this.testInterfaceType = testInterfaceType;
+    this.input = input;
   }
 
-  async getWeather(
-    complexType: Types.ObjectComplexType,
-    unionType: Types.UnionType,
-    unionComplexType: Types.UnionComplexType,
-    numberType: Types.NumberType,
-    stringType: Types.StringType,
-    booleanType: Types.BooleanType,
-    mapType: Types.MapType,
-    tupleComplexType: Types.TupleComplexType,
-    tupleType: Types.TupleType,
-    listComplexType: Types.ListComplexType,
-    objectType: Types.ObjectType,
-  ): Types.PromiseType {
-    return Promise.resolve(`Weather for ${location} is sunny!`);
+  async getWeather(location: string): Types.PromiseType {
+    return Promise.resolve(`Weather in ${location} is sunny!`);
   }
 }
 

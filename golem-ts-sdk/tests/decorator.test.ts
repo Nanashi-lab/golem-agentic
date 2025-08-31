@@ -1,11 +1,21 @@
+// Copyright 2024-2025 Golem Cloud
+//
+// Licensed under the Golem Source License v1.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://license.golem.cloud/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 import { AgentTypeRegistry } from '../src/internal/registry/agentTypeRegistry';
-import { AgentClassName } from '../src';
-import { AgentMethodMetadataRegistry } from '../src/internal/registry/agentMethodMetadataRegistry';
 import * as Option from 'effect/Option';
 import { expect } from 'vitest';
-
-const AssistantAgentClassName = new AgentClassName('AssistantAgent');
-const WeatherAgentClassName = new AgentClassName('WeatherAgent');
+import { AssistantAgentClassName, WeatherAgentClassName } from './testUtils';
 
 // See testAgents.ts for the agent classes with decorators, which is imported before every test suite via testSetup.ts
 it('Agent decorator should register the agent class and its methods into AgentTypeRegistry', () => {
