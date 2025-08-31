@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const SampleAgentModuleName = './sampleAgents';
+
 import { TypeMetadata } from '@golemcloud/golem-ts-types-core';
 import { Metadata } from '../.metadata/generated-types';
 import { TypescriptTypeRegistry } from '../src';
@@ -20,8 +22,14 @@ import { TypescriptTypeRegistry } from '../src';
 // and represents the entry point of any code-first user code
 TypescriptTypeRegistry.register(Metadata);
 
-await import('./sampleAgents');
+await import(SampleAgentModuleName);
 
 console.log(
-  `✅ Test-setup: Successfully loaded type metadata and imported agents (decorators). Total classes tracked: ${TypeMetadata.getAll().size}`,
+  `✅ Test-setup: Loaded type-script types in ${SampleAgentModuleName} and the following agents are registered: ${getAgentClassNamesInMetadata()}`,
 );
+
+function getAgentClassNamesInMetadata() {
+  return Array.from(TypeMetadata.getAll())
+    .map((entry) => entry[0])
+    .join(', ');
+}
