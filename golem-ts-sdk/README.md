@@ -8,36 +8,24 @@ import {
     description,
 } from '@golemcloud/golem-ts-sdk';
 
-import * as Either from '@golemcloud/golem-ts-sdk';
-
-type Question = {
-    text: string
+type Input = {
+    username: string,
+    location: Location
 }
 
-type Location = { lat: number, long: number };
-type LocationName = string;
+type GeoLocation = { lat: number, long: number };
 
-type Loc = Location | LocationName;
+type Name = string;
+
+type Place = Name | GeoLocation;
 
 @agent()
 class AssistantAgent extends BaseAgent {
-    
-    @prompt("Ask your question")
+    @prompt("Public weather forecast")
     @description("This method allows the agent to answer your question")
-    async ask(question: Question): Promise<string> {
-        
-        const location: Loc = { lat: 12.34, long: 56.78 };
-
-        const remoteWeatherClient = WeatherAgent.createRemote("afsal");
-        const remoteWeather = await remoteWeatherClient.getWeather(location);
-
-        const localWeatherClient = WeatherAgent.createLocal("afsal");
-        const localWeather = await localWeatherClient.getWeather(location);
-
-        return (
-            `Remote agent result: ${remoteWeather}\n` +
-            `Local agent result: ${localWeather}\n`
-        );
+    async ask(input: Input): Promise<string> {
+        const remoteWeatherClient = WeatherAgent.createRemote(input.username);
+        return await remoteWeatherClient.getWeather(input.location);
     }
 }
 
@@ -51,13 +39,11 @@ class WeatherAgent extends BaseAgent {
     }
 
     @prompt("Get weather")
-    @description("Weather forecast weather for you")
-    async getWeather(location: Location): Promise<Either.Either<string, string>> {
+    @description("Internal weather forecasting service. Only accessible if authorized.")
+    async getWeather(location: Place): Promise<String> {
         return Promise.resolve(
-            Either.ok(
-                `Hi ${this.userName} ! Weather in ${location} is sunny. ` +
-                `Reported by weather-agent ${this.getId()}. `
-            )
+            `Hi ${this.userName} ! Weather in ${location} is sunny. ` + 
+            `Reported by weather-agent ${this.getId()}. `
         );
     }
 }

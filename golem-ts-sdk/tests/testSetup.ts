@@ -1,18 +1,24 @@
-import { TypeMetadata } from '@golemcloud/golem-ts-types-core';
-import { Metadata } from '../.metadata/generated-types';
-import { TypescriptTypeRegistry } from '../src';
+import { vi } from 'vitest';
 
-// This setup is ran before every test suite (vitest worker)
-// and represents the entry point of any code-first user code
+// Global mocks which will be used within decorators,
+// These host functionalities shouldn't run when decorators run.
+// For example, getSelfMetadata is used in some decorators, however,
+// it executes only when `initiate` is called.
+// Also, these mocks are just place-holders. We can override the behavior
+// per tests using functionalities overrides module
+vi.mock('golem:api/host@1.1.7', () => ({
+  getSelfMetadata: () => ({
+    workerId: {
+      componentId: { uuid: { highBits: 0n, lowBits: 0n } },
+      workerName: 'change-this-by-overriding',
+    },
+    args: [],
+    env: [],
+    wasiConfigVars: [],
+    status: 'running',
+    componentVersion: 0n,
+    retryCount: 0n,
+  }),
+}));
 
-TypescriptTypeRegistry.register(Metadata);
-
-export default (async () => {
-  const result = await import('./testAgents');
-
-  console.log(
-    `✅ Test-setup: Successfully loaded type metadata and imported agents (decorators). Total classes tracked: ${TypeMetadata.getAll().size}`,
-  );
-
-  return result;
-})();
+await import('./agentsInit');

@@ -29,6 +29,7 @@ import * as AnalysedType from '../src/internal/mapping/types/AnalysedType';
 import * as Either from 'effect/Either';
 import * as Option from 'effect/Option';
 import { NameTypePair } from '../src/internal/mapping/types/AnalysedType';
+import { WorkerMetadata } from 'golem:api/host@1.1.7';
 
 // Interface type indirectly tests primitive types, union, list etc
 describe('TypeScript Interface to AnalysedType', () => {
