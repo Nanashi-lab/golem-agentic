@@ -7,6 +7,20 @@ import {
   AnalysedType,
   NameTypePair,
 } from '../src/internal/mapping/types/AnalysedType';
+import { AgentClassName } from '../src';
+import { AgentTypeName } from '../src/newTypes/agentTypeName';
+
+export const AssistantAgentClassName = new AgentClassName('AssistantAgent');
+
+export const WeatherAgentClassName = new AgentClassName('WeatherAgent');
+
+export const WeatherAgentName = AgentTypeName.fromAgentClassName(
+  WeatherAgentClassName,
+);
+
+export const AssistantAgentName = AgentTypeName.fromAgentClassName(
+  AssistantAgentClassName,
+);
 
 export function getAll() {
   return TypeMetadata.getAll();
