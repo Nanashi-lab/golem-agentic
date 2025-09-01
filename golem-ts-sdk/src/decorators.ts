@@ -281,8 +281,6 @@ export function agent() {
                 return WitValue.toTsValue(witVal, paramType);
               });
 
-              console.log(convertedArgs);
-
               const result = await fn.apply(instance, convertedArgs);
 
               const methodDef = agentType.methods.find(
