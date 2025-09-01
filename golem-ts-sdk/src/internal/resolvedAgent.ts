@@ -43,7 +43,9 @@ export class ResolvedAgent {
     methodName: string,
     args: DataValue,
   ): Promise<Result<DataValue, AgentError>> {
-    return this.agentInternal.invoke(methodName, args);
+
+    throw new Error(`Failed . ${methodName} with args ${JSON.stringify(args)}`);
+    // return this.agentInternal.invoke(methodName, args);
   }
 
   getDefinition(): AgentType {

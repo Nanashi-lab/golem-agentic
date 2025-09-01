@@ -106,7 +106,9 @@ async function invoke(
       val: UninitializedAgentError,
     };
   }
-  return resolvedAgent.value.invoke(methodName, input);
+
+  throw new Error(JSON.stringify(input));
+  //return resolvedAgent.value.invoke(methodName, input);
 }
 
 async function discoverAgentTypes(): Promise<bindings.guest.AgentType[]> {
