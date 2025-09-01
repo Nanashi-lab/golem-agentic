@@ -380,14 +380,14 @@ export function getWitValueFromDataValue(
 // Why is return value a tuple with a single element?
 // why should it have a name?
 export function getDataValueFromWitValue(
-  witValues: WitValue.WitValue,
+  witValue: WitValue.WitValue,
 ): DataValue {
   return {
     tag: 'tuple',
     val: [
       {
         tag: 'component-model',
-        val: witValues,
+        val: witValue,
       },
     ],
   };

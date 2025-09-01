@@ -15,13 +15,16 @@
 import { ClassMetadata, TypeMetadata } from '@golemcloud/golem-ts-types-core';
 import { WasmRpc, WorkerId } from 'golem:rpc/types@0.2.2';
 import * as Either from 'effect/Either';
-import * as Value from './mapping/values/Value';
 import * as WitValue from './mapping/values/WitValue';
-import { AgentId } from '../agentId';
 import * as Option from 'effect/Option';
-import { getAgentType, RegisteredAgentType } from 'golem:agent/host';
+import {
+  getAgentType,
+  makeAgentId,
+  RegisteredAgentType,
+} from 'golem:agent/host';
 import { AgentTypeName } from '../newTypes/agentTypeName';
 import { AgentClassName } from '../newTypes/agentClassName';
+import { DataValue, ElementValue } from 'golem:agent/common';
 
 export function getRemoteClient<T extends new (...args: any[]) => any>(
   ctor: T,
@@ -42,7 +45,7 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
 
     const metadata = metadataOpt.value;
 
-    const workerIdEither = initialiseClient(agentClassName, args, metadata);
+    const workerIdEither = getWorkerId(agentTypeName, args, metadata);
 
     if (Either.isLeft(workerIdEither)) {
       throw new Error(workerIdEither.left);
@@ -61,70 +64,6 @@ export function getRemoteClient<T extends new (...args: any[]) => any>(
       },
     });
   };
-}
-
-// TODO: Initialisation can/should be removed from SDK when golem executor does it automatically
-// Initialize client simply does a rpc-invoke on the initialize function of the remote agent
-// SDK will remove this initialization.
-function initialiseClient(
-  agentClassName: AgentClassName,
-  constructorArgs: any[],
-  classMetadata: ClassMetadata,
-): Either.Either<WorkerId, string> {
-  const agentTypeName = AgentTypeName.fromAgentClassName(agentClassName);
-
-  const workerIdEither = getWorkerId(agentTypeName, constructorArgs);
-
-  if (Either.isLeft(workerIdEither)) {
-    return Either.left(workerIdEither.left);
-  }
-
-  const workerId = workerIdEither.right;
-
-  const rpc = new WasmRpc(workerId);
-
-  const constructorParamInfo = classMetadata.constructorArgs;
-
-  const constructorParamTypes = constructorParamInfo.map((param) => param.type);
-
-  const constructorParamWitValuesResult = Either.all(
-    constructorArgs.map((arg, index) => {
-      const typ = constructorParamTypes[index];
-      return WitValue.fromTsValue(arg, typ);
-    }),
-  );
-
-  if (Either.isLeft(constructorParamWitValuesResult)) {
-    throw new Error(
-      'Failed to create remote agent: ' +
-        JSON.stringify(constructorParamWitValuesResult.left),
-    );
-  }
-
-  const agentTypeNameValue: Value.Value = {
-    kind: 'string',
-    value: agentTypeName.value,
-  };
-
-  let witValues = [
-    Value.toWitValue(agentTypeNameValue),
-    ...constructorParamWitValuesResult.right,
-  ];
-
-  const functionName = `${agentTypeName.value}.{initialize}`;
-
-  const initResult = rpc.invokeAndAwait(functionName, witValues);
-
-  if (initResult.tag === 'err') {
-    throw new Error(
-      'Failed to initialize remote agent (' +
-        functionName +
-        '). Error: ' +
-        JSON.stringify(initResult.val),
-    );
-  }
-
-  return Either.right(workerId);
 }
 
 function getMethodProxy(
@@ -196,6 +135,7 @@ function getMethodProxy(
 function getWorkerId(
   agentTypeName: AgentTypeName,
   constructorArgs: any[],
+  classMetadata: ClassMetadata,
 ): Either.Either<WorkerId, string> {
   // PlaceHolder implementation that finds the container-id corresponding to the agentType!
   // We need a host function - given an agent-type, it should return a component-id as proved in the prototype.
@@ -212,14 +152,47 @@ function getWorkerId(
   const registeredAgentType: RegisteredAgentType =
     optionalRegisteredAgentType.value;
 
-  // AgentId is basically the container-name aka worker name if the concept of "a container can have only one agent"
-  const agentId = AgentId.fromAgentTypeAndParams(
-    agentTypeName,
-    constructorArgs,
-  );
+  const constructorParamInfo = classMetadata.constructorArgs;
+
+  const constructorParamTypes = constructorParamInfo.map((param) => param.type);
+
+  const constructorParamWitValuesResult: Either.Either<ElementValue[], string> =
+    Either.all(
+      constructorArgs.map((arg, index) => {
+        const typ = constructorParamTypes[index];
+        return Either.map(WitValue.fromTsValue(arg, typ), (witValue) => {
+          let elementValue: ElementValue = {
+            tag: 'component-model',
+            val: witValue,
+          };
+
+          return elementValue;
+        });
+      }),
+    );
+
+  if (Either.isLeft(constructorParamWitValuesResult)) {
+    throw new Error(
+      'Failed to create remote agent: ' +
+        JSON.stringify(constructorParamWitValuesResult.left),
+    );
+  }
+
+  const constructorDataValue: DataValue = {
+    tag: 'tuple',
+    val: constructorParamWitValuesResult.right,
+  };
+
+  const agentId = makeAgentId(agentTypeName.value, constructorDataValue);
+
+  if (agentId.tag === 'err') {
+    return Either.left(
+      `Failed to create agent-id for agent type ${agentTypeName.value}: ${JSON.stringify(agentId.val)}`,
+    );
+  }
 
   return Either.right({
     componentId: registeredAgentType.implementedBy,
-    workerName: agentId.value,
+    workerName: agentId.val,
   });
 }
