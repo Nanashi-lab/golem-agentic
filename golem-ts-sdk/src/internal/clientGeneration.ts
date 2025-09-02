@@ -89,7 +89,8 @@ function getMethodProxy(
   const returnType = methodSignature?.returnType;
 
   return async (...fnArgs: any[]) => {
-    const functionName = `${agentTypeName.value}.{${prop.toString()}}`;
+    const methodNameKebab = convertMethodNameToKebab(prop.toString());
+    const functionName = `${agentTypeName.value}.{${methodNameKebab}}`;
 
     const parameterWitValuesEither = Either.all(
       fnArgs.map((fnArg, index) => {
@@ -207,4 +208,11 @@ function getWorkerId(
     componentId: registeredAgentType.implementedBy,
     workerName: agentId.val,
   });
+}
+
+function convertMethodNameToKebab(methodName: string): string {
+  return methodName
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .replace(/[\s_]+/g, '-')
+    .toLowerCase();
 }
