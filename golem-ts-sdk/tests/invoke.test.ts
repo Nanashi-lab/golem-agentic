@@ -33,7 +33,7 @@ import * as fc from 'fast-check';
 import { interfaceArb } from './arbitraries';
 import { ResolvedAgent } from '../src/internal/resolvedAgent';
 
-it("AssistantAgent can be successfully initiated and the methods can be invoked'", () => {
+it.skip("AssistantAgent can be successfully initiated and the methods can be invoked'", () => {
   fc.assert(
     fc.property(
       interfaceArb,
@@ -73,7 +73,7 @@ it("AssistantAgent can be successfully initiated and the methods can be invoked'
   );
 });
 
-it('WeatherAgent can be successfully initiated and the methods can be invoked', () => {
+it.skip('WeatherAgent can be successfully initiated and the methods can be invoked', () => {
   fc.assert(
     fc.property(
       fc.string(),

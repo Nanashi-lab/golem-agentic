@@ -44,8 +44,7 @@ export type Value =
 
 export function fromWitValue(wit: WitValue): Value {
   if (!wit.nodes.length) throw new Error('Empty nodes in WitValue');
-
-  return buildTree(wit.nodes[wit.nodes.length - 1], wit.nodes);
+  return buildTree(wit.nodes[0], wit.nodes);
 }
 
 function buildTree(node: WitNode, nodes: WitNode[]): Value {
@@ -169,109 +168,126 @@ function buildTree(node: WitNode, nodes: WitNode[]): Value {
 export function toWitValue(value: Value): WitValue {
   const nodes: WitNode[] = [];
   buildNodes(value, nodes);
-  return { nodes: nodes };
+  return { nodes };
 }
 
 function buildNodes(value: Value, nodes: WitNode[]): number {
-  const push = (node: WitNode): number => {
-    nodes.push(node);
-    return nodes.length - 1;
-  };
+  const idx = nodes.length;
+  nodes.push({ tag: 'placeholder', val: undefined } as any);
 
   switch (value.kind) {
-    case 'record':
+    case 'record': {
       const recordIndices = value.value.map((v) => buildNodes(v, nodes));
-      return push({ tag: 'record-value', val: recordIndices });
+      nodes[idx] = { tag: 'record-value', val: recordIndices };
+      return idx;
+    }
 
-    case 'variant':
-      return push({
-        tag: 'variant-value',
-        val:
-          value.caseValue !== undefined
-            ? [value.caseIdx, buildNodes(value.caseValue, nodes)]
-            : [value.caseIdx, undefined],
-      });
+    case 'variant': {
+      if (value.caseValue !== undefined) {
+        const innerIdx = buildNodes(value.caseValue, nodes);
+        nodes[idx] = { tag: 'variant-value', val: [value.caseIdx, innerIdx] };
+      } else {
+        nodes[idx] = { tag: 'variant-value', val: [value.caseIdx, undefined] };
+      }
+      return idx;
+    }
 
     case 'enum':
-      return push({ tag: 'enum-value', val: value.value });
+      nodes[idx] = { tag: 'enum-value', val: value.value };
+      return idx;
 
     case 'flags':
-      return push({ tag: 'flags-value', val: value.value });
+      nodes[idx] = { tag: 'flags-value', val: value.value };
+      return idx;
 
-    case 'tuple':
+    case 'tuple': {
       const tupleIndices = value.value.map((v) => buildNodes(v, nodes));
-      return push({ tag: 'tuple-value', val: tupleIndices });
+      nodes[idx] = { tag: 'tuple-value', val: tupleIndices };
+      return idx;
+    }
 
-    case 'list':
+    case 'list': {
       const listIndices = value.value.map((v) => buildNodes(v, nodes));
-      return push({ tag: 'list-value', val: listIndices });
+      nodes[idx] = { tag: 'list-value', val: listIndices };
+      return idx;
+    }
 
-    case 'option':
-      return push({
-        tag: 'option-value',
-        val:
-          value.value !== undefined
-            ? buildNodes(value.value, nodes)
-            : undefined,
-      });
-
-    case 'result':
-      if ('ok' in value.value) {
-        return push({
-          tag: 'result-value',
-          val: {
-            tag: 'ok',
-            val:
-              value.value.ok !== undefined
-                ? buildNodes(value.value.ok, nodes)
-                : undefined,
-          },
-        });
+    case 'option': {
+      if (value.value !== undefined) {
+        const innerIdx = buildNodes(value.value, nodes);
+        nodes[idx] = { tag: 'option-value', val: innerIdx };
       } else {
-        return push({
-          tag: 'result-value',
-          val: {
-            tag: 'err',
-            val:
-              value.value.err !== undefined
-                ? buildNodes(value.value.err, nodes)
-                : undefined,
-          },
-        });
+        nodes[idx] = { tag: 'option-value', val: undefined };
       }
+      return idx;
+    }
+
+    case 'result': {
+      if ('ok' in value.value) {
+        const innerIdx =
+          value.value.ok !== undefined
+            ? buildNodes(value.value.ok, nodes)
+            : undefined;
+        nodes[idx] = { tag: 'result-value', val: { tag: 'ok', val: innerIdx } };
+      } else {
+        const innerIdx =
+          value.value.err !== undefined
+            ? buildNodes(value.value.err, nodes)
+            : undefined;
+        nodes[idx] = {
+          tag: 'result-value',
+          val: { tag: 'err', val: innerIdx },
+        };
+      }
+      return idx;
+    }
 
     case 'u8':
-      return push({ tag: 'prim-u8', val: value.value });
+      nodes[idx] = { tag: 'prim-u8', val: value.value };
+      return idx;
     case 'u16':
-      return push({ tag: 'prim-u16', val: value.value });
+      nodes[idx] = { tag: 'prim-u16', val: value.value };
+      return idx;
     case 'u32':
-      return push({ tag: 'prim-u32', val: value.value });
+      nodes[idx] = { tag: 'prim-u32', val: value.value };
+      return idx;
     case 'u64':
-      return push({ tag: 'prim-u64', val: value.value });
+      nodes[idx] = { tag: 'prim-u64', val: value.value };
+      return idx;
     case 's8':
-      return push({ tag: 'prim-s8', val: value.value });
+      nodes[idx] = { tag: 'prim-s8', val: value.value };
+      return idx;
     case 's16':
-      return push({ tag: 'prim-s16', val: value.value });
+      nodes[idx] = { tag: 'prim-s16', val: value.value };
+      return idx;
     case 's32':
-      return push({ tag: 'prim-s32', val: value.value });
+      nodes[idx] = { tag: 'prim-s32', val: value.value };
+      return idx;
     case 's64':
-      return push({ tag: 'prim-s64', val: value.value });
+      nodes[idx] = { tag: 'prim-s64', val: value.value };
+      return idx;
     case 'f32':
-      return push({ tag: 'prim-float32', val: value.value });
+      nodes[idx] = { tag: 'prim-float32', val: value.value };
+      return idx;
     case 'f64':
-      return push({ tag: 'prim-float64', val: value.value });
+      nodes[idx] = { tag: 'prim-float64', val: value.value };
+      return idx;
     case 'char':
-      return push({ tag: 'prim-char', val: value.value });
+      nodes[idx] = { tag: 'prim-char', val: value.value };
+      return idx;
     case 'bool':
-      return push({ tag: 'prim-bool', val: value.value });
+      nodes[idx] = { tag: 'prim-bool', val: value.value };
+      return idx;
     case 'string':
-      return push({ tag: 'prim-string', val: value.value });
+      nodes[idx] = { tag: 'prim-string', val: value.value };
+      return idx;
 
     case 'handle':
-      return push({
+      nodes[idx] = {
         tag: 'handle',
         val: [{ value: value.uri }, value.resourceId],
-      });
+      };
+      return idx;
 
     default:
       throw new Error(`Unhandled kind: ${(value as any).kind}`);
