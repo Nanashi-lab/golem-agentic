@@ -225,7 +225,18 @@ function convertMethodNameToKebab(methodName: string): string {
 function unwrapResult(witValue: WitValue.WitValue): Value.Value {
   const value = Value.fromWitValue(witValue);
 
-  return value.kind === 'tuple' && value.value.length > 0
-    ? value.value[0]
-    : value;
+  const innerResult =
+    value.kind === 'tuple' && value.value.length > 0 ? value.value[0] : value;
+
+  return innerResult.kind === 'result'
+    ? innerResult.value.ok
+      ? innerResult.value.ok
+      : (() => {
+          throw new Error(
+            `Remote invocation failed: ${JSON.stringify(
+              innerResult.value.err,
+            )}`,
+          );
+        })()
+    : innerResult;
 }
