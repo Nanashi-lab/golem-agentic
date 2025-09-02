@@ -462,7 +462,7 @@ export function fromTsValue(
       return Either.left(
         unhandledTypeError(
           tsValue,
-          type,
+          Option.none(),
           Option.some('Unable to infer the type of promise'),
         ),
       );
@@ -478,6 +478,18 @@ export function fromTsValue(
 
   if (name === 'Map') return handleKeyValuePairs(tsValue, type);
 
+  // Inexperienced ts devs may accidentally use
+  // `String` inplace of `string` in typescript and that cannot be handled
+  if (name === 'String') {
+    throw new Error(
+      unhandledTypeError(
+        tsValue,
+        Option.some(name),
+        Option.some("Use 'string' instead of 'String' in type definitions"),
+      ),
+    );
+  }
+
   if (type.isObject()) {
     return handleObject(tsValue, type);
   }
@@ -486,7 +498,7 @@ export function fromTsValue(
     return handleObject(tsValue, type);
   }
 
-  return Either.left(unhandledTypeError(tsValue, type, Option.none()));
+  return Either.left(unhandledTypeError(tsValue, Option.none(), Option.none()));
 }
 
 function handleTypedArray<
@@ -527,7 +539,7 @@ function handleArrayType(
     return Either.left(
       unhandledTypeError(
         tsValue,
-        type,
+        Option.none(),
         Option.some('unable to infer the type of Array'),
       ),
     );
@@ -567,7 +579,7 @@ function handleKeyValuePairs(
     return Either.left(
       unhandledTypeError(
         tsValue,
-        type,
+        Option.none(),
         Option.some('Map must have two type arguments'),
       ),
     );
@@ -581,7 +593,7 @@ function handleKeyValuePairs(
     return Either.left(
       unhandledTypeError(
         tsValue,
-        type,
+        Option.none(),
         Option.some('unable to infer key or value type'),
       ),
     );

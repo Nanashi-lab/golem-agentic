@@ -180,7 +180,7 @@ function testInvoke(
 
   const parameterWitValue = Either.getOrThrowWith(
     WitValue.fromTsValue(arbInput, parameterType),
-    (error) => new Error(`Failed to convert method arg to WitValue. ${error}`),
+    (error) => new Error('Test error ' + error),
   );
 
   resolvedAgent

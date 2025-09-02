@@ -34,11 +34,14 @@ export function unionTypeMatchError(unionTypes: Type[], tsValue: any): string {
 // unhandled type of tsValue when converting from TS to WIT
 export function unhandledTypeError(
   tsValue: any,
-  expectedType: Type,
+  typeName: Option.Option<string>,
   message: Option.Option<string>,
 ): string {
-  const error = `Value ${safeDisplay(tsValue)} cannot be handled. Type of this value is inferred to be ${expectedType.getName()}`;
-  return error + (Option.isSome(message) ? ` Reason: ${message.value}` : '');
+  const error =
+    `${safeDisplay(tsValue)}` +
+    (Option.isSome(typeName) ? ` inferred as type ${typeName.value}` : '') +
+    ` cannot be handled. `;
+  return error + (Option.isSome(message) ? `${message.value}` : '');
 }
 
 // Unable to convert the value to the expected type in the output direction
