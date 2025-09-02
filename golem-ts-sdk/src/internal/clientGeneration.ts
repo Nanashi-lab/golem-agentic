@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ClassMetadata, TypeMetadata } from '@golemcloud/golem-ts-types-core';
+import {
+  ClassMetadata,
+  Type,
+  TypeMetadata,
+} from '@golemcloud/golem-ts-types-core';
 import { WasmRpc, WorkerId } from 'golem:rpc/types@0.2.2';
 import * as Either from 'effect/Either';
 import * as WitValue from './mapping/values/WitValue';
@@ -25,6 +29,7 @@ import {
 import { AgentTypeName } from '../newTypes/agentTypeName';
 import { AgentClassName } from '../newTypes/agentClassName';
 import { DataValue, ElementValue } from 'golem:agent/common';
+import * as Value from './mapping/values/Value';
 
 export function getRemoteClient<T extends new (...args: any[]) => any>(
   ctor: T,
@@ -89,7 +94,8 @@ function getMethodProxy(
   const returnType = methodSignature?.returnType;
 
   return async (...fnArgs: any[]) => {
-    const functionName = `${agentTypeName.value}.{${prop.toString()}}`;
+    const methodNameKebab = convertMethodNameToKebab(prop.toString());
+    const functionName = `${agentTypeName.value}.{${methodNameKebab}}`;
 
     const parameterWitValuesEither = Either.all(
       fnArgs.map((fnArg, index) => {
@@ -136,7 +142,7 @@ function getMethodProxy(
           })()
         : rpcResult.val;
 
-    return WitValue.toTsValue(rpcWitValue, returnType);
+    return Value.toTsValue(unwrapResult(rpcWitValue), returnType);
   };
 }
 
@@ -207,4 +213,30 @@ function getWorkerId(
     componentId: registeredAgentType.implementedBy,
     workerName: agentId.val,
   });
+}
+
+function convertMethodNameToKebab(methodName: string): string {
+  return methodName
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .replace(/[\s_]+/g, '-')
+    .toLowerCase();
+}
+
+function unwrapResult(witValue: WitValue.WitValue): Value.Value {
+  const value = Value.fromWitValue(witValue);
+
+  const innerResult =
+    value.kind === 'tuple' && value.value.length > 0 ? value.value[0] : value;
+
+  return innerResult.kind === 'result'
+    ? innerResult.value.ok
+      ? innerResult.value.ok
+      : (() => {
+          throw new Error(
+            `Remote invocation failed: ${JSON.stringify(
+              innerResult.value.err,
+            )}`,
+          );
+        })()
+    : innerResult;
 }
