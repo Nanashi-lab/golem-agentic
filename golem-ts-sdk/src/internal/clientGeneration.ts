@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ClassMetadata, TypeMetadata } from '@golemcloud/golem-ts-types-core';
+import {
+  ClassMetadata,
+  Type,
+  TypeMetadata,
+} from '@golemcloud/golem-ts-types-core';
 import { WasmRpc, WorkerId } from 'golem:rpc/types@0.2.2';
 import * as Either from 'effect/Either';
 import * as WitValue from './mapping/values/WitValue';
@@ -25,6 +29,7 @@ import {
 import { AgentTypeName } from '../newTypes/agentTypeName';
 import { AgentClassName } from '../newTypes/agentClassName';
 import { DataValue, ElementValue } from 'golem:agent/common';
+import * as Value from './mapping/values/Value';
 
 export function getRemoteClient<T extends new (...args: any[]) => any>(
   ctor: T,
@@ -137,7 +142,7 @@ function getMethodProxy(
           })()
         : rpcResult.val;
 
-    return WitValue.toTsValue(rpcWitValue, returnType);
+    return Value.toTsValue(unwrapResult(rpcWitValue), returnType);
   };
 }
 
@@ -215,4 +220,12 @@ function convertMethodNameToKebab(methodName: string): string {
     .replace(/([a-z])([A-Z])/g, '$1-$2')
     .replace(/[\s_]+/g, '-')
     .toLowerCase();
+}
+
+function unwrapResult(witValue: WitValue.WitValue): Value.Value {
+  const value = Value.fromWitValue(witValue);
+
+  return value.kind === 'tuple' && value.value.length > 0
+    ? value.value[0]
+    : value;
 }
