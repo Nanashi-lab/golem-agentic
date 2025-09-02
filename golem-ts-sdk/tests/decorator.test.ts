@@ -17,8 +17,9 @@ import * as Option from 'effect/Option';
 import { expect } from 'vitest';
 import { AssistantAgentClassName, WeatherAgentClassName } from './testUtils';
 
-// See testAgents.ts for the agent classes with decorators, which is imported before every test suite via testSetup.ts
-it('Agent decorator should register the agent class and its methods into AgentTypeRegistry', () => {
+// Test setup ensures loading agents prior to every test
+// If the sample agents in the set up changes, this test should fail
+test('Agent decorator should register the agent class and its methods into AgentTypeRegistry', () => {
   const assistantAgent = Option.getOrThrowWith(
     AgentTypeRegistry.lookup(AssistantAgentClassName),
     () => new Error('AssistantAgent not found in AgentTypeRegistry'),

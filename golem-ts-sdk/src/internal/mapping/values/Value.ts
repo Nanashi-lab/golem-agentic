@@ -17,6 +17,13 @@ import { WitNode, WitValue } from 'golem:rpc/types@0.2.2';
 import { Type, Symbol, Node } from '@golemcloud/golem-ts-types-core';
 import * as Either from 'effect/Either';
 import * as Option from 'effect/Option';
+import {
+  missingValueForKey,
+  typeMismatchIn,
+  typeMismatchOut,
+  unhandledTypeError,
+  unionTypeMatchError,
+} from './errors';
 
 export type Value =
   | { kind: 'bool'; value: boolean }
@@ -44,8 +51,7 @@ export type Value =
 
 export function fromWitValue(wit: WitValue): Value {
   if (!wit.nodes.length) throw new Error('Empty nodes in WitValue');
-
-  return buildTree(wit.nodes[wit.nodes.length - 1], wit.nodes);
+  return buildTree(wit.nodes[0], wit.nodes);
 }
 
 function buildTree(node: WitNode, nodes: WitNode[]): Value {
@@ -169,109 +175,126 @@ function buildTree(node: WitNode, nodes: WitNode[]): Value {
 export function toWitValue(value: Value): WitValue {
   const nodes: WitNode[] = [];
   buildNodes(value, nodes);
-  return { nodes: nodes };
+  return { nodes };
 }
 
 function buildNodes(value: Value, nodes: WitNode[]): number {
-  const push = (node: WitNode): number => {
-    nodes.push(node);
-    return nodes.length - 1;
-  };
+  const idx = nodes.length;
+  nodes.push({ tag: 'placeholder', val: undefined } as any);
 
   switch (value.kind) {
-    case 'record':
+    case 'record': {
       const recordIndices = value.value.map((v) => buildNodes(v, nodes));
-      return push({ tag: 'record-value', val: recordIndices });
+      nodes[idx] = { tag: 'record-value', val: recordIndices };
+      return idx;
+    }
 
-    case 'variant':
-      return push({
-        tag: 'variant-value',
-        val:
-          value.caseValue !== undefined
-            ? [value.caseIdx, buildNodes(value.caseValue, nodes)]
-            : [value.caseIdx, undefined],
-      });
+    case 'variant': {
+      if (value.caseValue !== undefined) {
+        const innerIdx = buildNodes(value.caseValue, nodes);
+        nodes[idx] = { tag: 'variant-value', val: [value.caseIdx, innerIdx] };
+      } else {
+        nodes[idx] = { tag: 'variant-value', val: [value.caseIdx, undefined] };
+      }
+      return idx;
+    }
 
     case 'enum':
-      return push({ tag: 'enum-value', val: value.value });
+      nodes[idx] = { tag: 'enum-value', val: value.value };
+      return idx;
 
     case 'flags':
-      return push({ tag: 'flags-value', val: value.value });
+      nodes[idx] = { tag: 'flags-value', val: value.value };
+      return idx;
 
-    case 'tuple':
+    case 'tuple': {
       const tupleIndices = value.value.map((v) => buildNodes(v, nodes));
-      return push({ tag: 'tuple-value', val: tupleIndices });
+      nodes[idx] = { tag: 'tuple-value', val: tupleIndices };
+      return idx;
+    }
 
-    case 'list':
+    case 'list': {
       const listIndices = value.value.map((v) => buildNodes(v, nodes));
-      return push({ tag: 'list-value', val: listIndices });
+      nodes[idx] = { tag: 'list-value', val: listIndices };
+      return idx;
+    }
 
-    case 'option':
-      return push({
-        tag: 'option-value',
-        val:
-          value.value !== undefined
-            ? buildNodes(value.value, nodes)
-            : undefined,
-      });
-
-    case 'result':
-      if ('ok' in value.value) {
-        return push({
-          tag: 'result-value',
-          val: {
-            tag: 'ok',
-            val:
-              value.value.ok !== undefined
-                ? buildNodes(value.value.ok, nodes)
-                : undefined,
-          },
-        });
+    case 'option': {
+      if (value.value !== undefined) {
+        const innerIdx = buildNodes(value.value, nodes);
+        nodes[idx] = { tag: 'option-value', val: innerIdx };
       } else {
-        return push({
-          tag: 'result-value',
-          val: {
-            tag: 'err',
-            val:
-              value.value.err !== undefined
-                ? buildNodes(value.value.err, nodes)
-                : undefined,
-          },
-        });
+        nodes[idx] = { tag: 'option-value', val: undefined };
       }
+      return idx;
+    }
+
+    case 'result': {
+      if ('ok' in value.value) {
+        const innerIdx =
+          value.value.ok !== undefined
+            ? buildNodes(value.value.ok, nodes)
+            : undefined;
+        nodes[idx] = { tag: 'result-value', val: { tag: 'ok', val: innerIdx } };
+      } else {
+        const innerIdx =
+          value.value.err !== undefined
+            ? buildNodes(value.value.err, nodes)
+            : undefined;
+        nodes[idx] = {
+          tag: 'result-value',
+          val: { tag: 'err', val: innerIdx },
+        };
+      }
+      return idx;
+    }
 
     case 'u8':
-      return push({ tag: 'prim-u8', val: value.value });
+      nodes[idx] = { tag: 'prim-u8', val: value.value };
+      return idx;
     case 'u16':
-      return push({ tag: 'prim-u16', val: value.value });
+      nodes[idx] = { tag: 'prim-u16', val: value.value };
+      return idx;
     case 'u32':
-      return push({ tag: 'prim-u32', val: value.value });
+      nodes[idx] = { tag: 'prim-u32', val: value.value };
+      return idx;
     case 'u64':
-      return push({ tag: 'prim-u64', val: value.value });
+      nodes[idx] = { tag: 'prim-u64', val: value.value };
+      return idx;
     case 's8':
-      return push({ tag: 'prim-s8', val: value.value });
+      nodes[idx] = { tag: 'prim-s8', val: value.value };
+      return idx;
     case 's16':
-      return push({ tag: 'prim-s16', val: value.value });
+      nodes[idx] = { tag: 'prim-s16', val: value.value };
+      return idx;
     case 's32':
-      return push({ tag: 'prim-s32', val: value.value });
+      nodes[idx] = { tag: 'prim-s32', val: value.value };
+      return idx;
     case 's64':
-      return push({ tag: 'prim-s64', val: value.value });
+      nodes[idx] = { tag: 'prim-s64', val: value.value };
+      return idx;
     case 'f32':
-      return push({ tag: 'prim-float32', val: value.value });
+      nodes[idx] = { tag: 'prim-float32', val: value.value };
+      return idx;
     case 'f64':
-      return push({ tag: 'prim-float64', val: value.value });
+      nodes[idx] = { tag: 'prim-float64', val: value.value };
+      return idx;
     case 'char':
-      return push({ tag: 'prim-char', val: value.value });
+      nodes[idx] = { tag: 'prim-char', val: value.value };
+      return idx;
     case 'bool':
-      return push({ tag: 'prim-bool', val: value.value });
+      nodes[idx] = { tag: 'prim-bool', val: value.value };
+      return idx;
     case 'string':
-      return push({ tag: 'prim-string', val: value.value });
+      nodes[idx] = { tag: 'prim-string', val: value.value };
+      return idx;
 
     case 'handle':
-      return push({
+      nodes[idx] = {
         tag: 'handle',
         val: [{ value: value.uri }, value.resourceId],
-      });
+      };
+      return idx;
 
     default:
       throw new Error(`Unhandled kind: ${(value as any).kind}`);
@@ -410,7 +433,7 @@ export function fromTsValue(
     if (typeof tsValue === 'number') {
       return Either.right({ kind: 's32', value: tsValue });
     } else {
-      return Either.left(invalidTypeError(tsValue, type));
+      return Either.left(typeMismatchIn(tsValue, type));
     }
   }
 
@@ -418,7 +441,7 @@ export function fromTsValue(
     if (typeof tsValue === 'bigint' || typeof tsValue === 'number') {
       return Either.right({ kind: 'u64', value: tsValue as any });
     } else {
-      return Either.left(invalidTypeError(tsValue, type));
+      return Either.left(typeMismatchIn(tsValue, type));
     }
   }
 
@@ -426,7 +449,7 @@ export function fromTsValue(
     if (typeof tsValue === 'string') {
       return Either.right({ kind: 'string', value: tsValue });
     } else {
-      return Either.left(invalidTypeError(tsValue, type));
+      return Either.left(typeMismatchIn(tsValue, type));
     }
   }
 
@@ -437,9 +460,9 @@ export function fromTsValue(
 
     if (!inner) {
       return Either.left(
-        unexpectedTypeError(
+        unhandledTypeError(
           tsValue,
-          type,
+          Option.none(),
           Option.some('Unable to infer the type of promise'),
         ),
       );
@@ -455,6 +478,18 @@ export function fromTsValue(
 
   if (name === 'Map') return handleKeyValuePairs(tsValue, type);
 
+  // Inexperienced ts devs may accidentally use
+  // `String` inplace of `string` in typescript and that cannot be handled
+  if (name === 'String') {
+    throw new Error(
+      unhandledTypeError(
+        tsValue,
+        Option.some(name),
+        Option.some("Use 'string' instead of 'String' in type definitions"),
+      ),
+    );
+  }
+
   if (type.isObject()) {
     return handleObject(tsValue, type);
   }
@@ -463,7 +498,7 @@ export function fromTsValue(
     return handleObject(tsValue, type);
   }
 
-  return Either.left(unexpectedTypeError(tsValue, type, Option.none()));
+  return Either.left(unhandledTypeError(tsValue, Option.none(), Option.none()));
 }
 
 function handleTypedArray<
@@ -482,7 +517,7 @@ function handleTypedArray<
   return tsValue instanceof ctor
     ? Either.right(tsValue)
     : Either.left(
-        invalidTypeError(tsValue, new Type({ kind: 'array', name: ctor.name })),
+        typeMismatchIn(tsValue, new Type({ kind: 'array', name: ctor.name })),
       );
 }
 
@@ -490,9 +525,7 @@ function handleBooleanType(tsValue: any): Either.Either<Value, string> {
   if (typeof tsValue === 'boolean') {
     return Either.right({ kind: 'bool', value: tsValue });
   } else {
-    return Either.left(
-      invalidTypeError(tsValue, new Type({ kind: 'boolean' })),
-    );
+    return Either.left(typeMismatchIn(tsValue, new Type({ kind: 'boolean' })));
   }
 }
 
@@ -504,15 +537,15 @@ function handleArrayType(
 
   if (!typeArg) {
     return Either.left(
-      unexpectedTypeError(
+      unhandledTypeError(
         tsValue,
-        type,
+        Option.none(),
         Option.some('unable to infer the type of Array'),
       ),
     );
   }
   if (!Array.isArray(tsValue)) {
-    return Either.left(invalidTypeError(tsValue, new Type({ kind: 'array' })));
+    return Either.left(typeMismatchIn(tsValue, new Type({ kind: 'array' })));
   }
 
   return Either.map(
@@ -528,7 +561,7 @@ function handleTupleType(
   const typeArgs = type.getTupleElements();
 
   if (!Array.isArray(tsValue)) {
-    return Either.left(invalidTypeError(tsValue, new Type({ kind: 'tuple' })));
+    return Either.left(typeMismatchIn(tsValue, new Type({ kind: 'tuple' })));
   }
 
   return Either.map(
@@ -544,23 +577,23 @@ function handleKeyValuePairs(
   const typeArgs = type.getTypeArguments?.();
   if (!typeArgs || typeArgs.length !== 2) {
     return Either.left(
-      unexpectedTypeError(
+      unhandledTypeError(
         tsValue,
-        type,
+        Option.none(),
         Option.some('Map must have two type arguments'),
       ),
     );
   }
   if (!(tsValue instanceof Map)) {
-    return Either.left(invalidTypeError(tsValue, type));
+    return Either.left(typeMismatchIn(tsValue, type));
   }
 
   const [keyType, valueType] = typeArgs;
   if (!keyType || !valueType) {
     return Either.left(
-      unexpectedTypeError(
+      unhandledTypeError(
         tsValue,
-        type,
+        Option.none(),
         Option.some('unable to infer key or value type'),
       ),
     );
@@ -581,7 +614,7 @@ function handleKeyValuePairs(
 
 function handleObject(tsValue: any, type: Type): Either.Either<Value, string> {
   if (typeof tsValue !== 'object' || tsValue === null) {
-    return Either.left(invalidTypeError(tsValue, type));
+    return Either.left(typeMismatchIn(tsValue, type));
   }
   const innerProperties: Symbol[] = type.getProperties();
   const values: Value[] = [];
@@ -764,28 +797,6 @@ function handleObjectMatch(value: any, type: Type): boolean {
   return true;
 }
 
-function invalidTypeError(tsValue: any, expectedType: Type): string {
-  const nameOrKind = expectedType.getName() ?? expectedType.getKind();
-  return `Expected ${nameOrKind}, but got ${tsValue} which is of type ${typeof tsValue}`;
-}
-
-function missingValueForKey(key: string, tsValue: any): string {
-  return `Missing key '${key}' in ${JSON.stringify(tsValue)}`;
-}
-
-function unionTypeMatchError(unionTypes: Type[], tsValue: any): string {
-  return `Value '${tsValue}' does not match any of the union types: ${unionTypes.map((t) => t.getName()).join(', ')}`;
-}
-
-function unexpectedTypeError(
-  tsValue: any,
-  expectedType: Type,
-  message: Option.Option<string>,
-): string {
-  const error = `Value ${JSON.stringify(tsValue)} cannot be handled. Type of this value is inferred to be ${expectedType.getName()}`;
-  return error + (Option.isSome(message) ? ` Reason: ${message.value}` : '');
-}
-
 export function toTsValue(value: Value, type: Type): any {
   const name = type.getName();
 
@@ -806,7 +817,7 @@ export function toTsValue(value: Value, type: Type): any {
     if (value.kind === 'string') {
       return value.value;
     } else {
-      throw new Error(`Expected string, obtained value ${value}`);
+      throw new Error(typeMismatchOut(value, 'string'));
     }
   }
 
@@ -818,7 +829,7 @@ export function toTsValue(value: Value, type: Type): any {
     if (value.kind === 'tuple' && value.value.length === 0) {
       return null;
     } else {
-      throw new Error(`Expected null (unit), obtained value ${value}`);
+      throw new Error(typeMismatchOut(value, 'null'));
     }
   }
 
@@ -826,7 +837,7 @@ export function toTsValue(value: Value, type: Type): any {
     if (value.kind === 'bool') {
       return value.value;
     } else {
-      throw new Error(`Expected boolean, obtained value ${value}`);
+      throw new Error(typeMismatchOut(value, 'boolean'));
     }
   }
 
@@ -835,7 +846,7 @@ export function toTsValue(value: Value, type: Type): any {
       if (value.kind === 'list') {
         return new Uint8Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Uint8Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Uint8Array'));
       }
     case 'Uint8ClampedArray':
       if (value.kind === 'list') {
@@ -843,69 +854,71 @@ export function toTsValue(value: Value, type: Type): any {
           value.value.map((v) => convertToNumber(v)),
         );
       } else {
-        throw new Error(`Expected Uint8ClampedArray, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Uint8ClampedArray'));
       }
     case 'Int8Array':
       if (value.kind === 'list') {
         return new Int8Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Int8Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Int8Array'));
       }
 
     case 'Int16Array':
       if (value.kind === 'list') {
         return new Int16Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Int16Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Int16Array'));
       }
     case 'Uint16Array':
       if (value.kind === 'list') {
         return new Uint16Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Uint16Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Uint16Array'));
       }
     case 'Int32Array':
       if (value.kind === 'list') {
         return new Int32Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Int32Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Int32Array'));
       }
     case 'Uint32Array':
       if (value.kind === 'list') {
         return new Uint32Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Uint32Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Uint32Array'));
       }
     case 'Float32Array':
       if (value.kind === 'list') {
         return new Float32Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Float32Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Float32Array'));
       }
     case 'Float64Array':
       if (value.kind === 'list') {
         return new Float64Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Float64Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Float64Array'));
       }
     case 'BigInt64Array':
       if (value.kind === 'list') {
         return new BigInt64Array(value.value.map((v) => convertToBigInt(v)));
       } else {
-        throw new Error(`Expected BigInt64Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'BigInt64Array'));
       }
     case 'BigUint64Array':
       if (value.kind === 'list') {
         return new BigUint64Array(value.value.map((v) => convertToBigInt(v)));
       } else {
-        throw new Error(`Expected BigUint64Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'BigUint64Array'));
       }
   }
 
   if (name === 'Promise') {
     const innerType = type.getPromiseElementType();
     if (!innerType) {
-      throw new Error(`Expected Promise to have one type argument`);
+      throw new Error(
+        `Internal Error: Expected Promise to have one type argument`,
+      );
     }
     return toTsValue(value, innerType);
   }
@@ -914,14 +927,14 @@ export function toTsValue(value: Value, type: Type): any {
     const typeArgs = type.getTypeArguments();
 
     if (typeArgs.length !== 2) {
-      throw new Error('Map must have two type arguments');
+      throw new Error('Internal Error: Map must have two type arguments');
     }
 
     if (value.kind === 'list') {
       const entries: [any, any][] = value.value.map((item: Value) => {
         if (item.kind !== 'tuple' || item.value.length !== 2) {
           throw new Error(
-            `Expected tuple of two items, obtained value ${item}`,
+            `Internal Error: Expected tuple of two items, got ${item}`,
           );
         }
 
@@ -932,7 +945,7 @@ export function toTsValue(value: Value, type: Type): any {
       });
       return new Map(entries);
     } else {
-      throw new Error(`Unable to convert ${JSON.stringify(value)} to Map`);
+      throw new Error(typeMismatchOut(value, 'Map'));
     }
   }
 
@@ -943,7 +956,7 @@ export function toTsValue(value: Value, type: Type): any {
         toTsValue(item, typeArg[idx]),
       );
     } else {
-      throw new Error(`Unable to convert ${JSON.stringify(value)} to tuple`);
+      throw new Error(typeMismatchOut(value, 'tuple'));
     }
   }
 
@@ -956,7 +969,7 @@ export function toTsValue(value: Value, type: Type): any {
       }
       return value.value.map((item: Value) => toTsValue(item, elemType));
     } else {
-      throw new Error(`Unable to convert ${JSON.stringify(value)} to array`);
+      throw new Error(typeMismatchOut(value, 'array'));
     }
   }
 
@@ -976,7 +989,7 @@ export function toTsValue(value: Value, type: Type): any {
         {} as Record<string, any>,
       );
     } else {
-      throw new Error(`Unable to convert ${JSON.stringify(value)} to object`);
+      throw new Error(typeMismatchOut(value, 'object'));
     }
   }
 
@@ -996,9 +1009,7 @@ export function toTsValue(value: Value, type: Type): any {
         {} as Record<string, any>,
       );
     } else {
-      throw new Error(
-        `Unable to convert ${JSON.stringify(value)} to interface`,
-      );
+      throw new Error(typeMismatchOut(value, 'interface'));
     }
   }
 
@@ -1006,7 +1017,7 @@ export function toTsValue(value: Value, type: Type): any {
     if (value.kind === 'variant') {
       const caseValue = value.caseValue;
       if (!caseValue) {
-        throw new Error(`Expected union, obtained value ${value}`);
+        throw new Error(`Expected union, got ${value}`);
       }
 
       const unionTypes = type.getUnionTypes();
@@ -1014,11 +1025,11 @@ export function toTsValue(value: Value, type: Type): any {
 
       return toTsValue(caseValue, matchingType);
     } else {
-      throw new Error(`Unable to convert ${JSON.stringify(value)} to union`);
+      throw new Error(typeMismatchOut(value, 'union'));
     }
   }
 
-  throw new Error(`'Type ${name} is not supported in golem'`);
+  throw new Error(`'Type ${name} is not supported in golem yet'`);
 }
 
 function convertToNumber(value: Value): any {
@@ -1044,6 +1055,6 @@ function convertToBigInt(value: Value): any {
   if (value.kind === 'u64' || value.kind === 's64') {
     return value.value;
   } else {
-    throw new Error(`Unable to convert the ${JSON.stringify(value)} to bigint`);
+    throw new Error(typeMismatchOut(value, 'bigint'));
   }
 }

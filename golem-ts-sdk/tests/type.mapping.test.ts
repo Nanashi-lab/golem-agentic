@@ -29,7 +29,6 @@ import * as AnalysedType from '../src/internal/mapping/types/AnalysedType';
 import * as Either from 'effect/Either';
 import * as Option from 'effect/Option';
 import { NameTypePair } from '../src/internal/mapping/types/AnalysedType';
-import { WorkerMetadata } from 'golem:api/host@1.1.7';
 
 // Interface type indirectly tests primitive types, union, list etc
 describe('TypeScript Interface to AnalysedType', () => {
@@ -152,7 +151,6 @@ describe('TypeScript Object to AnalysedType', () => {
   });
 });
 
-// To be confirmed.
 describe('TypeScript Union to AnalysedType.Variant', () => {
   it('Union is converted to Variant with the name of the type as case name', () => {
     const enumType = getUnionType();

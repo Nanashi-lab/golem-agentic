@@ -106,6 +106,7 @@ async function invoke(
       val: UninitializedAgentError,
     };
   }
+
   return resolvedAgent.value.invoke(methodName, input);
 }
 

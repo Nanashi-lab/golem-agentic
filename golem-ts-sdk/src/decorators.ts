@@ -274,8 +274,9 @@ export function agent() {
 
               const returnType: Type = methodInfo.returnType;
 
+              const paramTypeArray = Array.from(paramTypes.values());
+
               const convertedArgs = argsWitValues.map((witVal, idx) => {
-                const paramTypeArray = Array.from(paramTypes.values());
                 const paramType = paramTypeArray[idx];
                 return WitValue.toTsValue(witVal, paramType);
               });

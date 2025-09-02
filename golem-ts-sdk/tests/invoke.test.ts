@@ -33,7 +33,7 @@ import * as fc from 'fast-check';
 import { interfaceArb } from './arbitraries';
 import { ResolvedAgent } from '../src/internal/resolvedAgent';
 
-it("AssistantAgent can be successfully initiated and the methods can be invoked'", () => {
+test("AssistantAgent can be successfully initiated and the methods can be invoked'", () => {
   fc.assert(
     fc.property(
       interfaceArb,
@@ -73,7 +73,7 @@ it("AssistantAgent can be successfully initiated and the methods can be invoked'
   );
 });
 
-it('WeatherAgent can be successfully initiated and the methods can be invoked', () => {
+test('WeatherAgent can be successfully initiated and the methods can be invoked', () => {
   fc.assert(
     fc.property(
       fc.string(),
@@ -180,7 +180,7 @@ function testInvoke(
 
   const parameterWitValue = Either.getOrThrowWith(
     WitValue.fromTsValue(arbInput, parameterType),
-    (error) => new Error(`Failed to convert method arg to WitValue. ${error}`),
+    (error) => new Error('Test error ' + error),
   );
 
   resolvedAgent
