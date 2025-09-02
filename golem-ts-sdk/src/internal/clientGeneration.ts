@@ -88,7 +88,7 @@ function getMethodProxy(
 
   const returnType = methodSignature?.returnType;
 
-  return (...fnArgs: any[]) => {
+  return async (...fnArgs: any[]) => {
     const functionName = `${agentTypeName.value}.{${prop.toString()}}`;
 
     const parameterWitValuesEither = Either.all(
@@ -110,10 +110,22 @@ function getMethodProxy(
 
     const rpcForInvokeMethod = new WasmRpc(workerId);
 
-    const rpcResult = rpcForInvokeMethod.invokeAndAwait(
+    const rpcResultFuture = rpcForInvokeMethod.asyncInvokeAndAwait(
       functionName,
       parameterWitValues,
     );
+
+    const rpcResultPollable = rpcResultFuture.subscribe();
+
+    await rpcResultPollable.promise();
+
+    const rpcResult = rpcResultFuture.get();
+
+    if (!rpcResult) {
+      throw new Error(
+        `Failed to invoke ${functionName} in agent ${workerId.workerName}. RPC result is not available after polling`,
+      );
+    }
 
     const rpcWitValue =
       rpcResult.tag === 'err'
