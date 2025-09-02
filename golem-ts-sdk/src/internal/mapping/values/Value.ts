@@ -17,6 +17,13 @@ import { WitNode, WitValue } from 'golem:rpc/types@0.2.2';
 import { Type, Symbol, Node } from '@golemcloud/golem-ts-types-core';
 import * as Either from 'effect/Either';
 import * as Option from 'effect/Option';
+import {
+  missingValueForKey,
+  typeMismatchIn,
+  typeMismatchOut,
+  unhandledTypeError,
+  unionTypeMatchError,
+} from './errors';
 
 export type Value =
   | { kind: 'bool'; value: boolean }
@@ -426,7 +433,7 @@ export function fromTsValue(
     if (typeof tsValue === 'number') {
       return Either.right({ kind: 's32', value: tsValue });
     } else {
-      return Either.left(invalidTypeError(tsValue, type));
+      return Either.left(typeMismatchIn(tsValue, type));
     }
   }
 
@@ -434,7 +441,7 @@ export function fromTsValue(
     if (typeof tsValue === 'bigint' || typeof tsValue === 'number') {
       return Either.right({ kind: 'u64', value: tsValue as any });
     } else {
-      return Either.left(invalidTypeError(tsValue, type));
+      return Either.left(typeMismatchIn(tsValue, type));
     }
   }
 
@@ -442,7 +449,7 @@ export function fromTsValue(
     if (typeof tsValue === 'string') {
       return Either.right({ kind: 'string', value: tsValue });
     } else {
-      return Either.left(invalidTypeError(tsValue, type));
+      return Either.left(typeMismatchIn(tsValue, type));
     }
   }
 
@@ -453,7 +460,7 @@ export function fromTsValue(
 
     if (!inner) {
       return Either.left(
-        unexpectedTypeError(
+        unhandledTypeError(
           tsValue,
           type,
           Option.some('Unable to infer the type of promise'),
@@ -479,7 +486,7 @@ export function fromTsValue(
     return handleObject(tsValue, type);
   }
 
-  return Either.left(unexpectedTypeError(tsValue, type, Option.none()));
+  return Either.left(unhandledTypeError(tsValue, type, Option.none()));
 }
 
 function handleTypedArray<
@@ -498,7 +505,7 @@ function handleTypedArray<
   return tsValue instanceof ctor
     ? Either.right(tsValue)
     : Either.left(
-        invalidTypeError(tsValue, new Type({ kind: 'array', name: ctor.name })),
+        typeMismatchIn(tsValue, new Type({ kind: 'array', name: ctor.name })),
       );
 }
 
@@ -506,9 +513,7 @@ function handleBooleanType(tsValue: any): Either.Either<Value, string> {
   if (typeof tsValue === 'boolean') {
     return Either.right({ kind: 'bool', value: tsValue });
   } else {
-    return Either.left(
-      invalidTypeError(tsValue, new Type({ kind: 'boolean' })),
-    );
+    return Either.left(typeMismatchIn(tsValue, new Type({ kind: 'boolean' })));
   }
 }
 
@@ -520,7 +525,7 @@ function handleArrayType(
 
   if (!typeArg) {
     return Either.left(
-      unexpectedTypeError(
+      unhandledTypeError(
         tsValue,
         type,
         Option.some('unable to infer the type of Array'),
@@ -528,7 +533,7 @@ function handleArrayType(
     );
   }
   if (!Array.isArray(tsValue)) {
-    return Either.left(invalidTypeError(tsValue, new Type({ kind: 'array' })));
+    return Either.left(typeMismatchIn(tsValue, new Type({ kind: 'array' })));
   }
 
   return Either.map(
@@ -544,7 +549,7 @@ function handleTupleType(
   const typeArgs = type.getTupleElements();
 
   if (!Array.isArray(tsValue)) {
-    return Either.left(invalidTypeError(tsValue, new Type({ kind: 'tuple' })));
+    return Either.left(typeMismatchIn(tsValue, new Type({ kind: 'tuple' })));
   }
 
   return Either.map(
@@ -560,7 +565,7 @@ function handleKeyValuePairs(
   const typeArgs = type.getTypeArguments?.();
   if (!typeArgs || typeArgs.length !== 2) {
     return Either.left(
-      unexpectedTypeError(
+      unhandledTypeError(
         tsValue,
         type,
         Option.some('Map must have two type arguments'),
@@ -568,13 +573,13 @@ function handleKeyValuePairs(
     );
   }
   if (!(tsValue instanceof Map)) {
-    return Either.left(invalidTypeError(tsValue, type));
+    return Either.left(typeMismatchIn(tsValue, type));
   }
 
   const [keyType, valueType] = typeArgs;
   if (!keyType || !valueType) {
     return Either.left(
-      unexpectedTypeError(
+      unhandledTypeError(
         tsValue,
         type,
         Option.some('unable to infer key or value type'),
@@ -597,7 +602,7 @@ function handleKeyValuePairs(
 
 function handleObject(tsValue: any, type: Type): Either.Either<Value, string> {
   if (typeof tsValue !== 'object' || tsValue === null) {
-    return Either.left(invalidTypeError(tsValue, type));
+    return Either.left(typeMismatchIn(tsValue, type));
   }
   const innerProperties: Symbol[] = type.getProperties();
   const values: Value[] = [];
@@ -780,28 +785,6 @@ function handleObjectMatch(value: any, type: Type): boolean {
   return true;
 }
 
-function invalidTypeError(tsValue: any, expectedType: Type): string {
-  const nameOrKind = expectedType.getName() ?? expectedType.getKind();
-  return `Expected ${nameOrKind}, but got ${tsValue} which is of type ${typeof tsValue}`;
-}
-
-function missingValueForKey(key: string, tsValue: any): string {
-  return `Missing key '${key}' in ${JSON.stringify(tsValue)}`;
-}
-
-function unionTypeMatchError(unionTypes: Type[], tsValue: any): string {
-  return `Value '${tsValue}' does not match any of the union types: ${unionTypes.map((t) => t.getName()).join(', ')}`;
-}
-
-function unexpectedTypeError(
-  tsValue: any,
-  expectedType: Type,
-  message: Option.Option<string>,
-): string {
-  const error = `Value ${JSON.stringify(tsValue)} cannot be handled. Type of this value is inferred to be ${expectedType.getName()}`;
-  return error + (Option.isSome(message) ? ` Reason: ${message.value}` : '');
-}
-
 export function toTsValue(value: Value, type: Type): any {
   const name = type.getName();
 
@@ -822,7 +805,7 @@ export function toTsValue(value: Value, type: Type): any {
     if (value.kind === 'string') {
       return value.value;
     } else {
-      throw new Error(`Expected string, obtained value ${value}`);
+      throw new Error(typeMismatchOut(value, 'string'));
     }
   }
 
@@ -834,7 +817,7 @@ export function toTsValue(value: Value, type: Type): any {
     if (value.kind === 'tuple' && value.value.length === 0) {
       return null;
     } else {
-      throw new Error(`Expected null (unit), obtained value ${value}`);
+      throw new Error(typeMismatchOut(value, 'null'));
     }
   }
 
@@ -842,7 +825,7 @@ export function toTsValue(value: Value, type: Type): any {
     if (value.kind === 'bool') {
       return value.value;
     } else {
-      throw new Error(`Expected boolean, obtained value ${value}`);
+      throw new Error(typeMismatchOut(value, 'boolean'));
     }
   }
 
@@ -851,7 +834,7 @@ export function toTsValue(value: Value, type: Type): any {
       if (value.kind === 'list') {
         return new Uint8Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Uint8Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Uint8Array'));
       }
     case 'Uint8ClampedArray':
       if (value.kind === 'list') {
@@ -859,69 +842,71 @@ export function toTsValue(value: Value, type: Type): any {
           value.value.map((v) => convertToNumber(v)),
         );
       } else {
-        throw new Error(`Expected Uint8ClampedArray, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Uint8ClampedArray'));
       }
     case 'Int8Array':
       if (value.kind === 'list') {
         return new Int8Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Int8Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Int8Array'));
       }
 
     case 'Int16Array':
       if (value.kind === 'list') {
         return new Int16Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Int16Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Int16Array'));
       }
     case 'Uint16Array':
       if (value.kind === 'list') {
         return new Uint16Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Uint16Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Uint16Array'));
       }
     case 'Int32Array':
       if (value.kind === 'list') {
         return new Int32Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Int32Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Int32Array'));
       }
     case 'Uint32Array':
       if (value.kind === 'list') {
         return new Uint32Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Uint32Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Uint32Array'));
       }
     case 'Float32Array':
       if (value.kind === 'list') {
         return new Float32Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Float32Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Float32Array'));
       }
     case 'Float64Array':
       if (value.kind === 'list') {
         return new Float64Array(value.value.map((v) => convertToNumber(v)));
       } else {
-        throw new Error(`Expected Float64Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'Float64Array'));
       }
     case 'BigInt64Array':
       if (value.kind === 'list') {
         return new BigInt64Array(value.value.map((v) => convertToBigInt(v)));
       } else {
-        throw new Error(`Expected BigInt64Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'BigInt64Array'));
       }
     case 'BigUint64Array':
       if (value.kind === 'list') {
         return new BigUint64Array(value.value.map((v) => convertToBigInt(v)));
       } else {
-        throw new Error(`Expected BigUint64Array, obtained value ${value}`);
+        throw new Error(typeMismatchOut(value, 'BigUint64Array'));
       }
   }
 
   if (name === 'Promise') {
     const innerType = type.getPromiseElementType();
     if (!innerType) {
-      throw new Error(`Expected Promise to have one type argument`);
+      throw new Error(
+        `Internal Error: Expected Promise to have one type argument`,
+      );
     }
     return toTsValue(value, innerType);
   }
@@ -930,14 +915,14 @@ export function toTsValue(value: Value, type: Type): any {
     const typeArgs = type.getTypeArguments();
 
     if (typeArgs.length !== 2) {
-      throw new Error('Map must have two type arguments');
+      throw new Error('Internal Error: Map must have two type arguments');
     }
 
     if (value.kind === 'list') {
       const entries: [any, any][] = value.value.map((item: Value) => {
         if (item.kind !== 'tuple' || item.value.length !== 2) {
           throw new Error(
-            `Expected tuple of two items, obtained value ${item}`,
+            `Internal Error: Expected tuple of two items, got ${item}`,
           );
         }
 
@@ -948,7 +933,7 @@ export function toTsValue(value: Value, type: Type): any {
       });
       return new Map(entries);
     } else {
-      throw new Error(`Unable to convert ${JSON.stringify(value)} to Map`);
+      throw new Error(typeMismatchOut(value, 'Map'));
     }
   }
 
@@ -959,7 +944,7 @@ export function toTsValue(value: Value, type: Type): any {
         toTsValue(item, typeArg[idx]),
       );
     } else {
-      throw new Error(`Unable to convert ${JSON.stringify(value)} to tuple`);
+      throw new Error(typeMismatchOut(value, 'tuple'));
     }
   }
 
@@ -972,7 +957,7 @@ export function toTsValue(value: Value, type: Type): any {
       }
       return value.value.map((item: Value) => toTsValue(item, elemType));
     } else {
-      throw new Error(`Unable to convert ${JSON.stringify(value)} to array`);
+      throw new Error(typeMismatchOut(value, 'array'));
     }
   }
 
@@ -992,7 +977,7 @@ export function toTsValue(value: Value, type: Type): any {
         {} as Record<string, any>,
       );
     } else {
-      throw new Error(`Unable to convert ${JSON.stringify(value)} to object`);
+      throw new Error(typeMismatchOut(value, 'object'));
     }
   }
 
@@ -1012,9 +997,7 @@ export function toTsValue(value: Value, type: Type): any {
         {} as Record<string, any>,
       );
     } else {
-      throw new Error(
-        `Unable to convert ${JSON.stringify(value)} to interface`,
-      );
+      throw new Error(typeMismatchOut(value, 'interface'));
     }
   }
 
@@ -1022,7 +1005,7 @@ export function toTsValue(value: Value, type: Type): any {
     if (value.kind === 'variant') {
       const caseValue = value.caseValue;
       if (!caseValue) {
-        throw new Error(`Expected union, obtained value ${value}`);
+        throw new Error(`Expected union, got ${value}`);
       }
 
       const unionTypes = type.getUnionTypes();
@@ -1030,11 +1013,11 @@ export function toTsValue(value: Value, type: Type): any {
 
       return toTsValue(caseValue, matchingType);
     } else {
-      throw new Error(`Unable to convert ${JSON.stringify(value)} to union`);
+      throw new Error(typeMismatchOut(value, 'union'));
     }
   }
 
-  throw new Error(`'Type ${name} is not supported in golem'`);
+  throw new Error(`'Type ${name} is not supported in golem yet'`);
 }
 
 function convertToNumber(value: Value): any {
@@ -1060,6 +1043,6 @@ function convertToBigInt(value: Value): any {
   if (value.kind === 'u64' || value.kind === 's64') {
     return value.value;
   } else {
-    throw new Error(`Unable to convert the ${JSON.stringify(value)} to bigint`);
+    throw new Error(typeMismatchOut(value, 'bigint'));
   }
 }

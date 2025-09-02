@@ -107,8 +107,7 @@ async function invoke(
     };
   }
 
-  throw new Error(JSON.stringify(input));
-  //return resolvedAgent.value.invoke(methodName, input);
+  return resolvedAgent.value.invoke(methodName, input);
 }
 
 async function discoverAgentTypes(): Promise<bindings.guest.AgentType[]> {
