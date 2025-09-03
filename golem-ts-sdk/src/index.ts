@@ -32,6 +32,11 @@ export * from './newTypes/textInput';
 export { AgentClassName } from './newTypes/agentClassName';
 export { TypescriptTypeRegistry } from './typescriptTypeRegistry';
 
+export * from "./host/hostapi";
+export * from "./host/guard";
+export * from "./host/result";
+export * from "./host/transaction";
+
 let resolvedAgent: Option.Option<ResolvedAgent> = Option.none();
 
 const UninitiatedAgentErrorMessage: string = 'Agent is not initialized';
