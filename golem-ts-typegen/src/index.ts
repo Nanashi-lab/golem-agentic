@@ -147,6 +147,10 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
     return new Type({ kind: "boolean", name: "boolean" });
   }
 
+  if (type.isLiteral()) {
+    return new Type({kind: 'literal', name: type.getText() });
+  }
+
   if (type.isTuple()) {
     const tupleElems = type.getTupleElements().map((el) => getFromTsMorph(el));
 
