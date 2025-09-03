@@ -37,6 +37,13 @@ export function buildJSONFromType(type: Type): LiteTypeJSON {
     };
   }
 
+  if (type.isLiteral()) {
+    return {
+      kind: 'literal',
+      name: getTypeName(type),
+    };
+  }
+
   if (type.isTuple()) {
     return {
       kind: 'tuple',
