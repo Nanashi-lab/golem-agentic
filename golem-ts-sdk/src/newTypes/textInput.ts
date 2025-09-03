@@ -21,10 +21,11 @@ export type TextSource = {
   textType: TextType | undefined;
 };
 
-export type UnstructuredText = {  tag: 'url', val: string } | { tag: 'inline', val: TextSource };
+export type UnstructuredText =
+  | { tag: 'url'; val: string }
+  | { tag: 'inline'; val: TextSource };
 
 export const TextInput = {
-
   /**
    * Creates a `TextInput` with a default language code of `'en'`.
    *
@@ -35,7 +36,7 @@ export const TextInput = {
   fromText(input: string, languageCode?: string): UnstructuredText {
     languageCode = languageCode ? languageCode : 'en';
 
-    return { tag: "inline", val: { data: input, textType: { languageCode } } };
+    return { tag: 'inline', val: { data: input, textType: { languageCode } } };
   },
 
   /**
@@ -44,6 +45,6 @@ export const TextInput = {
    * @param urlValue
    */
   fromUrl(urlValue: string): UnstructuredText {
-    return { tag: "url", val: urlValue }
-  }
-}
+    return { tag: 'url', val: urlValue };
+  },
+};
