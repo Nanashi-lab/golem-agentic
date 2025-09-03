@@ -20,7 +20,6 @@ import {
   TypeMetadata,
   LiteTypeJSON,
   buildJSONFromType,
-  buildTypeFromJSON,
 } from "@golemcloud/golem-ts-types-core";
 import * as fs from "node:fs";
 import path from "path";
