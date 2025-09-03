@@ -148,7 +148,7 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
   }
 
   if (type.isLiteral()) {
-    return new Type({kind: 'literal', name: type.getText() });
+    return new Type({ kind: "literal", name: type.getText() });
   }
 
   if (type.isTuple()) {

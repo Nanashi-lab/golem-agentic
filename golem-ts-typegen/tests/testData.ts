@@ -96,8 +96,8 @@ class MyAgent {
     tupleType: TupleType,
     listComplexType: ListComplexType,
     objectType: ObjectType,
-    unionWithLiteral: 'foo' | 'bar' | 1 | true | false,
-    objectWithLiteral: {tag: 'inline', val: string}
+    unionWithLiteral: "foo" | "bar" | 1 | true | false,
+    objectWithLiteral: { tag: "inline"; val: string },
   ): PromiseType {
     return Promise.resolve(`Weather for ${location} is sunny!`);
   }
