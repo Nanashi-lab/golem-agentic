@@ -28,6 +28,7 @@ type Kind =
   | 'interface'
   | 'promise'
   | 'map'
+  | 'literal'
   | 'alias';
 
 export class Type {

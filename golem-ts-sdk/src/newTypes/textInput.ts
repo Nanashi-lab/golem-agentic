@@ -12,26 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * Represents text input for agent methods.
- *
- * Unlike a plain `string`, `TextInput` includes additional metadata,
- * such as `languageCode`, to support unstructured text in multiple languages.
- */
-export type TextInput = {
-  input: string;
+export type TextType = {
   languageCode: string;
 };
 
-/**
- * Creates a `TextInput` with a default language code of `'en'`.
- *
- * @param input - The text content.
- * @returns A `TextInput` object with `languageCode` set to `'en'`.
- */
-export function defaultTextInput(input: string): TextInput {
-  return {
-    input,
-    languageCode: 'en',
-  };
-}
+export type TextSource = {
+  data: string;
+  textType: TextType | undefined;
+};
+
+export type UnstructuredText =
+  | { tag: 'url'; val: string }
+  | { tag: 'inline'; val: TextSource };
+
+export const TextInput = {
+  /**
+   * Creates a `TextInput` with a default language code of `'en'`.
+   *
+   * @param input - The text content.
+   * @param languageCode - The language code
+   * @returns A `TextInput` object with `languageCode` set to `'en'`.
+   */
+  fromText(input: string, languageCode?: string): UnstructuredText {
+    languageCode = languageCode ? languageCode : 'en';
+
+    return { tag: 'inline', val: { data: input, textType: { languageCode } } };
+  },
+
+  /**
+   * Creates a `TextInput` from a URL.
+   *
+   * @param urlValue
+   */
+  fromUrl(urlValue: string): UnstructuredText {
+    return { tag: 'url', val: urlValue };
+  },
+};
