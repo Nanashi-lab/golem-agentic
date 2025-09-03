@@ -107,6 +107,10 @@ export class Type {
     return this.kind === 'map';
   }
 
+  isLiteral(): boolean {
+    return this.kind === 'literal';
+  }
+
   getUnionTypes(): Type[] {
     return this.unionTypes ?? [];
   }

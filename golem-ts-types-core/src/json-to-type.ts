@@ -86,6 +86,9 @@ export function buildTypeFromJSON(json: LiteTypeJSON): Type {
       });
     }
 
+    case 'literal':
+      return new Type({ kind: 'literal', name: json.name });
+
     case 'alias': {
       const target = buildTypeFromJSON(json.target);
       const aliasDecl = new Node('TypeAlias', false);
