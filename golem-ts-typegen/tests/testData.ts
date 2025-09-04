@@ -48,6 +48,16 @@ export type ObjectComplexType = {
   k: SimpleInterfaceType;
 };
 
+export class FooBar {
+  constructor(
+    public name: string,
+    public value: number,
+  ) {
+    this.name = name;
+    this.value = value;
+  }
+}
+
 export interface TestInterfaceType {
   numberProp: number;
   stringProp: string;
@@ -98,6 +108,7 @@ class MyAgent {
     objectType: ObjectType,
     unionWithLiteral: "foo" | "bar" | 1 | true | false,
     objectWithLiteral: { tag: "inline"; val: string },
+    classType: FooBar,
   ): PromiseType {
     return Promise.resolve(`Weather for ${location} is sunny!`);
   }
