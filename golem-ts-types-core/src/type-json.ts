@@ -33,6 +33,16 @@ export type LiteTypeJSON =
       }>;
     }
   | {
+      kind: 'class';
+      name: string;
+      properties: Array<{
+        name: string;
+        type: LiteTypeJSON;
+        optional?: boolean;
+      }>;
+
+    }
+  | {
       kind: 'interface';
       name?: string;
       properties: Array<{
