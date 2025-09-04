@@ -186,6 +186,40 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
     });
   }
 
+  if (type.isClass()) {
+    const result: Symbol[] = type.getProperties().map((prop) => {
+      const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());
+      const nodes = prop.getDeclarations();
+      const node = nodes[0];
+      const tsType = getFromTsMorph(type);
+      const propName = prop.getName();
+
+      if (
+        (TsMorphNode.isPropertySignature(node) ||
+          TsMorphNode.isPropertyDeclaration(node)) &&
+        node.hasQuestionToken()
+      ) {
+        return new Symbol({
+          name: propName,
+          declarations: [new Node("PropertyDeclaration", true)],
+          typeAtLocation: tsType,
+        });
+      } else {
+        return new Symbol({
+          name: propName,
+          declarations: [new Node("PropertyDeclaration", false)],
+          typeAtLocation: tsType,
+        });
+      }
+    });
+
+    return new Type({
+      kind: "class",
+      name,
+      properties: result,
+    });
+  }
+
   if (type.isInterface()) {
     const result: Symbol[] = type.getProperties().map((prop) => {
       const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());

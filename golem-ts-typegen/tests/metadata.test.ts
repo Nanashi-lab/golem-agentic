@@ -25,6 +25,7 @@ import {
   getUnionType,
   getComplexObjectType,
   getInterfaceType,
+  getClassType,
 } from "./util.js";
 
 describe("golem-ts-typegen can work correctly read types from .metadata directory", () => {
@@ -77,5 +78,10 @@ describe("golem-ts-typegen can work correctly read types from .metadata director
   it("track interface type", () => {
     const tupleType = getInterfaceType();
     expect(tupleType.isInterface()).toEqual(true);
+  });
+
+  it("track class type", () => {
+    const classType = getClassType();
+    expect(classType.isClass()).toEqual(true);
   });
 });

@@ -98,6 +98,10 @@ export function getPromiseType(): Type {
   return fetchType("Promise");
 }
 
+export function getClassType(): Type {
+  return fetchType("FooBar");
+}
+
 // Fetch a type by its name from the loaded metadata (loaded by setup module)
 function fetchType(typeNameInTestData: string): Type {
   const classMetadata = Array.from(getAll()).map(([_, v]) => v);
