@@ -25,6 +25,7 @@ type Kind =
   | 'tuple'
   | 'union'
   | 'object'
+  | 'class'
   | 'interface'
   | 'promise'
   | 'map'
@@ -101,6 +102,10 @@ export class Type {
 
   isPromise(): boolean {
     return this.kind === 'promise';
+  }
+
+  isClass(): boolean {
+    return this.kind === 'class';
   }
 
   isMap(): boolean {

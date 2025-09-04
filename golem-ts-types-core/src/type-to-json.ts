@@ -91,6 +91,25 @@ export function buildJSONFromType(type: Type): LiteTypeJSON {
     };
   }
 
+  if (type.isClass()) {
+    const props = type.getProperties().map((sym) => {
+      const decl = sym.getDeclarations()[0];
+      const optional = decl.hasQuestionToken?.() ?? false;
+      const propType = sym.getTypeAtLocation(decl);
+      return {
+        name: sym.getName(),
+        type: buildJSONFromType(propType),
+        optional: optional || undefined,
+      };
+    });
+
+    return {
+      kind: type.isObject() ? 'object' : 'interface',
+      name: type.getName(),
+      properties: props,
+    };
+  }
+
   if (type.isMap()) {
     const keyAndValue = type.getTypeArguments();
 
@@ -122,6 +141,6 @@ export function buildJSONFromType(type: Type): LiteTypeJSON {
   }
 
   throw new Error(
-    `Failed to convert Type to JSON type. Unsupported type: ${type.getName() ?? 'unknown'}`,
+    `Failed to convert Type (kind: ${type.getKind()}) to JSON type. Unsupported type: ${type.getName() ?? 'unknown'}`,
   );
 }
