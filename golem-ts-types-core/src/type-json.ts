@@ -40,7 +40,6 @@ export type LiteTypeJSON =
         type: LiteTypeJSON;
         optional?: boolean;
       }>;
-
     }
   | {
       kind: 'interface';
