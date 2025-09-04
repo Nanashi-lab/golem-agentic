@@ -108,7 +108,7 @@ jobs:
         run: |
           npm install
 
-      - name: Run WIT deps update for golen-ts-sdk
+      - name: Run WIT deps update for golem-ts-sdk
         run: |
           wit-deps update || (
             echo "Failed to update WIT dependencies"
