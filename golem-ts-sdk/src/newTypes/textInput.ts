@@ -18,7 +18,7 @@ export type TextType = {
 
 export type TextSource = {
   data: string;
-  textType: TextType | undefined;
+  textType: TextType;
 };
 
 export type UnstructuredText =

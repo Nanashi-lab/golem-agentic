@@ -88,6 +88,10 @@ export function getPromiseType(): Type {
   return fetchType('Promise');
 }
 
+export function getUnionOfLiterals(): Type {
+  return fetchType('UnionOfLiterals');
+}
+
 export function getRecordFieldsFromAnalysedType(
   analysedType: AnalysedType,
 ): NameTypePair[] | undefined {

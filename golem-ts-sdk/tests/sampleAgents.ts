@@ -14,6 +14,7 @@
 
 import { agent, BaseAgent, UnstructuredText } from '../src';
 import * as Types from './testTypes';
+import { UnionOfLiterals } from './testTypes';
 
 @agent()
 class WeatherAgent extends BaseAgent {
@@ -59,7 +60,7 @@ class AssistantAgent extends BaseAgent {
     tupleType: Types.TupleType,
     listComplexType: Types.ListComplexType,
     objectType: Types.ObjectType,
-    unstructuredText: UnstructuredText
+    UnionOfLiterals: UnionOfLiterals,
   ): Types.PromiseType {
     return Promise.resolve(`Weather for ${location} is sunny!`);
   }

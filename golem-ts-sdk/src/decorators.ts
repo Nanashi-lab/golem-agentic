@@ -152,7 +152,7 @@ export function agent() {
     // Note: Either.getOrThrowWith doesn't seem to work within the decorator context
     if (Either.isLeft(methodSchemaEither)) {
       throw new Error(
-        `Failed to get agent method schema for ${agentClassName}: ${methodSchemaEither.left}`,
+        `Schema generation failed for agent class ${agentClassName.value}. ${methodSchemaEither.left}`,
       );
     }
 
