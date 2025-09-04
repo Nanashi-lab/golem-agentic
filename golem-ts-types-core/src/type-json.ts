@@ -34,7 +34,7 @@ export type LiteTypeJSON =
     }
   | {
       kind: 'class';
-      name: string;
+      name?: string;
       properties: Array<{
         name: string;
         type: LiteTypeJSON;

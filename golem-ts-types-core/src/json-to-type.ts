@@ -54,6 +54,22 @@ export function buildTypeFromJSON(json: LiteTypeJSON): Type {
       });
     }
 
+    case 'class': {
+      const props = json.properties.map(
+        (p) =>
+          new Symbol({
+            name: p.name,
+            declarations: [new Node('PropertyDeclaration', !!p.optional)],
+            typeAtLocation: buildTypeFromJSON(p.type),
+          }),
+      );
+      return new Type({
+        kind: 'class',
+        name: json.name ?? 'Class',
+        properties: props,
+      });
+    }
+
     case 'object': {
       const props = json.properties.map(
         (p) =>
