@@ -1,7 +1,7 @@
 {
   "name": "@golemcloud/golem-ts-sdk",
   "type": "module",
-  "version": "0.0.1-dev.36",
+  "version": "0.0.1-dev.37",
   "publishConfig": {
     "access": "public",
     "tag": "test"
@@ -35,7 +35,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write \"src/**/*\" \"tests/**/*\"",
     "format:check": "prettier --check \"src/**/*\" \"tests/**/*\"",
-    "generate-dts":  "wasm-rquickjs generate-dts --wit ../wit --output types",
+    "generate-dts": "wasm-rquickjs generate-dts --wit ../wit --output types",
     "clean-test-data": "rm -rf .metadata",
     "generate-test-types-metadata": "npx golem-typegen ./tsconfig.json --files tests/**/*.ts",
     "prebuild": "npm run clean-test-data && npm run generate-dts && npm run generate-test-types-metadata",
