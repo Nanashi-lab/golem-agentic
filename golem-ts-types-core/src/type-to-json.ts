@@ -104,7 +104,7 @@ export function buildJSONFromType(type: Type): LiteTypeJSON {
     });
 
     return {
-      kind: type.isObject() ? 'object' : 'interface',
+      kind: 'class',
       name: type.getName(),
       properties: props,
     };
