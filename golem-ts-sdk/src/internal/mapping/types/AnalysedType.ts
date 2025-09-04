@@ -301,6 +301,9 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
     return Either.map(elemType, (inner) => list(inner));
   }
 
+  if (type.isClass()) {
+    return Either.left(`${type.getName()} is a class, which is not supported. Use object instead.`)
+  }
 
   if (type.isUnion()) {
     let fieldIdx = 1;
@@ -388,7 +391,19 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
       })
     }));
 
-    return Either.map(result, (fields) => record(fields));
+    if (Either.isLeft(result)) {
+      return Either.left(result.left);
+    }
+
+    const fields = result.right;
+
+    if (fields.length === 0) {
+      return Either.left(`Type ${type.getName()} is an object but has no properties. Object types must define at least one property.`);
+
+    }
+
+
+    return Either.right(record(fields))
   }
 
   if (type.isInterface()) {
@@ -448,7 +463,7 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
   }
 
 
-  return Either.left(`Type ${name} is not supported as argument or return type`);
+  return Either.left(`Type "${name}" is not supported`);
 
 }
 

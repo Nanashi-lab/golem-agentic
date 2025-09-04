@@ -140,7 +140,10 @@ export function agent() {
     const constructorDataSchema = Either.getOrElse(
       getConstructorDataSchema(classMetadata),
       (err) => {
-        throw new Error('Invalid constructor parameters for the agent: ' + err);
+        throw new Error(
+          `Schema generation failed for agent class ${agentClassName.value} due to unsupported types in constructor. ` +
+            err,
+        );
       },
     );
 

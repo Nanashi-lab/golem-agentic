@@ -109,3 +109,13 @@ export interface TestInterfaceType {
   // enumProp: EnumTypeAlias,
   // enumPropInlined: EnumTypeAlias,
 }
+
+export class FooBar {
+  constructor(
+    public name: string,
+    public value: number,
+  ) {
+    this.name = name;
+    this.value = value;
+  }
+}

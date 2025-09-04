@@ -14,7 +14,7 @@
 
 import { agent, BaseAgent, UnstructuredText } from '../src';
 import * as Types from './testTypes';
-import { UnionOfLiterals } from './testTypes';
+import { FooBar, UnionOfLiterals } from './testTypes';
 
 @agent()
 class WeatherAgent extends BaseAgent {
