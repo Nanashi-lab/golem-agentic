@@ -22,6 +22,7 @@ import {
   getNumberType,
   getStringType,
   getPromiseType,
+  getUnionOfLiterals,
 } from './testUtils';
 
 import * as AnalysedType from '../src/internal/mapping/types/AnalysedType';
@@ -108,7 +109,7 @@ describe('TypeScript primitives to AnalysedType', () => {
 
 // A promise<inner> type will be considered as AnalysedType<inner>,
 // as TypeScript allows returning the value that the promise resolves to
-describe('TypeScript Promise type to type', () => {
+describe('TypeScript Promise type to AnalysedType', () => {
   it('Promise type is converted to AnalysedType', () => {
     const promiseType = getPromiseType();
     const result = Either.getOrElse(
@@ -206,6 +207,52 @@ describe('TypeScript Union to AnalysedType.Variant', () => {
 
     expect(analysedType).toEqual(expected);
   });
+});
+
+test('UnstructuredText complex types to AnalysedType', () => {
+  const unstructuredTextType = getUnionOfLiterals();
+
+  const analysedType = Either.getOrThrow(
+    AnalysedType.fromTsType(unstructuredTextType),
+  );
+
+  const expectedAnalysedType: AnalysedType.AnalysedType = {
+    kind: 'variant',
+    value: {
+      cases: [
+        {
+          name: 'null-type',
+          typ: {
+            kind: 'tuple',
+            value: {
+              items: [],
+              name: undefined,
+              owner: undefined,
+            },
+          },
+        },
+        {
+          name: 'type-first',
+          typ: {
+            kind: 'bool',
+          },
+        },
+        {
+          name: 'a',
+        },
+        {
+          name: 'b',
+        },
+        {
+          name: 'c',
+        },
+      ],
+      name: undefined,
+      owner: undefined,
+    },
+  };
+
+  expect(analysedType).toEqual(expectedAnalysedType);
 });
 
 function checkPrimitiveFields(fields: any[]) {

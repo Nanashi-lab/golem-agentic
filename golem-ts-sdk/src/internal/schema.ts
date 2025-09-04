@@ -89,7 +89,7 @@ export function getAgentMethodSchema(
 
       if (Either.isLeft(inputSchemaEither)) {
         return Either.left(
-          `Failed to construct input schema for method ${methodName}: ${inputSchemaEither.left}`,
+          `Unsupported types used in method ${methodName}. ${inputSchemaEither.left}`,
         );
       }
 

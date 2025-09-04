@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { agent, BaseAgent } from '../src';
+import { agent, BaseAgent, UnstructuredText } from '../src';
 import * as Types from './testTypes';
+import { UnionOfLiterals } from './testTypes';
 
 @agent()
 class WeatherAgent extends BaseAgent {
@@ -59,6 +60,7 @@ class AssistantAgent extends BaseAgent {
     tupleType: Types.TupleType,
     listComplexType: Types.ListComplexType,
     objectType: Types.ObjectType,
+    UnionOfLiterals: UnionOfLiterals,
   ): Types.PromiseType {
     return Promise.resolve(`Weather for ${location} is sunny!`);
   }

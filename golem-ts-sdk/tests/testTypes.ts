@@ -16,6 +16,8 @@ interface SimpleInterfaceType {
   n: number;
 }
 
+export type UnionOfLiterals = 'a' | 'b' | 'c' | true | false | null;
+
 export type PromiseType = Promise<string>;
 
 export type ObjectType = { a: string; b: number; c: boolean };

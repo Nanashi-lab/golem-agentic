@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Node, Type as TsType} from "@golemcloud/golem-ts-types-core";
+import { buildJSONFromType, Node, Type as TsType } from '@golemcloud/golem-ts-types-core';
 import * as Either from "effect/Either";
 import {numberToOrdinalKebab} from "./typeIndexOrdinal";
 
@@ -203,16 +203,17 @@ export const option = (inner: AnalysedType): AnalysedType => ({ kind: 'option', 
 
 
 export function fromTsType(tsType: TsType): Either.Either<AnalysedType, string> {
-  const visited = new Set<TsType>();
-  return fromTsTypeInternal(tsType, visited);
+  return fromTsTypeInternal(tsType);
 }
 
 
-export function fromTsTypeInternal(type: TsType, visited: Set<TsType>): Either.Either<AnalysedType, string> {
+export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, string> {
 
 
   const name =
      type.getName();
+
+
 
   switch (name) {
     case "Float64Array": return Either.right(list(f64()));
@@ -227,6 +228,20 @@ export function fromTsTypeInternal(type: TsType, visited: Set<TsType>): Either.E
     case "BigUint64Array": return Either.right(list(u64()));
   }
 
+  if (type.isLiteral()) {
+    const literalName = type.getName();
+
+    if (!literalName) {
+      return Either.left(`Unable to determine the literal value`);
+    }
+
+    if (isNumberString(literalName)) {
+      return Either.left("Literals of number type are not supported");
+    }
+
+    return Either.right(enum_([trimQuotes(literalName)]))
+  }
+
   if (type.isPromise()) {
     const inner = type.getPromiseElementType();
 
@@ -234,7 +249,7 @@ export function fromTsTypeInternal(type: TsType, visited: Set<TsType>): Either.E
       return Either.left(`Unable to infer the type of promise`)
     }
 
-    return fromTsTypeInternal(inner, visited);
+    return fromTsTypeInternal(inner);
   }
 
   if (type.isBoolean() || name === 'true' || name === 'false')  {
@@ -244,8 +259,8 @@ export function fromTsTypeInternal(type: TsType, visited: Set<TsType>): Either.E
   if (name === "Map" && type.getTypeArguments().length === 2) {
     const [keyT, valT] = type.getTypeArguments();
 
-    const key = fromTsTypeInternal(keyT, visited);
-    const value = fromTsTypeInternal(valT, visited);
+    const key = fromTsTypeInternal(keyT);
+    const value = fromTsTypeInternal(valT);
 
 
     return Either.zipWith(key, value, (k, v) =>
@@ -254,25 +269,25 @@ export function fromTsTypeInternal(type: TsType, visited: Set<TsType>): Either.E
 
   if (name === "Iterable" && type.getTypeArguments().length === 1) {
     const inner = type.getTypeArguments()[0];
-    return Either.map(fromTsTypeInternal(inner, visited), (result) => list(result));
+    return Either.map(fromTsTypeInternal(inner), (result) => list(result));
   }
 
   if (name === "AsyncIterable" && type.getTypeArguments().length === 1) {
     const inner = type.getTypeArguments()[0];
-    return Either.map(fromTsTypeInternal(inner, visited), (result) => list(result));
+    return Either.map(fromTsTypeInternal(inner), (result) => list(result));
   }
 
 
   if (name === "Iterator" && type.getTypeArguments().length === 1) {
     const inner = type.getTypeArguments()[0];
-    return Either.map(fromTsTypeInternal(inner, visited), (result) => list(result));
-  };
+    return Either.map(fromTsTypeInternal(inner), (result) => list(result));
+  }
 
   if (type.isTuple()) {
-    const tupleElems = Either.all(type.getTupleElements().map(el => fromTsTypeInternal(el, visited)));
+    const tupleElems = Either.all(type.getTupleElements().map(el => fromTsTypeInternal(el)));
 
     return Either.map(tupleElems, (items) => tuple(items));
-  };
+  }
 
   if (type.isArray()) {
     const arrayElementType = type.getArrayElementType();
@@ -281,10 +296,11 @@ export function fromTsTypeInternal(type: TsType, visited: Set<TsType>): Either.E
       return Either.left("Unable to determine the array element type");
     }
 
-    const elemType = fromTsTypeInternal(arrayElementType, visited);
+    const elemType = fromTsTypeInternal(arrayElementType);
 
     return Either.map(elemType, (inner) => list(inner));
   }
+
 
   if (type.isUnion()) {
     let fieldIdx = 1;
@@ -304,12 +320,46 @@ export function fromTsTypeInternal(type: TsType, visited: Set<TsType>): Either.E
           typ: bool()
         });
       } else {
-        Either.map(fromTsTypeInternal(t, visited), (result) => {
+        if (t.isLiteral()) {
+          const name = t.getName();
+
+          if (!name) {
+            return Either.left(`Unable to determine the literal value`);
+          }
+
+          if (isNumberString(name)) {
+            return Either.left("Literals of number type are not supported");
+          }
+
+          possibleTypes.push({
+            name: trimQuotes(name),
+          });
+
+        } else if (t.isNull() || t.isUndefined()) {
+          const result =
+            fromTsTypeInternal(t);
+
+          if (Either.isLeft(result)) {
+            return result;
+          }
+
+          possibleTypes.push({
+            name: `null-type`,
+            typ: result.right
+          });
+        } else {
+          const result =
+            fromTsTypeInternal(t);
+
+          if (Either.isLeft(result)) {
+            return result;
+          }
+
           possibleTypes.push({
             name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
-            typ: result,
+            typ: result.right,
           });
-        });
+        }
       }
     }
 
@@ -318,12 +368,14 @@ export function fromTsTypeInternal(type: TsType, visited: Set<TsType>): Either.E
 
 
   if (type.isObject()) {
+
     const result = Either.all(type.getProperties().map((prop) => {
       const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());
+
       const nodes: Node[] = prop.getDeclarations();
       const node = nodes[0];
 
-      const tsType = fromTsTypeInternal(type, visited);
+      const tsType = fromTsTypeInternal(type);
 
       if ((Node.isPropertySignature(node) || Node.isPropertyDeclaration(node)) && node.hasQuestionToken()) {
         return Either.map(tsType, (analysedType) => {
@@ -340,12 +392,15 @@ export function fromTsTypeInternal(type: TsType, visited: Set<TsType>): Either.E
   }
 
   if (type.isInterface()) {
+
     const result = Either.all(type.getProperties().map((prop) => {
       const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());
       const nodes: Node[] = prop.getDeclarations();
       const node = nodes[0];
 
-      const tsType = fromTsTypeInternal(type, visited);
+      const tsType = fromTsTypeInternal(type);
+
+
 
       if ((Node.isPropertySignature(node) || Node.isPropertyDeclaration(node)) && node.hasQuestionToken()) {
         return Either.map(tsType, (analysedType) => {
@@ -353,7 +408,7 @@ export function fromTsTypeInternal(type: TsType, visited: Set<TsType>): Either.E
         });
       }
 
-      return Either.map(tsType, (analysedType) => {
+      return Either.map(fromTsTypeInternal(type), (analysedType) => {
         return field(prop.getName(), analysedType)
       })
     }));
@@ -363,26 +418,47 @@ export function fromTsTypeInternal(type: TsType, visited: Set<TsType>): Either.E
   }
 
   if (type.isNull()) {
+
     return Either.right(tuple([]))
   }
 
   if (type.isBigInt()) {
+
+
     return Either.right(u64())
   }
 
 
   if (type.isUndefined()) {
+
+
     return Either.right(tuple([]))
   }
 
   if (type.isNumber()) {
+
+
     return Either.right(s32()) // For the same reason - as an example - Rust defaults to i32
   }
 
   if (type.isString()) {
+
+
     return Either.right(str())
   }
 
-  return Either.left(`The following type is not supported as argument or return type in agentic context. Type Name: ${name}. Please report this issue to Golem Cloud`);
 
+  return Either.left(`Type ${name} is not supported as argument or return type`);
+
+}
+
+function isNumberString(name: string): boolean {
+  return !isNaN(Number(name));
+}
+
+function trimQuotes(s: string): string {
+  if (s.startsWith('"') && s.endsWith('"')) {
+    return s.slice(1, -1);
+  }
+  return s;
 }
