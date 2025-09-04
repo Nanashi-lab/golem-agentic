@@ -179,7 +179,7 @@ export namespace Result {
     export function fromNullish<T>(value: T | undefined): Result<T, undefined>;
     export function fromNullish<T>(value: T | null | undefined): Result<T, null | undefined>;
     export function fromNullish<T>(value: T | null | undefined) {
-        return value != null ? Result.ok(value) : Result.err(value);
+        return value !== null ? Result.ok(value) : Result.err(value);
     }
 
     export function all<T>(results: readonly Result.Ok<T>[]): Result.Ok<T[]>;
