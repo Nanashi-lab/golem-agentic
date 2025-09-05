@@ -89,6 +89,8 @@ export interface TestInterfaceType {
   float64ArrayProp: Float64Array;
 }
 
+export type RecordType = Record<string, number>;
+
 class MyAgent {
   constructor(readonly testInterfaceType: TestInterfaceType) {
     this.testInterfaceType = testInterfaceType;
@@ -109,6 +111,8 @@ class MyAgent {
     unionWithLiteral: "foo" | "bar" | 1 | true | false,
     objectWithLiteral: { tag: "inline"; val: string },
     classType: FooBar,
+    recordType: Record<string, number>,
+    recordTypeAliased: RecordType,
   ): PromiseType {
     return Promise.resolve(`Weather for ${location} is sunny!`);
   }

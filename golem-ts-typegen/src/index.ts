@@ -129,6 +129,17 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type.Type {
       };
   }
 
+  // These will handle record types. However, record type is devoid
+  // of details, and hence we don't support record type at the SDK level
+  if (type.isObject() && type.getProperties().length === 0) {
+    const name = rawName ?? aliasName ?? type.getText();
+
+    return {
+      kind: "others",
+      name: name,
+    };
+  }
+
   if (rawName === "Promise" && type.getTypeArguments().length === 1) {
     const inner = type.getTypeArguments()[0];
     const promiseType = getFromTsMorph(inner);
