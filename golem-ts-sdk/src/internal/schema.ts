@@ -79,7 +79,7 @@ export function getAgentMethodSchema(
 
       const parameters: MethodParams = signature.methodParams;
 
-      const returnType: Type = signature.returnType;
+      const returnType: Type.Type = signature.returnType;
 
       const baseMeta =
         AgentMethodMetadataRegistry.lookup(agentClassName)?.get(methodName) ??
@@ -136,7 +136,7 @@ export function buildInputSchema(
 }
 
 export function buildOutputSchema(
-  returnType: Type,
+  returnType: Type.Type,
 ): Either.Either<DataSchema, string> {
   return Either.map(convertToElementSchema(returnType), (result) => {
     return {
@@ -147,7 +147,7 @@ export function buildOutputSchema(
 }
 
 function convertToElementSchema(
-  type: Type,
+  type: Type.Type,
 ): Either.Either<ElementSchema, string> {
   return Either.map(WitType.fromTsType(type), (witType) => {
     return {

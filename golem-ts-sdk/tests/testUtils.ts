@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  getTypeName,
-  Type,
-  TypeMetadata,
-} from '@golemcloud/golem-ts-types-core';
+import { Type, TypeMetadata } from '@golemcloud/golem-ts-types-core';
 import {
   AnalysedType,
   NameTypePair,
@@ -40,55 +36,55 @@ export function getAll() {
   return TypeMetadata.getAll();
 }
 
-export function getTestInterfaceType(): Type {
+export function getTestInterfaceType(): Type.Type {
   return fetchType('TestInterfaceType');
 }
 
-export function getTestMapType(): Type {
-  return fetchType('Map');
+export function getTestMapType(): Type.Type {
+  return fetchType('MapType');
 }
 
-export function getTestObjectType(): Type {
+export function getTestObjectType(): Type.Type {
   return fetchType('ObjectType');
 }
 
-export function getTestListOfObjectType(): Type {
-  return fetchType('Array');
+export function getTestListOfObjectType(): Type.Type {
+  return fetchType('ListComplexType');
 }
 
-export function getUnionType(): Type {
+export function getUnionType(): Type.Type {
   return fetchType('UnionType');
 }
 
-export function getUnionComplexType(): Type {
+export function getUnionComplexType(): Type.Type {
   return fetchType('UnionComplexType');
 }
 
-export function getTupleType(): Type {
+export function getTupleType(): Type.Type {
   return fetchType('TupleType');
 }
 
-export function getTupleComplexType(): Type {
+export function getTupleComplexType(): Type.Type {
   return fetchType('TupleComplexType');
 }
 
-export function getBooleanType(): Type {
+export function getBooleanType(): Type.Type {
   return fetchType('boolean');
 }
 
-export function getStringType(): Type {
+export function getStringType(): Type.Type {
   return fetchType('string');
 }
 
-export function getNumberType(): Type {
+export function getNumberType(): Type.Type {
   return fetchType('number');
 }
 
-export function getPromiseType(): Type {
-  return fetchType('Promise');
+export function getPromiseType(): Type.Type {
+  return fetchType('PromiseType');
 }
 
-export function getUnionOfLiterals(): Type {
+export function getUnionOfLiterals(): Type.Type {
   return fetchType('UnionOfLiterals');
 }
 
@@ -98,12 +94,12 @@ export function getRecordFieldsFromAnalysedType(
   return analysedType.kind === 'record' ? analysedType.value.fields : undefined;
 }
 
-function fetchType(typeNameInTestData: string): Type {
+function fetchType(typeNameInTestData: string): Type.Type {
   const classMetadata = Array.from(getAll()).map(([_, v]) => v);
 
   for (const type of classMetadata) {
     const constructorArg = type.constructorArgs.find((arg) => {
-      const typeName = getTypeName(arg.type);
+      const typeName = arg.type.name;
       return typeName === typeNameInTestData;
     });
 
@@ -114,15 +110,12 @@ function fetchType(typeNameInTestData: string): Type {
     const methods = Array.from(type.methods.values());
 
     for (const method of methods) {
-      if (
-        method.returnType &&
-        getTypeName(method.returnType) === typeNameInTestData
-      ) {
+      if (method.returnType && method.returnType.name === typeNameInTestData) {
         return method.returnType;
       }
 
       const param = Array.from(method.methodParams.entries()).find(([_, t]) => {
-        const typeName = getTypeName(t);
+        const typeName = t.name;
         return typeName === typeNameInTestData;
       });
 

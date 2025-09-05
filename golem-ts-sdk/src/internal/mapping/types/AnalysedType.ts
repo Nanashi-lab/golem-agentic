@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { buildJSONFromType, Node, Type as TsType } from '@golemcloud/golem-ts-types-core';
+import { Node, Type as CoreType } from '@golemcloud/golem-ts-types-core';
 import * as Either from "effect/Either";
 import {numberToOrdinalKebab} from "./typeIndexOrdinal";
+
+type TsType = CoreType.Type;
 
 export interface NameTypePair {
   name: string;
@@ -208,13 +210,9 @@ export function fromTsType(tsType: TsType): Either.Either<AnalysedType, string> 
 
 
 export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, string> {
+  const name = type.name;
 
-
-  const name =
-     type.getName();
-
-
-
+  // TODO: Switch to pattern match on kind
   switch (name) {
     case "Float64Array": return Either.right(list(f64()));
     case "Float32Array": return Either.right(list(f32()));
@@ -228,11 +226,11 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
     case "BigUint64Array": return Either.right(list(u64()));
   }
 
-  if (type.isLiteral()) {
-    const literalName = type.getName();
+  if (type.kind === 'literal') {
+    const literalName = type.name;
 
     if (!literalName) {
-      return Either.left(`Unable to determine the literal value`);
+      return Either.left(`Unable to determine the literal value. ${type}`);
     }
 
     if (isNumberString(literalName)) {
@@ -242,8 +240,8 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
     return Either.right(enum_([trimQuotes(literalName)]))
   }
 
-  if (type.isPromise()) {
-    const inner = type.getPromiseElementType();
+  if (type.kind === 'promise') {
+    const inner = type.element;
 
     if (!inner) {
       return Either.left(`Unable to infer the type of promise`)
@@ -252,12 +250,13 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
     return fromTsTypeInternal(inner);
   }
 
-  if (type.isBoolean() || name === 'true' || name === 'false')  {
+  if (type.kind === 'boolean' || name === 'true' || name === 'false')  {
       return Either.right(bool())
     }
 
-  if (name === "Map" && type.getTypeArguments().length === 2) {
-    const [keyT, valT] = type.getTypeArguments();
+  if (type.kind === "map") {
+   const keyT = type.key;
+   const valT = type.value;
 
     const key = fromTsTypeInternal(keyT);
     const value = fromTsTypeInternal(valT);
@@ -267,30 +266,15 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
         list(tuple([k, v])));
   }
 
-  if (name === "Iterable" && type.getTypeArguments().length === 1) {
-    const inner = type.getTypeArguments()[0];
-    return Either.map(fromTsTypeInternal(inner), (result) => list(result));
-  }
 
-  if (name === "AsyncIterable" && type.getTypeArguments().length === 1) {
-    const inner = type.getTypeArguments()[0];
-    return Either.map(fromTsTypeInternal(inner), (result) => list(result));
-  }
-
-
-  if (name === "Iterator" && type.getTypeArguments().length === 1) {
-    const inner = type.getTypeArguments()[0];
-    return Either.map(fromTsTypeInternal(inner), (result) => list(result));
-  }
-
-  if (type.isTuple()) {
-    const tupleElems = Either.all(type.getTupleElements().map(el => fromTsTypeInternal(el)));
+  if (type.kind === 'tuple') {
+    const tupleElems = Either.all(type.elements.map(el => fromTsTypeInternal(el)));
 
     return Either.map(tupleElems, (items) => tuple(items));
   }
 
-  if (type.isArray()) {
-    const arrayElementType = type.getArrayElementType();
+  if (type.kind === 'array') {
+    const arrayElementType = type.element;
 
     if (!arrayElementType) {
       return Either.left("Unable to determine the array element type");
@@ -301,19 +285,22 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
     return Either.map(elemType, (inner) => list(inner));
   }
 
-  if (type.isClass()) {
-    return Either.left(`${type.getName()} is a class, which is not supported. Use object instead.`)
+  if (type.kind === 'class') {
+    const message =
+      type.name ? `${type.name} is a class, which is not supported` : "class is not supported";
+
+    return Either.left(`${message}. Use object instead.`)
   }
 
-  if (type.isUnion()) {
+  if (type.kind === 'union') {
     let fieldIdx = 1;
 
     const possibleTypes: NameOptionTypePair[] = [];
 
     let boolTracked = false;
 
-    for (const t of type.getUnionTypes()) {
-      if (t.isBoolean() || t.getName() === "false" || t.getName() === "true") {
+    for (const t of type.unionTypes) {
+      if (t.kind === 'boolean' || t.name === "false" || t.name === "true") {
         if (boolTracked) {
           continue;
         }
@@ -323,8 +310,8 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
           typ: bool()
         });
       } else {
-        if (t.isLiteral()) {
-          const name = t.getName();
+        if (t.kind === 'literal') {
+          const name = t.name;
 
           if (!name) {
             return Either.left(`Unable to determine the literal value`);
@@ -338,7 +325,7 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
             name: trimQuotes(name),
           });
 
-        } else if (t.isNull() || t.isUndefined()) {
+        } else if (t.kind === 'null' || t.kind === 'undefined') {
           const result =
             fromTsTypeInternal(t);
 
@@ -370,9 +357,9 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
   }
 
 
-  if (type.isObject()) {
+  if (type.kind === 'object') {
 
-    const result = Either.all(type.getProperties().map((prop) => {
+    const result = Either.all(type.properties.map((prop) => {
       const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());
 
       const nodes: Node[] = prop.getDeclarations();
@@ -398,7 +385,7 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
     const fields = result.right;
 
     if (fields.length === 0) {
-      return Either.left(`Type ${type.getName()} is an object but has no properties. Object types must define at least one property.`);
+      return Either.left(`Type ${type.name} is an object but has no properties. Object types must define at least one property.`);
 
     }
 
@@ -406,9 +393,9 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
     return Either.right(record(fields))
   }
 
-  if (type.isInterface()) {
+  if (type.kind === 'interface') {
 
-    const result = Either.all(type.getProperties().map((prop) => {
+    const result = Either.all(type.properties.map((prop) => {
       const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());
       const nodes: Node[] = prop.getDeclarations();
       const node = nodes[0];
@@ -432,34 +419,45 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
 
   }
 
-  if (type.isNull()) {
+  if (type.kind === 'null') {
 
     return Either.right(tuple([]))
   }
 
-  if (type.isBigInt()) {
+  if (type.kind === 'bigint') {
 
 
     return Either.right(u64())
   }
 
 
-  if (type.isUndefined()) {
+  if (type.kind === 'undefined') {
 
 
     return Either.right(tuple([]))
   }
 
-  if (type.isNumber()) {
+  if (type.kind === 'number') {
 
 
     return Either.right(s32()) // For the same reason - as an example - Rust defaults to i32
   }
 
-  if (type.isString()) {
+  if (type.kind === 'string') {
 
 
     return Either.right(str())
+  }
+
+  if (type.kind === 'others') {
+    const name = type.name
+
+    if (!name) {
+      return Either.left("Unsupported type (anonymous) found.");
+    }
+
+
+    return Either.left(`Type "${name}" is not supported`)
   }
 
 

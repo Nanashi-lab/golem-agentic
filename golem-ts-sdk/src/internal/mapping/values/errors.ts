@@ -16,8 +16,8 @@ import { Type } from '@golemcloud/golem-ts-types-core';
 import * as Option from 'effect/Option';
 
 // type mismatch in tsValue when converting from TS to WIT
-export function typeMismatchIn(tsValue: any, expectedType: Type): string {
-  const nameOrKind = expectedType.getName() ?? expectedType.getKind();
+export function typeMismatchIn(tsValue: any, expectedType: Type.Type): string {
+  const nameOrKind = expectedType.name ?? expectedType.kind;
   return `Type mismatch. Expected ${nameOrKind}, but got ${safeDisplay(tsValue)} which is of type ${typeof tsValue}`;
 }
 
@@ -27,8 +27,11 @@ export function missingValueForKey(key: string, tsValue: any): string {
 }
 
 // tsValue does not match any of the union types when converting from TS to WIT
-export function unionTypeMatchError(unionTypes: Type[], tsValue: any): string {
-  return `Value '${safeDisplay(tsValue)}' does not match any of the union types: ${unionTypes.map((t) => t.getName()).join(', ')}`;
+export function unionTypeMatchError(
+  unionTypes: Type.Type[],
+  tsValue: any,
+): string {
+  return `Value '${safeDisplay(tsValue)}' does not match any of the union types: ${unionTypes.map((t) => t.name).join(', ')}`;
 }
 
 // unhandled type of tsValue when converting from TS to WIT

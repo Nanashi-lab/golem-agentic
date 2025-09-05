@@ -21,13 +21,13 @@ export { WitValue } from 'golem:rpc/types@0.2.2';
 
 export const fromTsValue = (
   tsValue: any,
-  tsType: Type,
+  tsType: Type.Type,
 ): Either.Either<WitValue, string> => {
   const valueEither = Value.fromTsValue(tsValue, tsType);
   return Either.map(valueEither, Value.toWitValue);
 };
 
-export const toTsValue = (witValue: WitValue, expectedType: Type): any => {
+export const toTsValue = (witValue: WitValue, expectedType: Type.Type): any => {
   const value = Value.fromWitValue(witValue);
   return Value.toTsValue(value, expectedType);
 };
