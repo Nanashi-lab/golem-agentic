@@ -42,7 +42,7 @@ export function unhandledTypeError(
 ): string {
   const error =
     `${safeDisplay(tsValue)}` +
-    (Option.isSome(typeName) ? ` inferred as type ${typeName.value}` : '') +
+    (Option.isSome(typeName) ? ` inferred as ${typeName.value}` : '') +
     ` cannot be handled. `;
   return error + (Option.isSome(message) ? `${message.value}` : '');
 }

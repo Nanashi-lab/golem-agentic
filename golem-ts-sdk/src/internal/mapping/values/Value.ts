@@ -790,221 +790,258 @@ export function toTsValue(value: Value, type: Type.Type): any {
     return toTsValue(caseValue, type);
   }
 
-  if (type.kind === 'number') {
-    return convertToNumber(value);
-  }
-
-  if (type.kind === 'string') {
-    if (value.kind === 'string') {
-      return value.value;
-    } else {
-      throw new Error(typeMismatchOut(value, 'string'));
-    }
-  }
-
-  if (type.kind === 'bigint') {
-    return convertToBigInt(value);
-  }
-
-  if (type.kind === 'null') {
-    if (value.kind === 'tuple' && value.value.length === 0) {
-      return null;
-    } else {
-      throw new Error(typeMismatchOut(value, 'null'));
-    }
-  }
-
-  if (type.kind === 'boolean' || name === 'true' || name === 'false') {
-    if (value.kind === 'bool') {
-      return value.value;
-    } else {
-      throw new Error(typeMismatchOut(value, 'boolean'));
-    }
-  }
-
-  switch (name) {
-    case 'Uint8Array':
-      if (value.kind === 'list') {
-        return new Uint8Array(value.value.map((v) => convertToNumber(v)));
+  switch (type.kind) {
+    case 'boolean':
+      if (value.kind === 'bool') {
+        return value.value;
       } else {
-        throw new Error(typeMismatchOut(value, 'Uint8Array'));
+        throw new Error(typeMismatchOut(value, 'boolean'));
       }
-    case 'Uint8ClampedArray':
+
+    case 'number':
+      return convertToNumber(value);
+
+    case 'string':
+      if (value.kind === 'string') {
+        return value.value;
+      } else {
+        throw new Error(typeMismatchOut(value, 'string'));
+      }
+
+    case 'bigint':
+      return convertToBigInt(value);
+
+    case 'null':
+      if (value.kind === 'tuple' && value.value.length === 0) {
+        return null;
+      } else {
+        throw new Error(typeMismatchOut(value, 'null'));
+      }
+
+    case 'undefined':
+      if (value.kind === 'tuple' && value.value.length === 0) {
+        return undefined;
+      } else {
+        throw new Error(typeMismatchOut(value, 'undefined'));
+      }
+
+    case 'array':
+      switch (type.name) {
+        case 'Uint8Array':
+          if (value.kind === 'list') {
+            return new Uint8Array(value.value.map((v) => convertToNumber(v)));
+          } else {
+            throw new Error(typeMismatchOut(value, 'Uint8Array'));
+          }
+        case 'Uint8ClampedArray':
+          if (value.kind === 'list') {
+            return new Uint8ClampedArray(
+              value.value.map((v) => convertToNumber(v)),
+            );
+          } else {
+            throw new Error(typeMismatchOut(value, 'Uint8ClampedArray'));
+          }
+        case 'Int8Array':
+          if (value.kind === 'list') {
+            return new Int8Array(value.value.map((v) => convertToNumber(v)));
+          } else {
+            throw new Error(typeMismatchOut(value, 'Int8Array'));
+          }
+
+        case 'Int16Array':
+          if (value.kind === 'list') {
+            return new Int16Array(value.value.map((v) => convertToNumber(v)));
+          } else {
+            throw new Error(typeMismatchOut(value, 'Int16Array'));
+          }
+        case 'Uint16Array':
+          if (value.kind === 'list') {
+            return new Uint16Array(value.value.map((v) => convertToNumber(v)));
+          } else {
+            throw new Error(typeMismatchOut(value, 'Uint16Array'));
+          }
+        case 'Int32Array':
+          if (value.kind === 'list') {
+            return new Int32Array(value.value.map((v) => convertToNumber(v)));
+          } else {
+            throw new Error(typeMismatchOut(value, 'Int32Array'));
+          }
+        case 'Uint32Array':
+          if (value.kind === 'list') {
+            return new Uint32Array(value.value.map((v) => convertToNumber(v)));
+          } else {
+            throw new Error(typeMismatchOut(value, 'Uint32Array'));
+          }
+        case 'Float32Array':
+          if (value.kind === 'list') {
+            return new Float32Array(value.value.map((v) => convertToNumber(v)));
+          } else {
+            throw new Error(typeMismatchOut(value, 'Float32Array'));
+          }
+        case 'Float64Array':
+          if (value.kind === 'list') {
+            return new Float64Array(value.value.map((v) => convertToNumber(v)));
+          } else {
+            throw new Error(typeMismatchOut(value, 'Float64Array'));
+          }
+        case 'BigInt64Array':
+          if (value.kind === 'list') {
+            return new BigInt64Array(
+              value.value.map((v) => convertToBigInt(v)),
+            );
+          } else {
+            throw new Error(typeMismatchOut(value, 'BigInt64Array'));
+          }
+        case 'BigUint64Array':
+          if (value.kind === 'list') {
+            return new BigUint64Array(
+              value.value.map((v) => convertToBigInt(v)),
+            );
+          } else {
+            throw new Error(typeMismatchOut(value, 'BigUint64Array'));
+          }
+      }
+
       if (value.kind === 'list') {
-        return new Uint8ClampedArray(
-          value.value.map((v) => convertToNumber(v)),
+        const elemType = type.element;
+
+        if (!elemType) {
+          throw new Error(`Unable to infer the type of Array`);
+        }
+        return value.value.map((item: Value) => toTsValue(item, elemType));
+      } else {
+        throw new Error(typeMismatchOut(value, 'array'));
+      }
+
+    case 'tuple':
+      const typeArg = type.elements;
+      if (value.kind === 'tuple') {
+        return value.value.map((item: Value, idx: number) =>
+          toTsValue(item, typeArg[idx]),
         );
       } else {
-        throw new Error(typeMismatchOut(value, 'Uint8ClampedArray'));
-      }
-    case 'Int8Array':
-      if (value.kind === 'list') {
-        return new Int8Array(value.value.map((v) => convertToNumber(v)));
-      } else {
-        throw new Error(typeMismatchOut(value, 'Int8Array'));
+        throw new Error(typeMismatchOut(value, 'tuple'));
       }
 
-    case 'Int16Array':
-      if (value.kind === 'list') {
-        return new Int16Array(value.value.map((v) => convertToNumber(v)));
-      } else {
-        throw new Error(typeMismatchOut(value, 'Int16Array'));
-      }
-    case 'Uint16Array':
-      if (value.kind === 'list') {
-        return new Uint16Array(value.value.map((v) => convertToNumber(v)));
-      } else {
-        throw new Error(typeMismatchOut(value, 'Uint16Array'));
-      }
-    case 'Int32Array':
-      if (value.kind === 'list') {
-        return new Int32Array(value.value.map((v) => convertToNumber(v)));
-      } else {
-        throw new Error(typeMismatchOut(value, 'Int32Array'));
-      }
-    case 'Uint32Array':
-      if (value.kind === 'list') {
-        return new Uint32Array(value.value.map((v) => convertToNumber(v)));
-      } else {
-        throw new Error(typeMismatchOut(value, 'Uint32Array'));
-      }
-    case 'Float32Array':
-      if (value.kind === 'list') {
-        return new Float32Array(value.value.map((v) => convertToNumber(v)));
-      } else {
-        throw new Error(typeMismatchOut(value, 'Float32Array'));
-      }
-    case 'Float64Array':
-      if (value.kind === 'list') {
-        return new Float64Array(value.value.map((v) => convertToNumber(v)));
-      } else {
-        throw new Error(typeMismatchOut(value, 'Float64Array'));
-      }
-    case 'BigInt64Array':
-      if (value.kind === 'list') {
-        return new BigInt64Array(value.value.map((v) => convertToBigInt(v)));
-      } else {
-        throw new Error(typeMismatchOut(value, 'BigInt64Array'));
-      }
-    case 'BigUint64Array':
-      if (value.kind === 'list') {
-        return new BigUint64Array(value.value.map((v) => convertToBigInt(v)));
-      } else {
-        throw new Error(typeMismatchOut(value, 'BigUint64Array'));
-      }
-  }
-
-  if (type.kind === 'promise') {
-    const innerType = type.element;
-    if (!innerType) {
-      throw new Error(
-        `Internal Error: Expected Promise to have one type argument`,
-      );
-    }
-    return toTsValue(value, innerType);
-  }
-
-  if (type.kind === 'map') {
-    if (value.kind === 'list') {
-      const entries: [any, any][] = value.value.map((item: Value) => {
-        if (item.kind !== 'tuple' || item.value.length !== 2) {
-          throw new Error(
-            `Internal Error: Expected tuple of two items, got ${item}`,
-          );
+    case 'union':
+      if (value.kind === 'variant') {
+        const caseValue = value.caseValue;
+        if (!caseValue) {
+          throw new Error(`Expected union, got ${value}`);
         }
 
-        return [
-          toTsValue(item.value[0], type.key),
-          toTsValue(item.value[1], type.value),
-        ] as [any, any];
-      });
-      return new Map(entries);
-    } else {
-      throw new Error(typeMismatchOut(value, 'Map'));
-    }
-  }
+        const unionTypes = type.unionTypes;
+        const matchingType = unionTypes[value.caseIdx];
 
-  if (type.kind === 'tuple') {
-    const typeArg = type.elements;
-    if (value.kind === 'tuple') {
-      return value.value.map((item: Value, idx: number) =>
-        toTsValue(item, typeArg[idx]),
-      );
-    } else {
-      throw new Error(typeMismatchOut(value, 'tuple'));
-    }
-  }
-
-  if (type.kind === 'array') {
-    if (value.kind === 'list') {
-      const elemType = type.element;
-
-      if (!elemType) {
-        throw new Error(`Unable to infer the type of Array`);
-      }
-      return value.value.map((item: Value) => toTsValue(item, elemType));
-    } else {
-      throw new Error(typeMismatchOut(value, 'array'));
-    }
-  }
-
-  if (type.kind === 'object') {
-    if (value.kind === 'record') {
-      const fieldValues = value.value;
-      const expectedTypeFields = type.properties;
-      return expectedTypeFields.reduce(
-        (acc, field, idx) => {
-          const name = field.getName();
-          const expectedFieldType = field.getTypeAtLocation(
-            field.getDeclarations()[0],
-          );
-          acc[name] = toTsValue(fieldValues[idx], expectedFieldType);
-          return acc;
-        },
-        {} as Record<string, any>,
-      );
-    } else {
-      throw new Error(typeMismatchOut(value, 'object'));
-    }
-  }
-
-  if (type.kind === 'interface') {
-    if (value.kind === 'record') {
-      const fieldValues = value.value;
-      const expectedTypeFields = type.properties;
-      return expectedTypeFields.reduce(
-        (acc, field, idx) => {
-          const name = field.getName();
-          const expectedFieldType = field.getTypeAtLocation(
-            field.getDeclarations()[0],
-          );
-          acc[name] = toTsValue(fieldValues[idx], expectedFieldType);
-          return acc;
-        },
-        {} as Record<string, any>,
-      );
-    } else {
-      throw new Error(typeMismatchOut(value, 'interface'));
-    }
-  }
-
-  if (type.kind === 'union') {
-    if (value.kind === 'variant') {
-      const caseValue = value.caseValue;
-      if (!caseValue) {
-        throw new Error(`Expected union, got ${value}`);
+        return toTsValue(caseValue, matchingType);
+      } else {
+        throw new Error(typeMismatchOut(value, 'union'));
       }
 
-      const unionTypes = type.unionTypes;
-      const matchingType = unionTypes[value.caseIdx];
+    case 'object':
+      if (value.kind === 'record') {
+        const fieldValues = value.value;
+        const expectedTypeFields = type.properties;
+        return expectedTypeFields.reduce(
+          (acc, field, idx) => {
+            const name = field.getName();
+            const expectedFieldType = field.getTypeAtLocation(
+              field.getDeclarations()[0],
+            );
+            acc[name] = toTsValue(fieldValues[idx], expectedFieldType);
+            return acc;
+          },
+          {} as Record<string, any>,
+        );
+      } else {
+        throw new Error(typeMismatchOut(value, 'object'));
+      }
 
-      return toTsValue(caseValue, matchingType);
-    } else {
-      throw new Error(typeMismatchOut(value, 'union'));
-    }
+    case 'class':
+      throw new Error(
+        unhandledTypeError(
+          value,
+          Option.some(name ?? 'anonymous'),
+          Option.none(),
+        ),
+      );
+
+    case 'interface':
+      if (value.kind === 'record') {
+        const fieldValues = value.value;
+        const expectedTypeFields = type.properties;
+        return expectedTypeFields.reduce(
+          (acc, field, idx) => {
+            const name = field.getName();
+            const expectedFieldType = field.getTypeAtLocation(
+              field.getDeclarations()[0],
+            );
+            acc[name] = toTsValue(fieldValues[idx], expectedFieldType);
+            return acc;
+          },
+          {} as Record<string, any>,
+        );
+      } else {
+        throw new Error(typeMismatchOut(value, 'interface'));
+      }
+
+    case 'promise':
+      const innerType = type.element;
+      if (!innerType) {
+        throw new Error(
+          `Internal Error: Expected Promise to have one type argument`,
+        );
+      }
+      return toTsValue(value, innerType);
+
+    case 'map':
+      if (value.kind === 'list') {
+        const entries: [any, any][] = value.value.map((item: Value) => {
+          if (item.kind !== 'tuple' || item.value.length !== 2) {
+            throw new Error(
+              `Internal Error: Expected tuple of two items, got ${item}`,
+            );
+          }
+
+          return [
+            toTsValue(item.value[0], type.key),
+            toTsValue(item.value[1], type.value),
+          ] as [any, any];
+        });
+        return new Map(entries);
+      } else {
+        throw new Error(typeMismatchOut(value, 'Map'));
+      }
+
+    case 'literal':
+      const literalValue = type.name;
+      if (
+        value.kind === 'bool' &&
+        (literalValue === 'true' || literalValue === 'false')
+      ) {
+        return value.value;
+      } else {
+        throw new Error(typeMismatchOut(value, 'boolean'));
+      }
+
+    case 'alias':
+      throw new Error(
+        unhandledTypeError(
+          value,
+          Option.some(name ?? 'anonymous'),
+          Option.none(),
+        ),
+      );
+
+    case 'others':
+      throw new Error(
+        unhandledTypeError(
+          value,
+          Option.some(name ?? 'anonymous'),
+          Option.none(),
+        ),
+      );
   }
-
-  throw new Error(`'Type ${name} is not supported in golem yet'`);
 }
 
 function convertToNumber(value: Value): any {
