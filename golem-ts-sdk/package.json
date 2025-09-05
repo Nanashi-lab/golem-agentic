@@ -52,7 +52,7 @@
   "description": "",
   "devDependencies": {
     "@eslint/js": "^9.33.0",
-    "@golemcloud/golem-ts-typegen": "^0.0.1-dev.11",
+    "@golemcloud/golem-ts-typegen": "^0.0.1",
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@types/node": "^24.3.0",
@@ -72,7 +72,7 @@
   },
   "private": false,
   "dependencies": {
-    "@golemcloud/golem-ts-types-core": "^0.0.1-dev.10",
+    "@golemcloud/golem-ts-types-core": "^0.0.1",
     "effect": "^3.17.6"
   }
 }
