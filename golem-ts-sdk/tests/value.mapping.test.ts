@@ -291,7 +291,7 @@ describe('typescript value to wit value round-trip conversions', () => {
   });
 });
 
-function runRoundTripTest<T>(data: T, type: Type) {
+function runRoundTripTest<T>(data: T, type: Type.Type) {
   const witValueEither = WitValue.fromTsValue(data, type);
 
   const witValue = EffectEither.getOrElse(witValueEither, (err) => {

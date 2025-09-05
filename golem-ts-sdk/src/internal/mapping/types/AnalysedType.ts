@@ -212,10 +212,7 @@ export function fromTsType(tsType: TsType): Either.Either<AnalysedType, string> 
 export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, string> {
 
 
-  const name =
-     CoreType.getName(type)
-
-
+  const name = type.name;
 
   switch (name) {
     case "Float64Array": return Either.right(list(f64()));
@@ -234,7 +231,7 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
     const literalName = type.name;
 
     if (!literalName) {
-      return Either.left(`Unable to determine the literal value`);
+      return Either.left(`Unable to determine the literal value. ${type}`);
     }
 
     if (isNumberString(literalName)) {
@@ -304,7 +301,7 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
     let boolTracked = false;
 
     for (const t of type.unionTypes) {
-      if (t.kind === 'boolean' || CoreType.getName(t) === "false" || CoreType.getName(t) === "true") {
+      if (t.kind === 'boolean' || t.name === "false" || t.name === "true") {
         if (boolTracked) {
           continue;
         }
@@ -315,7 +312,7 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
         });
       } else {
         if (t.kind === 'literal') {
-          const name = CoreType.getName(t)
+          const name = t.name;
 
           if (!name) {
             return Either.left(`Unable to determine the literal value`);
@@ -389,7 +386,7 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
     const fields = result.right;
 
     if (fields.length === 0) {
-      return Either.left(`Type ${CoreType.getName(type)} is an object but has no properties. Object types must define at least one property.`);
+      return Either.left(`Type ${type.name} is an object but has no properties. Object types must define at least one property.`);
 
     }
 
@@ -454,7 +451,7 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
   }
 
   if (type.kind === 'others') {
-    const name = CoreType.getName(type);
+    const name = type.name
 
     if (!name) {
       return Either.left("Unsupported type (anonymous) found.");

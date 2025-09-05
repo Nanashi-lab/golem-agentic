@@ -307,7 +307,7 @@ export function fromTsValue(
   tsValue: any,
   type: Type.Type,
 ): Either.Either<Value, string> {
-  const name = Type.getName(type);
+  const name = type.name;
 
   switch (name) {
     case 'Int8Array':
@@ -421,7 +421,7 @@ export function fromTsValue(
       }));
   }
 
-  if (type.kind  === 'null') {
+  if (type.kind === 'null') {
     return Either.right({ kind: 'tuple', value: [] });
   }
 
@@ -456,7 +456,7 @@ export function fromTsValue(
   if (type.kind === 'array') return handleArrayType(tsValue, type.element);
 
   if (type.kind === 'promise') {
-    const inner = type.element
+    const inner = type.element;
 
     if (!inner) {
       return Either.left(
@@ -476,7 +476,8 @@ export function fromTsValue(
     return handleUnion(tsValue, type, type.unionTypes);
   }
 
-  if (type.kind === 'map') return handleKeyValuePairs(tsValue, type, type.key, type.value);
+  if (type.kind === 'map')
+    return handleKeyValuePairs(tsValue, type, type.key, type.value);
 
   // Inexperienced ts devs may accidentally use
   // `String` inplace of `string` in typescript and that cannot be handled
@@ -533,9 +534,10 @@ function handleArrayType(
   tsValue: any,
   elementType: Type.Type,
 ): Either.Either<Value, string> {
-
   if (!Array.isArray(tsValue)) {
-    return Either.left(typeMismatchIn(tsValue, { kind: 'array', element: elementType }));
+    return Either.left(
+      typeMismatchIn(tsValue, { kind: 'array', element: elementType }),
+    );
   }
 
   return Either.map(
@@ -548,9 +550,10 @@ function handleTupleType(
   tsValue: any,
   types: Type.Type[],
 ): Either.Either<Value, string> {
-
   if (!Array.isArray(tsValue)) {
-    return Either.left(typeMismatchIn(tsValue, { kind: 'tuple', elements: types }));
+    return Either.left(
+      typeMismatchIn(tsValue, { kind: 'tuple', elements: types }),
+    );
   }
 
   return Either.map(
@@ -563,7 +566,7 @@ function handleKeyValuePairs(
   tsValue: any,
   mapType: Type.Type,
   keyType: Type.Type,
-  valueType: Type.Type
+  valueType: Type.Type,
 ): Either.Either<Value, string> {
   if (!(tsValue instanceof Map)) {
     return Either.left(typeMismatchIn(tsValue, mapType));
@@ -582,7 +585,11 @@ function handleKeyValuePairs(
   return Either.map(values, (value) => ({ kind: 'list', value }));
 }
 
-function handleObject(tsValue: any, type: Type.Type, innerProperties: Symbol[]): Either.Either<Value, string> {
+function handleObject(
+  tsValue: any,
+  type: Type.Type,
+  innerProperties: Symbol[],
+): Either.Either<Value, string> {
   if (typeof tsValue !== 'object' || tsValue === null) {
     return Either.left(typeMismatchIn(tsValue, type));
   }
@@ -624,7 +631,11 @@ function handleObject(tsValue: any, type: Type.Type, innerProperties: Symbol[]):
   return Either.right({ kind: 'record', value: values });
 }
 
-function handleUnion(tsValue: any, type: Type.Type, possibleTypes: Type.Type[]): Either.Either<Value, string> {
+function handleUnion(
+  tsValue: any,
+  type: Type.Type,
+  possibleTypes: Type.Type[],
+): Either.Either<Value, string> {
   const typeWithIndex = findTypeOfAny(tsValue, possibleTypes);
 
   if (!typeWithIndex) {
@@ -656,7 +667,7 @@ function findTypeOfAny(
 }
 
 function matchesType(value: any, type: Type.Type): boolean {
-  const name = Type.getName(type);
+  const name = type.name;
 
   if (type.kind === 'number') {
     return typeof value === 'number';
@@ -733,7 +744,11 @@ function matchesArray(value: any, elementType: Type.Type): boolean {
   return value.every((item) => matchesType(item, elementType));
 }
 
-function handleObjectMatch(value: any, type: Type.Type, props: Symbol[]): boolean {
+function handleObjectMatch(
+  value: any,
+  type: Type.Type,
+  props: Symbol[],
+): boolean {
   if (typeof value !== 'object' || value === null) return false;
 
   const valueKeys = Object.keys(value);
@@ -764,7 +779,7 @@ function handleObjectMatch(value: any, type: Type.Type, props: Symbol[]): boolea
 }
 
 export function toTsValue(value: Value, type: Type.Type): any {
-  const name = Type.getName(type);
+  const name = type.name;
 
   if (value.kind === 'option') {
     const caseValue = value.value;
@@ -890,7 +905,6 @@ export function toTsValue(value: Value, type: Type.Type): any {
   }
 
   if (type.kind === 'map') {
-
     if (value.kind === 'list') {
       const entries: [any, any][] = value.value.map((item: Value) => {
         if (item.kind !== 'tuple' || item.value.length !== 2) {
@@ -937,7 +951,7 @@ export function toTsValue(value: Value, type: Type.Type): any {
   if (type.kind === 'object') {
     if (value.kind === 'record') {
       const fieldValues = value.value;
-      const expectedTypeFields = type.properties
+      const expectedTypeFields = type.properties;
       return expectedTypeFields.reduce(
         (acc, field, idx) => {
           const name = field.getName();
