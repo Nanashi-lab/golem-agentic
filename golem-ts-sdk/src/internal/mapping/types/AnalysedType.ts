@@ -210,259 +210,227 @@ export function fromTsType(tsType: TsType): Either.Either<AnalysedType, string> 
 
 
 export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, string> {
-  const name = type.name;
-
-  // TODO: Switch to pattern match on kind
-  switch (name) {
-    case "Float64Array": return Either.right(list(f64()));
-    case "Float32Array": return Either.right(list(f32()));
-    case "Int8Array":    return Either.right(list(s8()));
-    case "Uint8Array":   return Either.right(list(u8()));
-    case "Int16Array":   return Either.right(list(s16()));
-    case "Uint16Array":  return Either.right(list(u16()));
-    case "Int32Array":   return Either.right(list(s32()));
-    case "Uint32Array":  return Either.right(list(u32()));
-    case "BigInt64Array":  return Either.right(list(s64()));
-    case "BigUint64Array": return Either.right(list(u64()));
-  }
-
-  if (type.kind === 'literal') {
-    const literalName = type.name;
-
-    if (!literalName) {
-      return Either.left(`Unable to determine the literal value. ${type}`);
-    }
-
-    if (isNumberString(literalName)) {
-      return Either.left("Literals of number type are not supported");
-    }
-
-    return Either.right(enum_([trimQuotes(literalName)]))
-  }
-
-  if (type.kind === 'promise') {
-    const inner = type.element;
-
-    if (!inner) {
-      return Either.left(`Unable to infer the type of promise`)
-    }
-
-    return fromTsTypeInternal(inner);
-  }
-
-  if (type.kind === 'boolean' || name === 'true' || name === 'false')  {
+  switch (type.kind) {
+    case "boolean":
       return Either.right(bool())
-    }
 
-  if (type.kind === "map") {
-   const keyT = type.key;
-   const valT = type.value;
+    case "number":
+      return Either.right(s32())
 
-    const key = fromTsTypeInternal(keyT);
-    const value = fromTsTypeInternal(valT);
+    case "string":
+      return Either.right(str())
 
+    case "bigint":
+      return Either.right(u64())
 
-    return Either.zipWith(key, value, (k, v) =>
-        list(tuple([k, v])));
-  }
+    case "null":
+      return Either.right(tuple([]))
 
+    case "undefined":
+      return Either.right(tuple([]))
 
-  if (type.kind === 'tuple') {
-    const tupleElems = Either.all(type.elements.map(el => fromTsTypeInternal(el)));
+    case "tuple":
+      const tupleElems = Either.all(type.elements.map(el => fromTsTypeInternal(el)));
+      return Either.map(tupleElems, (items) => tuple(items));
 
-    return Either.map(tupleElems, (items) => tuple(items));
-  }
+    case "union":
+      let fieldIdx = 1;
 
-  if (type.kind === 'array') {
-    const arrayElementType = type.element;
+      const possibleTypes: NameOptionTypePair[] = [];
 
-    if (!arrayElementType) {
-      return Either.left("Unable to determine the array element type");
-    }
+      let boolTracked = false;
 
-    const elemType = fromTsTypeInternal(arrayElementType);
-
-    return Either.map(elemType, (inner) => list(inner));
-  }
-
-  if (type.kind === 'class') {
-    const message =
-      type.name ? `${type.name} is a class, which is not supported` : "class is not supported";
-
-    return Either.left(`${message}. Use object instead.`)
-  }
-
-  if (type.kind === 'union') {
-    let fieldIdx = 1;
-
-    const possibleTypes: NameOptionTypePair[] = [];
-
-    let boolTracked = false;
-
-    for (const t of type.unionTypes) {
-      if (t.kind === 'boolean' || t.name === "false" || t.name === "true") {
-        if (boolTracked) {
-          continue;
-        }
-        boolTracked = true;
-        possibleTypes.push({
-          name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
-          typ: bool()
-        });
-      } else {
-        if (t.kind === 'literal') {
-          const name = t.name;
-
-          if (!name) {
-            return Either.left(`Unable to determine the literal value`);
+      for (const t of type.unionTypes) {
+        if (t.kind === 'boolean' || t.name === "false" || t.name === "true") {
+          if (boolTracked) {
+            continue;
           }
-
-          if (isNumberString(name)) {
-            return Either.left("Literals of number type are not supported");
-          }
-
-          possibleTypes.push({
-            name: trimQuotes(name),
-          });
-
-        } else if (t.kind === 'null' || t.kind === 'undefined') {
-          const result =
-            fromTsTypeInternal(t);
-
-          if (Either.isLeft(result)) {
-            return result;
-          }
-
-          possibleTypes.push({
-            name: `null-type`,
-            typ: result.right
-          });
-        } else {
-          const result =
-            fromTsTypeInternal(t);
-
-          if (Either.isLeft(result)) {
-            return result;
-          }
-
+          boolTracked = true;
           possibleTypes.push({
             name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
-            typ: result.right,
+            typ: bool()
           });
+        } else {
+          if (t.kind === 'literal') {
+            const name = t.name;
+
+            if (!name) {
+              return Either.left(`Unable to determine the literal value`);
+            }
+
+            if (isNumberString(name)) {
+              return Either.left("Literals of number type are not supported");
+            }
+
+            possibleTypes.push({
+              name: trimQuotes(name),
+            });
+
+          } else if (t.kind === 'null' || t.kind === 'undefined') {
+            const result =
+              fromTsTypeInternal(t);
+
+            if (Either.isLeft(result)) {
+              return result;
+            }
+
+            possibleTypes.push({
+              name: `null-type`,
+              typ: result.right
+            });
+          } else {
+            const result =
+              fromTsTypeInternal(t);
+
+            if (Either.isLeft(result)) {
+              return result;
+            }
+
+            possibleTypes.push({
+              name: `type-${numberToOrdinalKebab(fieldIdx++)}`,
+              typ: result.right,
+            });
+          }
         }
       }
-    }
 
-    return Either.right(variant(possibleTypes));
-  }
+      return Either.right(variant(possibleTypes));
 
+    case "object":
+      const result = Either.all(type.properties.map((prop) => {
+        const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());
 
-  if (type.kind === 'object') {
+        const nodes: Node[] = prop.getDeclarations();
+        const node = nodes[0];
 
-    const result = Either.all(type.properties.map((prop) => {
-      const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());
+        const tsType = fromTsTypeInternal(type);
 
-      const nodes: Node[] = prop.getDeclarations();
-      const node = nodes[0];
+        if ((Node.isPropertySignature(node) || Node.isPropertyDeclaration(node)) && node.hasQuestionToken()) {
+          return Either.map(tsType, (analysedType) => {
+            return field(prop.getName(), option(analysedType))
+          });
+        }
 
-      const tsType = fromTsTypeInternal(type);
-
-      if ((Node.isPropertySignature(node) || Node.isPropertyDeclaration(node)) && node.hasQuestionToken()) {
         return Either.map(tsType, (analysedType) => {
-          return field(prop.getName(), option(analysedType))
-        });
+          return field(prop.getName(), analysedType)
+        })
+      }));
+
+      if (Either.isLeft(result)) {
+        return Either.left(result.left);
       }
 
-      return Either.map(tsType, (analysedType) => {
-        return field(prop.getName(), analysedType)
-      })
-    }));
+      const fields = result.right;
 
-    if (Either.isLeft(result)) {
-      return Either.left(result.left);
-    }
+      if (fields.length === 0) {
+        return Either.left(`Type ${type.name} is an object but has no properties. Object types must define at least one property.`);
 
-    const fields = result.right;
-
-    if (fields.length === 0) {
-      return Either.left(`Type ${type.name} is an object but has no properties. Object types must define at least one property.`);
-
-    }
-
-
-    return Either.right(record(fields))
-  }
-
-  if (type.kind === 'interface') {
-
-    const result = Either.all(type.properties.map((prop) => {
-      const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());
-      const nodes: Node[] = prop.getDeclarations();
-      const node = nodes[0];
-
-      const tsType = fromTsTypeInternal(type);
-
-
-
-      if ((Node.isPropertySignature(node) || Node.isPropertyDeclaration(node)) && node.hasQuestionToken()) {
-        return Either.map(tsType, (analysedType) => {
-          return field(prop.getName(), option(analysedType))
-        });
       }
 
-      return Either.map(fromTsTypeInternal(type), (analysedType) => {
-        return field(prop.getName(), analysedType)
-      })
-    }));
 
-    return Either.map(result, (fields) => record(fields));
+      return Either.right(record(fields))
 
+    case "class":
+      const message =
+        type.name ? `${type.name} is a class, which is not supported` : "class is not supported";
+
+      return Either.left(`${message}. Use object instead.`)
+
+    case "interface":
+      const interfaceRsult = Either.all(type.properties.map((prop) => {
+        const type = prop.getTypeAtLocation(prop.getValueDeclarationOrThrow());
+        const nodes: Node[] = prop.getDeclarations();
+        const node = nodes[0];
+
+        const tsType = fromTsTypeInternal(type);
+
+
+
+        if ((Node.isPropertySignature(node) || Node.isPropertyDeclaration(node)) && node.hasQuestionToken()) {
+          return Either.map(tsType, (analysedType) => {
+            return field(prop.getName(), option(analysedType))
+          });
+        }
+
+        return Either.map(fromTsTypeInternal(type), (analysedType) => {
+          return field(prop.getName(), analysedType)
+        })
+      }));
+
+      return Either.map(interfaceRsult, (fields) => record(fields));
+
+    case "promise":
+      const inner = type.element;
+      return fromTsTypeInternal(inner);
+
+    case "map":
+      const keyT = type.key;
+      const valT = type.value;
+
+      const key = fromTsTypeInternal(keyT);
+      const value = fromTsTypeInternal(valT);
+
+
+      return Either.zipWith(key, value, (k, v) =>
+        list(tuple([k, v])));
+
+    case "literal":
+      const literalName = type.name;
+
+      if (!literalName) {
+        return Either.left(`Unable to determine the literal value. ${type}`);
+      }
+
+      if (literalName === 'true' || literalName === 'false') {
+        return Either.right(bool());
+      }
+
+      if (isNumberString(literalName)) {
+        return Either.left("Literals of number type are not supported");
+      }
+
+      return Either.right(enum_([trimQuotes(literalName)]))
+
+    case "alias":
+      return Either.left(`Type aliases are not supported. Found alias: ${type.name ?? "<anonymous>"}`);
+
+    case "others":
+      const customTypeName = type.name
+
+      if (!customTypeName) {
+        return Either.left("Unsupported type (anonymous) found.");
+      }
+
+
+      return Either.left(`Type "${customTypeName}" is not supported`)
+
+    case 'array':
+      const name = type.name;
+
+      switch (name) {
+        case "Float64Array": return Either.right(list(f64()));
+        case "Float32Array": return Either.right(list(f32()));
+        case "Int8Array":    return Either.right(list(s8()));
+        case "Uint8Array":   return Either.right(list(u8()));
+        case "Int16Array":   return Either.right(list(s16()));
+        case "Uint16Array":  return Either.right(list(u16()));
+        case "Int32Array":   return Either.right(list(s32()));
+        case "Uint32Array":  return Either.right(list(u32()));
+        case "BigInt64Array":  return Either.right(list(s64()));
+        case "BigUint64Array": return Either.right(list(u64()));
+      }
+
+      const arrayElementType =
+        (type.kind === "array") ? type.element : undefined;
+
+      if (!arrayElementType) {
+        return Either.left("Unable to determine the array element type");
+      }
+
+      const elemType = fromTsTypeInternal(arrayElementType);
+
+      return Either.map(elemType, (inner) => list(inner));
   }
-
-  if (type.kind === 'null') {
-
-    return Either.right(tuple([]))
-  }
-
-  if (type.kind === 'bigint') {
-
-
-    return Either.right(u64())
-  }
-
-
-  if (type.kind === 'undefined') {
-
-
-    return Either.right(tuple([]))
-  }
-
-  if (type.kind === 'number') {
-
-
-    return Either.right(s32()) // For the same reason - as an example - Rust defaults to i32
-  }
-
-  if (type.kind === 'string') {
-
-
-    return Either.right(str())
-  }
-
-  if (type.kind === 'others') {
-    const name = type.name
-
-    if (!name) {
-      return Either.left("Unsupported type (anonymous) found.");
-    }
-
-
-    return Either.left(`Type "${name}" is not supported`)
-  }
-
-
-  return Either.left(`Type "${name}" is not supported`);
-
 }
 
 function isNumberString(name: string): boolean {
