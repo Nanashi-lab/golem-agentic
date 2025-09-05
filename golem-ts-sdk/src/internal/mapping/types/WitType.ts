@@ -20,7 +20,7 @@ import * as AnalysedType from "./AnalysedType";
 
 export { WitType } from "golem:rpc/types@0.2.2";
 
-export const fromTsType = (type: Type): Either.Either<WitType, string> => {
+export const fromTsType = (type: Type.Type): Either.Either<WitType, string> => {
     const analysedTypeEither = AnalysedType.fromTsType(type);
     return Either.flatMap(analysedTypeEither, (analysedType) => {
         const builder = new WitTypeBuilder();

@@ -305,9 +305,9 @@ function buildNodes(value: Value, nodes: WitNode[]): number {
 // as `Type` holds more information, and can be used to determine the error messages for wrong `tsValue` more accurately.
 export function fromTsValue(
   tsValue: any,
-  type: Type,
+  type: Type.Type,
 ): Either.Either<Value, string> {
-  const name = type.getName();
+  const name = Type.getName(type);
 
   switch (name) {
     case 'Int8Array':
@@ -421,15 +421,15 @@ export function fromTsValue(
       }));
   }
 
-  if (type.isNull()) {
+  if (type.kind  === 'null') {
     return Either.right({ kind: 'tuple', value: [] });
   }
 
-  if (type.isBoolean() || name === 'true' || name === 'false') {
+  if (type.kind === 'boolean' || name === 'true' || name === 'false') {
     return handleBooleanType(tsValue);
   }
 
-  if (type.isNumber()) {
+  if (type.kind === 'number') {
     if (typeof tsValue === 'number') {
       return Either.right({ kind: 's32', value: tsValue });
     } else {
@@ -437,7 +437,7 @@ export function fromTsValue(
     }
   }
 
-  if (type.isBigInt()) {
+  if (type.kind === 'bigint') {
     if (typeof tsValue === 'bigint' || typeof tsValue === 'number') {
       return Either.right({ kind: 'u64', value: tsValue as any });
     } else {
@@ -445,7 +445,7 @@ export function fromTsValue(
     }
   }
 
-  if (type.isString()) {
+  if (type.kind === 'string') {
     if (typeof tsValue === 'string') {
       return Either.right({ kind: 'string', value: tsValue });
     } else {
@@ -453,10 +453,10 @@ export function fromTsValue(
     }
   }
 
-  if (type.isArray()) return handleArrayType(tsValue, type);
+  if (type.kind === 'array') return handleArrayType(tsValue, type.element);
 
-  if (name === 'Promise') {
-    const inner = type.getPromiseElementType();
+  if (type.kind === 'promise') {
+    const inner = type.element
 
     if (!inner) {
       return Either.left(
@@ -470,13 +470,13 @@ export function fromTsValue(
     return fromTsValue(tsValue, inner);
   }
 
-  if (type.isTuple()) return handleTupleType(tsValue, type);
+  if (type.kind === 'tuple') return handleTupleType(tsValue, type.elements);
 
-  if (type.isUnion()) {
-    return handleUnion(tsValue, type);
+  if (type.kind === 'union') {
+    return handleUnion(tsValue, type, type.unionTypes);
   }
 
-  if (name === 'Map') return handleKeyValuePairs(tsValue, type);
+  if (type.kind === 'map') return handleKeyValuePairs(tsValue, type, type.key, type.value);
 
   // Inexperienced ts devs may accidentally use
   // `String` inplace of `string` in typescript and that cannot be handled
@@ -490,12 +490,12 @@ export function fromTsValue(
     );
   }
 
-  if (type.isObject()) {
-    return handleObject(tsValue, type);
+  if (type.kind === 'object') {
+    return handleObject(tsValue, type, type.properties);
   }
 
-  if (type.isInterface()) {
-    return handleObject(tsValue, type);
+  if (type.kind === 'interface') {
+    return handleObject(tsValue, type, type.properties);
   }
 
   return Either.left(unhandledTypeError(tsValue, Option.none(), Option.none()));
@@ -517,7 +517,7 @@ function handleTypedArray<
   return tsValue instanceof ctor
     ? Either.right(tsValue)
     : Either.left(
-        typeMismatchIn(tsValue, new Type({ kind: 'array', name: ctor.name })),
+        typeMismatchIn(tsValue, { kind: 'array', element: { kind: 'number' } }),
       );
 }
 
@@ -525,78 +525,48 @@ function handleBooleanType(tsValue: any): Either.Either<Value, string> {
   if (typeof tsValue === 'boolean') {
     return Either.right({ kind: 'bool', value: tsValue });
   } else {
-    return Either.left(typeMismatchIn(tsValue, new Type({ kind: 'boolean' })));
+    return Either.left(typeMismatchIn(tsValue, { kind: 'boolean' }));
   }
 }
 
 function handleArrayType(
   tsValue: any,
-  type: Type,
+  elementType: Type.Type,
 ): Either.Either<Value, string> {
-  const typeArg = type.getArrayElementType();
 
-  if (!typeArg) {
-    return Either.left(
-      unhandledTypeError(
-        tsValue,
-        Option.none(),
-        Option.some('unable to infer the type of Array'),
-      ),
-    );
-  }
   if (!Array.isArray(tsValue)) {
-    return Either.left(typeMismatchIn(tsValue, new Type({ kind: 'array' })));
+    return Either.left(typeMismatchIn(tsValue, { kind: 'array', element: elementType }));
   }
 
   return Either.map(
-    Either.all(tsValue.map((item) => fromTsValue(item, typeArg))),
+    Either.all(tsValue.map((item) => fromTsValue(item, elementType))),
     (values) => ({ kind: 'list', value: values }),
   );
 }
 
 function handleTupleType(
   tsValue: any,
-  type: Type,
+  types: Type.Type[],
 ): Either.Either<Value, string> {
-  const typeArgs = type.getTupleElements();
 
   if (!Array.isArray(tsValue)) {
-    return Either.left(typeMismatchIn(tsValue, new Type({ kind: 'tuple' })));
+    return Either.left(typeMismatchIn(tsValue, { kind: 'tuple', elements: types }));
   }
 
   return Either.map(
-    Either.all(tsValue.map((item, idx) => fromTsValue(item, typeArgs[idx]))),
+    Either.all(tsValue.map((item, idx) => fromTsValue(item, types[idx]))),
     (values) => ({ kind: 'tuple', value: values }),
   );
 }
 
 function handleKeyValuePairs(
   tsValue: any,
-  type: Type,
+  mapType: Type.Type,
+  keyType: Type.Type,
+  valueType: Type.Type
 ): Either.Either<Value, string> {
-  const typeArgs = type.getTypeArguments?.();
-  if (!typeArgs || typeArgs.length !== 2) {
-    return Either.left(
-      unhandledTypeError(
-        tsValue,
-        Option.none(),
-        Option.some('Map must have two type arguments'),
-      ),
-    );
-  }
   if (!(tsValue instanceof Map)) {
-    return Either.left(typeMismatchIn(tsValue, type));
-  }
-
-  const [keyType, valueType] = typeArgs;
-  if (!keyType || !valueType) {
-    return Either.left(
-      unhandledTypeError(
-        tsValue,
-        Option.none(),
-        Option.some('unable to infer key or value type'),
-      ),
-    );
+    return Either.left(typeMismatchIn(tsValue, mapType));
   }
 
   const values = Either.all(
@@ -612,11 +582,10 @@ function handleKeyValuePairs(
   return Either.map(values, (value) => ({ kind: 'list', value }));
 }
 
-function handleObject(tsValue: any, type: Type): Either.Either<Value, string> {
+function handleObject(tsValue: any, type: Type.Type, innerProperties: Symbol[]): Either.Either<Value, string> {
   if (typeof tsValue !== 'object' || tsValue === null) {
     return Either.left(typeMismatchIn(tsValue, type));
   }
-  const innerProperties: Symbol[] = type.getProperties();
   const values: Value[] = [];
 
   for (const prop of innerProperties) {
@@ -630,11 +599,11 @@ function handleObject(tsValue: any, type: Type): Either.Either<Value, string> {
       if (Node.isPropertySignature(node) || Node.isPropertyDeclaration(node)) {
         if (node.hasQuestionToken()) {
           values.push({ kind: 'option' });
-        } else if (propType.isString() && tsValue === '') {
+        } else if (propType.kind === 'string' && tsValue === '') {
           values.push({ kind: 'string', value: '' });
-        } else if (propType.isNumber() && tsValue === 0) {
+        } else if (propType.kind === 'number' && tsValue === 0) {
           values.push({ kind: 's32', value: 0 });
-        } else if (propType.isBoolean() && tsValue === false) {
+        } else if (propType.kind === 'boolean' && tsValue === false) {
           values.push({ kind: 'bool', value: false });
         } else {
           return Either.left(missingValueForKey(key, tsValue));
@@ -655,8 +624,7 @@ function handleObject(tsValue: any, type: Type): Either.Either<Value, string> {
   return Either.right({ kind: 'record', value: values });
 }
 
-function handleUnion(tsValue: any, type: Type): Either.Either<Value, string> {
-  const possibleTypes = type.getUnionTypes();
+function handleUnion(tsValue: any, type: Type.Type, possibleTypes: Type.Type[]): Either.Either<Value, string> {
   const typeWithIndex = findTypeOfAny(tsValue, possibleTypes);
 
   if (!typeWithIndex) {
@@ -676,8 +644,8 @@ function handleUnion(tsValue: any, type: Type): Either.Either<Value, string> {
 
 function findTypeOfAny(
   value: any,
-  typeList: readonly Type[],
-): [Type, number] | undefined {
+  typeList: readonly Type.Type[],
+): [Type.Type, number] | undefined {
   for (let idx = 0; idx < typeList.length; idx++) {
     const type = typeList[idx];
     if (matchesType(value, type)) {
@@ -687,41 +655,42 @@ function findTypeOfAny(
   return undefined;
 }
 
-function matchesType(value: any, type: Type): boolean {
-  const name = type.getName();
+function matchesType(value: any, type: Type.Type): boolean {
+  const name = Type.getName(type);
 
-  if (type.isNumber()) {
+  if (type.kind === 'number') {
     return typeof value === 'number';
   }
 
-  if (type.isBoolean() || name === 'true' || name === 'false') {
+  if (type.kind === 'boolean' || name === 'true' || name === 'false') {
     return typeof value === 'boolean';
   }
 
-  if (type.isString()) {
+  if (type.kind === 'string') {
     return typeof value === 'string';
   }
 
-  if (type.isNull()) {
+  if (type.kind === 'null') {
     return value === null;
   }
 
-  if (type.isUndefined()) {
+  if (type.kind === 'undefined') {
     return value === undefined;
   }
 
-  if (type.isArray()) {
-    const elemType = type.getArrayElementType();
+  if (type.kind === 'array') {
+    const elemType = type.element;
 
     return matchesArray(value, elemType);
   }
 
-  if (type.isTuple()) {
-    return matchesTuple(value, type.getTupleElements());
+  if (type.kind === 'tuple') {
+    return matchesTuple(value, type.elements);
   }
 
-  if (name === 'Map' && type.getTypeArguments().length === 2) {
-    const [keyType, valType] = type.getTypeArguments?.() ?? [];
+  if (type.kind === 'map') {
+    const keyType = type.key;
+    const valType = type.value;
 
     if (!keyType || !valType) {
       return false;
@@ -733,16 +702,16 @@ function matchesType(value: any, type: Type): boolean {
     );
   }
 
-  if (type.isObject()) {
-    return handleObjectMatch(value, type);
+  if (type.kind === 'object') {
+    return handleObjectMatch(value, type, type.properties);
   }
 
-  if (type.isInterface()) {
-    return handleObjectMatch(value, type);
+  if (type.kind === 'interface') {
+    return handleObjectMatch(value, type, type.properties);
   }
 
-  if (type.isUnion()) {
-    return type.getUnionTypes().some((t) => matchesType(value, t));
+  if (type.kind === 'union') {
+    return type.unionTypes.some((t) => matchesType(value, t));
   }
 
   return false;
@@ -750,7 +719,7 @@ function matchesType(value: any, type: Type): boolean {
 
 function matchesTuple(
   value: any,
-  tupleTypes: readonly Type[] | undefined,
+  tupleTypes: readonly Type.Type[] | undefined,
 ): boolean {
   if (!Array.isArray(value)) return false;
   if (!tupleTypes) return false;
@@ -759,16 +728,13 @@ function matchesTuple(
   return value.every((v, idx) => matchesType(v, tupleTypes[idx]));
 }
 
-function matchesArray(value: any, elementType: Type | undefined): boolean {
+function matchesArray(value: any, elementType: Type.Type): boolean {
   if (!Array.isArray(value)) return false;
-  if (!elementType) return true;
   return value.every((item) => matchesType(item, elementType));
 }
 
-function handleObjectMatch(value: any, type: Type): boolean {
+function handleObjectMatch(value: any, type: Type.Type, props: Symbol[]): boolean {
   if (typeof value !== 'object' || value === null) return false;
-
-  const props: Symbol[] = type.getProperties();
 
   const valueKeys = Object.keys(value);
   if (valueKeys.length !== props.length) return false;
@@ -797,8 +763,8 @@ function handleObjectMatch(value: any, type: Type): boolean {
   return true;
 }
 
-export function toTsValue(value: Value, type: Type): any {
-  const name = type.getName();
+export function toTsValue(value: Value, type: Type.Type): any {
+  const name = Type.getName(type);
 
   if (value.kind === 'option') {
     const caseValue = value.value;
@@ -809,11 +775,11 @@ export function toTsValue(value: Value, type: Type): any {
     return toTsValue(caseValue, type);
   }
 
-  if (type.isNumber()) {
+  if (type.kind === 'number') {
     return convertToNumber(value);
   }
 
-  if (type.isString()) {
+  if (type.kind === 'string') {
     if (value.kind === 'string') {
       return value.value;
     } else {
@@ -821,11 +787,11 @@ export function toTsValue(value: Value, type: Type): any {
     }
   }
 
-  if (type.isBigInt()) {
+  if (type.kind === 'bigint') {
     return convertToBigInt(value);
   }
 
-  if (type.isNull()) {
+  if (type.kind === 'null') {
     if (value.kind === 'tuple' && value.value.length === 0) {
       return null;
     } else {
@@ -833,7 +799,7 @@ export function toTsValue(value: Value, type: Type): any {
     }
   }
 
-  if (type.isBoolean() || name === 'true' || name === 'false') {
+  if (type.kind === 'boolean' || name === 'true' || name === 'false') {
     if (value.kind === 'bool') {
       return value.value;
     } else {
@@ -913,8 +879,8 @@ export function toTsValue(value: Value, type: Type): any {
       }
   }
 
-  if (name === 'Promise') {
-    const innerType = type.getPromiseElementType();
+  if (type.kind === 'promise') {
+    const innerType = type.element;
     if (!innerType) {
       throw new Error(
         `Internal Error: Expected Promise to have one type argument`,
@@ -923,12 +889,7 @@ export function toTsValue(value: Value, type: Type): any {
     return toTsValue(value, innerType);
   }
 
-  if (name === 'Map') {
-    const typeArgs = type.getTypeArguments();
-
-    if (typeArgs.length !== 2) {
-      throw new Error('Internal Error: Map must have two type arguments');
-    }
+  if (type.kind === 'map') {
 
     if (value.kind === 'list') {
       const entries: [any, any][] = value.value.map((item: Value) => {
@@ -939,8 +900,8 @@ export function toTsValue(value: Value, type: Type): any {
         }
 
         return [
-          toTsValue(item.value[0], typeArgs[0]),
-          toTsValue(item.value[1], typeArgs[1]),
+          toTsValue(item.value[0], type.key),
+          toTsValue(item.value[1], type.value),
         ] as [any, any];
       });
       return new Map(entries);
@@ -949,8 +910,8 @@ export function toTsValue(value: Value, type: Type): any {
     }
   }
 
-  if (type.isTuple()) {
-    const typeArg = type.getTupleElements();
+  if (type.kind === 'tuple') {
+    const typeArg = type.elements;
     if (value.kind === 'tuple') {
       return value.value.map((item: Value, idx: number) =>
         toTsValue(item, typeArg[idx]),
@@ -960,9 +921,9 @@ export function toTsValue(value: Value, type: Type): any {
     }
   }
 
-  if (type.isArray()) {
+  if (type.kind === 'array') {
     if (value.kind === 'list') {
-      const elemType = type.getArrayElementType();
+      const elemType = type.element;
 
       if (!elemType) {
         throw new Error(`Unable to infer the type of Array`);
@@ -973,10 +934,10 @@ export function toTsValue(value: Value, type: Type): any {
     }
   }
 
-  if (type.isObject()) {
+  if (type.kind === 'object') {
     if (value.kind === 'record') {
       const fieldValues = value.value;
-      const expectedTypeFields = type.getProperties();
+      const expectedTypeFields = type.properties
       return expectedTypeFields.reduce(
         (acc, field, idx) => {
           const name = field.getName();
@@ -993,10 +954,10 @@ export function toTsValue(value: Value, type: Type): any {
     }
   }
 
-  if (type.isInterface()) {
+  if (type.kind === 'interface') {
     if (value.kind === 'record') {
       const fieldValues = value.value;
-      const expectedTypeFields = type.getProperties();
+      const expectedTypeFields = type.properties;
       return expectedTypeFields.reduce(
         (acc, field, idx) => {
           const name = field.getName();
@@ -1013,14 +974,14 @@ export function toTsValue(value: Value, type: Type): any {
     }
   }
 
-  if (type.isUnion()) {
+  if (type.kind === 'union') {
     if (value.kind === 'variant') {
       const caseValue = value.caseValue;
       if (!caseValue) {
         throw new Error(`Expected union, got ${value}`);
       }
 
-      const unionTypes = type.getUnionTypes();
+      const unionTypes = type.unionTypes;
       const matchingType = unionTypes[value.caseIdx];
 
       return toTsValue(caseValue, matchingType);

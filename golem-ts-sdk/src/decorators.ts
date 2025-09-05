@@ -35,6 +35,7 @@ import { AgentId } from './agentId';
 import { createCustomError } from './internal/agentError';
 import { AgentTypeName } from './newTypes/agentTypeName';
 
+type Type = Type.Type;
 /**
  * Marks a class as an Agent and registers it in the global agent registry.
  * Note that the method generates a `local` and `remote` client for the agent.
