@@ -210,10 +210,9 @@ export function fromTsType(tsType: TsType): Either.Either<AnalysedType, string> 
 
 
 export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, string> {
-
-
   const name = type.name;
 
+  // TODO: Switch to pattern match on kind
   switch (name) {
     case "Float64Array": return Either.right(list(f64()));
     case "Float32Array": return Either.right(list(f32()));
