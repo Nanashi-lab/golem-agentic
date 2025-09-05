@@ -19,39 +19,46 @@ import { Type } from './type-lite';
 
 export function buildTypeFromJSON(json: LiteTypeJSON): Type {
   switch (json.kind) {
+    case 'others':
+      return { kind: 'others', name: json.name };
     case 'boolean':
+      return { kind: 'boolean', name: json.name };
     case 'number':
+      return { kind: 'number', name: json.name };
     case 'string':
+      return { kind: 'string', name: json.name };
     case 'bigint':
+      return { kind: 'bigint', name: json.name };
     case 'null':
+      return { kind: 'null', name: json.name };
     case 'undefined':
-      return new Type({ kind: json.kind, name: json.name });
+      return { kind: 'undefined', name: json.name };
 
     case 'array': {
       const elem = buildTypeFromJSON(json.element);
-      return new Type({
+      return {
         kind: 'array',
-        name: json.name ?? 'Array',
+        name: json.name,
         element: elem,
-      });
+      };
     }
 
     case 'tuple': {
       const elems = json.elements.map(buildTypeFromJSON);
-      return new Type({
+      return {
         kind: 'tuple',
         name: json.name ?? 'Tuple',
         elements: elems,
-      });
+      };
     }
 
     case 'union': {
       const types = json.types.map(buildTypeFromJSON);
-      return new Type({
+      return {
         kind: 'union',
         name: json.name ?? 'Union',
         unionTypes: types,
-      });
+      };
     }
 
     case 'class': {
@@ -59,15 +66,15 @@ export function buildTypeFromJSON(json: LiteTypeJSON): Type {
         (p) =>
           new Symbol({
             name: p.name,
-            declarations: [new Node('PropertyDeclaration', !!p.optional)],
+            declarations: [new Node('PropertySignature', !!p.optional)],
             typeAtLocation: buildTypeFromJSON(p.type),
           }),
       );
-      return new Type({
+      return {
         kind: 'class',
-        name: json.name ?? 'Class',
+        name: json.name,
         properties: props,
-      });
+      };
     }
 
     case 'object': {
@@ -79,11 +86,11 @@ export function buildTypeFromJSON(json: LiteTypeJSON): Type {
             typeAtLocation: buildTypeFromJSON(p.type),
           }),
       );
-      return new Type({
+      return {
         kind: 'object',
-        name: json.name ?? 'Object',
+        name: json.name,
         properties: props,
-      });
+      };
     }
 
     case 'interface': {
@@ -95,15 +102,15 @@ export function buildTypeFromJSON(json: LiteTypeJSON): Type {
             typeAtLocation: buildTypeFromJSON(p.type),
           }),
       );
-      return new Type({
+      return {
         kind: 'interface',
-        name: json.name ?? 'Interface',
+        name: json.name,
         properties: props,
-      });
+      };
     }
 
     case 'literal':
-      return new Type({ kind: 'literal', name: json.name });
+      return { kind: 'literal', name: json.name };
 
     case 'alias': {
       const target = buildTypeFromJSON(json.target);
@@ -113,30 +120,35 @@ export function buildTypeFromJSON(json: LiteTypeJSON): Type {
         declarations: [aliasDecl],
         aliasTarget: target,
       });
-      return new Type({
+      return {
         kind: 'alias',
         name: json.name,
         aliasSymbol: aliasSym,
-      });
+      };
     }
 
     case 'promise':
       const elemType = buildTypeFromJSON(json.element);
-      return new Type({
+      return {
         kind: 'promise',
         name: json.name ?? 'Promise',
         element: elemType,
-      });
+      };
 
     case 'map':
       const typeArgs = (json.typeArgs ?? []).map(buildTypeFromJSON);
-      return new Type({
+
+      if (typeArgs.length !== 2) {
+        throw new Error(
+          `Map type must have exactly 2 type arguments, got ${typeArgs.length}`,
+        );
+      }
+
+      return {
         kind: 'map',
         name: json.name ?? 'Map',
-        typeArgs: typeArgs,
-      });
-
-    default:
-      throw new Error(`Unsupported type kind: ${(json as any).kind}`);
+        key: typeArgs[0],
+        value: typeArgs[1],
+      };
   }
 }

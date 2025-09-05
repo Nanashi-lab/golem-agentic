@@ -12,135 +12,150 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { unwrapAlias, Type, getTypeName } from './type-lite';
 import { LiteTypeJSON } from './type-json';
+import * as Type from './type-lite';
 
-export function buildJSONFromType(type: Type): LiteTypeJSON {
-  type = unwrapAlias(type);
+export function buildJSONFromType(type: Type.Type): LiteTypeJSON {
+  switch (type.kind) {
+    case 'number':
+      return { kind: 'number', name: type.name };
 
-  if (type.isBoolean()) return { kind: 'boolean', name: 'boolean' };
-  if (type.isNumber()) return { kind: 'number', name: 'number' };
-  if (type.isString()) return { kind: 'string', name: 'string' };
-  if (type.isBigInt()) return { kind: 'bigint', name: 'bigint' };
-  if (type.isNull()) return { kind: 'null', name: 'null' };
-  if (type.isUndefined()) return { kind: 'undefined', name: 'undefined' };
+    case 'string':
+      return { kind: 'string', name: type.name };
 
-  if (type.isArray()) {
-    const elem = type.getArrayElementType();
+    case 'bigint':
+      return { kind: 'bigint', name: type.name };
 
-    if (!elem) throw new Error('Missing element type in Array');
+    case 'null':
+      return { kind: 'null', name: type.name };
 
-    return {
-      kind: 'array',
-      name: getTypeName(type),
-      element: buildJSONFromType(elem),
-    };
-  }
+    case 'undefined':
+      return { kind: 'undefined', name: type.name };
 
-  if (type.isLiteral()) {
-    return {
-      kind: 'literal',
-      name: getTypeName(type),
-    };
-  }
+    case 'array':
+      const elem = Type.getArrayElementType(type);
 
-  if (type.isTuple()) {
-    return {
-      kind: 'tuple',
-      name: getTypeName(type),
-      elements: type.getTupleElements().map(buildJSONFromType),
-    };
-  }
+      if (!elem) throw new Error('Missing element type in Array');
 
-  if (type.isUnion()) {
-    return {
-      kind: 'union',
-      name: type.getName(),
-      types: type.getUnionTypes().map(buildJSONFromType),
-    };
-  }
-
-  if (type.isObject() || type.isInterface()) {
-    const props = type.getProperties().map((sym) => {
-      const decl = sym.getDeclarations()[0];
-      const optional = decl.hasQuestionToken?.() ?? false;
-      const propType = sym.getTypeAtLocation(decl);
       return {
-        name: sym.getName(),
-        type: buildJSONFromType(propType),
-        optional: optional || undefined,
+        kind: 'array',
+        name: type.name,
+        element: buildJSONFromType(elem),
       };
-    });
 
-    return {
-      kind: type.isObject() ? 'object' : 'interface',
-      name: type.getName(),
-      properties: props,
-    };
-  }
-
-  if (type.isPromise()) {
-    const elementType = type.getPromiseElementType();
-
-    if (!elementType) throw new Error('Missing element type in Promise');
-
-    return {
-      kind: 'promise',
-      name: getTypeName(type),
-      element: buildJSONFromType(elementType),
-    };
-  }
-
-  if (type.isClass()) {
-    const props = type.getProperties().map((sym) => {
-      const decl = sym.getDeclarations()[0];
-      const optional = decl.hasQuestionToken?.() ?? false;
-      const propType = sym.getTypeAtLocation(decl);
+    case 'tuple':
       return {
-        name: sym.getName(),
-        type: buildJSONFromType(propType),
-        optional: optional || undefined,
+        kind: 'tuple',
+        name: type.name,
+        elements: type.elements.map(buildJSONFromType),
       };
-    });
 
-    return {
-      kind: 'class',
-      name: type.getName(),
-      properties: props,
-    };
+    case 'union':
+      return {
+        kind: 'union',
+        name: type.name,
+        types: type.unionTypes.map(buildJSONFromType),
+      };
+
+    case 'object':
+      const props = type.properties.map((sym) => {
+        const decl = sym.getDeclarations()[0];
+        const optional = decl.hasQuestionToken?.() ?? false;
+        const propType = sym.getTypeAtLocation(decl);
+        return {
+          name: sym.getName(),
+          type: buildJSONFromType(propType),
+          optional: optional || undefined,
+        };
+      });
+
+      return {
+        kind: 'object',
+        name: type.name,
+        properties: props,
+      };
+
+    case 'class':
+      const classProps = type.properties.map((sym) => {
+        const decl = sym.getDeclarations()[0];
+        const optional = decl.hasQuestionToken?.() ?? false;
+        const propType = sym.getTypeAtLocation(decl);
+        return {
+          name: sym.getName(),
+          type: buildJSONFromType(propType),
+          optional: optional || undefined,
+        };
+      });
+
+      return {
+        kind: 'class',
+        name: type.name,
+        properties: classProps,
+      };
+
+    case 'interface':
+      const interfaceProps = type.properties.map((sym) => {
+        const decl = sym.getDeclarations()[0];
+        const optional = decl.hasQuestionToken?.() ?? false;
+        const propType = sym.getTypeAtLocation(decl);
+        return {
+          name: sym.getName(),
+          type: buildJSONFromType(propType),
+          optional: optional || undefined,
+        };
+      });
+
+      return {
+        kind: 'interface',
+        name: type.name,
+        properties: interfaceProps,
+      };
+
+    case 'promise':
+      const elementType = type.element;
+
+      if (!elementType) throw new Error('Missing element type in Promise');
+
+      return {
+        kind: 'promise',
+        name: type.name,
+        element: buildJSONFromType(elementType),
+      };
+
+    case 'map':
+      const key = type.key;
+      const value = type.value;
+
+      const keyJson = buildJSONFromType(key);
+      const valueJson = buildJSONFromType(value);
+
+      return {
+        kind: 'map',
+        name: type.name,
+        typeArgs: [keyJson, valueJson],
+      };
+
+    case 'literal':
+      return {
+        kind: 'literal',
+        name: type.name ?? 'literal',
+      };
+
+    case 'alias':
+      const aliasSym = type.aliasSymbol;
+      if (!aliasSym) throw new Error('Alias missing symbol');
+      const target = aliasSym.getAliasTarget();
+      if (!target) throw new Error('Alias missing target');
+      return {
+        kind: 'alias',
+        name: type.name ?? 'alias',
+        target: buildJSONFromType(target),
+      };
+
+    case 'others':
+      return { kind: 'others', name: type.name };
+
+    case 'boolean':
+      return { kind: 'boolean', name: type.name };
   }
-
-  if (type.isMap()) {
-    const keyAndValue = type.getTypeArguments();
-
-    if (keyAndValue.length !== 2)
-      throw new Error('Map must have exactly two type arguments');
-
-    const key = keyAndValue[0];
-    const value = keyAndValue[1];
-
-    const keyJson = buildJSONFromType(key);
-    const valueJson = buildJSONFromType(value);
-
-    return {
-      kind: 'map',
-      name: getTypeName(type),
-      typeArgs: [keyJson, valueJson],
-    };
-  }
-
-  const aliasSym = type.getAliasSymbol();
-  if (aliasSym) {
-    const target = (aliasSym as any)._getAliasTarget?.() as Type;
-    if (!target) throw new Error('Alias missing target');
-    return {
-      kind: 'alias',
-      name: type.getName()!,
-      target: buildJSONFromType(target),
-    };
-  }
-
-  throw new Error(
-    `Failed to convert Type (kind: ${type.getKind()}) to JSON type. Unsupported type: ${type.getName() ?? 'unknown'}`,
-  );
 }

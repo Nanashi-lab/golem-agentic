@@ -26,144 +26,148 @@ import {
   Type,
   TypeMetadata,
 } from "@golemcloud/golem-ts-types-core";
+
 import * as fs from "node:fs";
 import path from "path";
 
-export function getFromTsMorph(tsMorphType: TsMorphType): Type {
+export function getFromTsMorph(tsMorphType: TsMorphType): Type.Type {
   const type = unwrapAlias(tsMorphType);
-  const name = getTypeName(type);
+  const rawName = getRawTypeName(type);
+  const aliasName = getAliasTypeName(type);
+  const name = aliasName ?? rawName ?? type.getText();
 
-  switch (name) {
+  switch (rawName) {
     case "Float64Array":
-      return new Type({
+      return {
         kind: "array",
         name: "Float64Array",
-        element: new Type({
+        element: {
           kind: "number",
           name: "number",
-        }),
-      });
+        },
+      };
     case "Float32Array":
-      return new Type({
+      return {
         kind: "array",
         name: "Float32Array",
-        element: new Type({
+        element: {
           kind: "number",
           name: "number",
-        }),
-      });
+        },
+      };
     case "Int8Array":
-      return new Type({
+      return {
         kind: "array",
         name: "Int8Array",
-        element: new Type({
+        element: {
           kind: "number",
           name: "number",
-        }),
-      });
+        },
+      };
     case "Uint8Array":
-      return new Type({
+      return {
         kind: "array",
         name: "Uint8Array",
-        element: new Type({
+        element: {
           kind: "number",
           name: "number",
-        }),
-      });
+        },
+      };
     case "Int16Array":
-      return new Type({
+      return {
         kind: "array",
         name: "Int16Array",
-        element: new Type({
+        element: {
           kind: "number",
           name: "number",
-        }),
-      });
+        },
+      };
     case "Uint16Array":
-      return new Type({
+      return {
         kind: "array",
         name: "Uint16Array",
-        element: new Type({
+        element: {
           kind: "number",
           name: "number",
-        }),
-      });
+        },
+      };
     case "Int32Array":
-      return new Type({
+      return {
         kind: "array",
         name: "Int32Array",
-        element: new Type({
+        element: {
           kind: "number",
           name: "number",
-        }),
-      });
+        },
+      };
     case "Uint32Array":
-      return new Type({
+      return {
         kind: "array",
         name: "Uint32Array",
-        element: new Type({
+        element: {
           kind: "number",
           name: "number",
-        }),
-      });
+        },
+      };
     case "BigInt64Array":
-      return new Type({
+      return {
         kind: "array",
         name: "BigInt64Array",
-        element: new Type({
+        element: {
           kind: "number",
           name: "number",
-        }),
-      });
+        },
+      };
     case "BigUint64Array":
-      return new Type({
+      return {
         kind: "array",
         name: "BigUint64Array",
-        element: new Type({
+        element: {
           kind: "number",
           name: "number",
-        }),
-      });
+        },
+      };
   }
 
-  if (name === "Promise" && type.getTypeArguments().length === 1) {
+  if (rawName === "Promise" && type.getTypeArguments().length === 1) {
     const inner = type.getTypeArguments()[0];
     const promiseType = getFromTsMorph(inner);
 
-    return new Type({
+    return {
       kind: "promise",
       name,
       element: promiseType,
-    });
+    };
   }
 
-  if (name === "Map" && type.getTypeArguments().length === 2) {
+  if (rawName === "Map" && type.getTypeArguments().length === 2) {
     const [keyT, valT] = type.getTypeArguments();
     const key = getFromTsMorph(keyT);
     const value = getFromTsMorph(valT);
-    return new Type({
+    return {
       kind: "map",
       name,
-      typeArgs: [key, value],
-    });
+      key: key,
+      value: value,
+    };
   }
 
-  if (type.isBoolean() || name === "true" || name === "false") {
-    return new Type({ kind: "boolean", name: "boolean" });
+  if (type.isBoolean() || rawName === "true" || rawName === "false") {
+    return { kind: "boolean", name: "boolean" };
   }
 
   if (type.isLiteral()) {
-    return new Type({ kind: "literal", name: type.getText() });
+    return { kind: "literal", name: type.getText() };
   }
 
   if (type.isTuple()) {
     const tupleElems = type.getTupleElements().map((el) => getFromTsMorph(el));
 
-    return new Type({
+    return {
       kind: "tuple",
       name,
       elements: tupleElems,
-    });
+    };
   }
 
   if (type.isArray()) {
@@ -174,21 +178,21 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
 
     const element = getFromTsMorph(elementType);
 
-    return new Type({
+    return {
       kind: "array",
       name,
       element,
-    });
+    };
   }
 
   if (type.isUnion()) {
     const unionTypes = type.getUnionTypes().map((t) => getFromTsMorph(t));
 
-    return new Type({
+    return {
       kind: "union",
       name,
       unionTypes,
-    });
+    };
   }
 
   if (type.isClass()) {
@@ -218,11 +222,11 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
       }
     });
 
-    return new Type({
+    return {
       kind: "class",
       name,
       properties: result,
-    });
+    };
   }
 
   if (type.isInterface()) {
@@ -252,11 +256,11 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
       }
     });
 
-    return new Type({
+    return {
       kind: "interface",
       name,
       properties: result,
-    });
+    };
   }
 
   if (type.isObject()) {
@@ -286,42 +290,37 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
       }
     });
 
-    return new Type({
+    return {
       kind: "object",
       name,
       properties: result,
-    });
+    };
   }
 
   if (type.isNull()) {
-    return new Type({ kind: "null", name: "null" });
+    return { kind: "null", name: "null" };
   }
 
   if (type.isBigInt()) {
-    return new Type({ kind: "bigint", name: "bigint" });
+    return { kind: "bigint", name: "bigint" };
   }
 
   if (type.isUndefined()) {
-    return new Type({ kind: "undefined", name: "undefined" });
+    return { kind: "undefined", name: "undefined" };
   }
 
   if (type.isNumber()) {
-    return new Type({ kind: "number", name: "number" });
+    return { kind: "number", name: "number" };
   }
 
   if (type.isString()) {
-    return new Type({ kind: "string", name: "string" });
+    return { kind: "string", name: "string" };
   }
 
-  // TODO; have custom types in types-core and pipe those types into custom
-  throw new Error(
-    "Type " +
-      `"${type.getText()}"` +
-      " not supported. This is a limitation of the type-gen module.",
-  );
+  return { kind: "others", name: type.getText() };
 }
 
-export function getTypeName(type: TsMorphType): string | undefined {
+export function getRawTypeName(type: TsMorphType): string | undefined {
   const rawName = type.getSymbol()?.getName();
 
   if (!rawName || rawName === "__type") {
@@ -335,6 +334,14 @@ export function getTypeName(type: TsMorphType): string | undefined {
   }
 
   return rawName;
+}
+
+export function getAliasTypeName(type: TsMorphType): string | undefined {
+  const alias = type.getAliasSymbol()?.getName();
+  if (!alias || alias === "__type") {
+    return undefined;
+  }
+  return alias;
 }
 
 export function unwrapAlias(type: TsMorphType): TsMorphType {

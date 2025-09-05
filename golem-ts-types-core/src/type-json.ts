@@ -13,12 +13,12 @@
 // limitations under the License.
 
 export type LiteTypeJSON =
-  | { kind: 'boolean'; name?: 'boolean' | 'true' | 'false' }
-  | { kind: 'number'; name?: 'number' }
-  | { kind: 'string'; name?: 'string' }
-  | { kind: 'bigint'; name?: 'bigint' }
-  | { kind: 'null'; name?: 'null' }
-  | { kind: 'undefined'; name?: 'undefined' }
+  | { kind: 'boolean'; name?: string }
+  | { kind: 'number'; name?: string }
+  | { kind: 'string'; name?: string }
+  | { kind: 'bigint'; name?: string }
+  | { kind: 'null'; name?: string }
+  | { kind: 'undefined'; name?: string }
   | { kind: 'array'; name?: string; element: LiteTypeJSON }
   | { kind: 'tuple'; name?: string; elements: LiteTypeJSON[] }
   | { kind: 'union'; name?: string; types: LiteTypeJSON[] }
@@ -52,7 +52,7 @@ export type LiteTypeJSON =
     }
   | {
       kind: 'promise';
-      name: string;
+      name?: string;
       element: LiteTypeJSON;
     }
   | {
@@ -62,6 +62,7 @@ export type LiteTypeJSON =
     }
   | {
       kind: 'map';
-      name: string;
+      name?: string;
       typeArgs?: LiteTypeJSON[];
-    };
+    }
+  | { kind: 'others'; name?: string };

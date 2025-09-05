@@ -14,166 +14,87 @@
 
 import { Symbol } from './symbol';
 
-type Kind =
-  | 'boolean'
-  | 'number'
-  | 'string'
-  | 'bigint'
-  | 'null'
-  | 'undefined'
-  | 'array'
-  | 'tuple'
-  | 'union'
-  | 'object'
-  | 'class'
-  | 'interface'
-  | 'promise'
-  | 'map'
-  | 'literal'
-  | 'alias';
+export type Type =
+  | { kind: 'boolean'; name?: string }
+  | { kind: 'number'; name?: string }
+  | { kind: 'string'; name?: string }
+  | { kind: 'bigint'; name?: string }
+  | { kind: 'null'; name?: string }
+  | { kind: 'undefined'; name?: string }
+  | { kind: 'array'; name?: string; element: Type }
+  | { kind: 'tuple'; name?: string; elements: Type[] }
+  | { kind: 'union'; name?: string; unionTypes: Type[] }
+  | { kind: 'object'; name?: string; properties: Symbol[] }
+  | { kind: 'class'; name?: string; properties: Symbol[] }
+  | { kind: 'interface'; name?: string; properties: Symbol[] }
+  | { kind: 'promise'; name?: string; element: Type }
+  | { kind: 'map'; name?: string; key: Type; value: Type }
+  | { kind: 'literal'; name?: string }
+  | { kind: 'alias'; name?: string; aliasSymbol: Symbol }
+  | { kind: 'others'; name?: string };
 
-export class Type {
-  private readonly kind: Kind;
-  private readonly name?: string;
-  private readonly element?: Type;
-  private readonly elements?: Type[];
-  private readonly unionTypes?: Type[];
-  private readonly properties?: Symbol[];
-  private readonly typeArgs?: Type[];
-  private readonly aliasSymbol?: Symbol;
-
-  constructor(from: {
-    kind: Kind;
-    name?: string;
-    element?: Type;
-    elements?: Type[];
-    unionTypes?: Type[];
-    properties?: Symbol[];
-    typeArgs?: Type[];
-    aliasSymbol?: Symbol;
-  }) {
-    this.kind = from.kind;
-    this.name = from.name;
-    this.element = from.element;
-    this.elements = from.elements;
-    this.unionTypes = from.unionTypes;
-    this.properties = from.properties;
-    this.typeArgs = from.typeArgs;
-    this.aliasSymbol = from.aliasSymbol;
-  }
-
-  getName(): string | undefined {
-    return this.name;
-  }
-
-  getKind(): Kind {
-    return this.kind;
-  }
-
-  getTypeArguments(): Type[] {
-    return this.typeArgs ?? [];
-  }
-
-  getPromiseElementType(): Type | undefined {
-    return this.element;
-  }
-
-  isBoolean(): boolean {
-    return this.kind === 'boolean';
-  }
-
-  isTuple(): boolean {
-    return this.kind === 'tuple';
-  }
-  getTupleElements(): Type[] {
-    return this.elements ?? [];
-  }
-
-  isArray(): boolean {
-    return this.kind === 'array';
-  }
-  getArrayElementType(): Type | undefined {
-    return this.element;
-  }
-
-  isUnion(): boolean {
-    return this.kind === 'union';
-  }
-
-  isPromise(): boolean {
-    return this.kind === 'promise';
-  }
-
-  isClass(): boolean {
-    return this.kind === 'class';
-  }
-
-  isMap(): boolean {
-    return this.kind === 'map';
-  }
-
-  isLiteral(): boolean {
-    return this.kind === 'literal';
-  }
-
-  getUnionTypes(): Type[] {
-    return this.unionTypes ?? [];
-  }
-
-  isObject(): boolean {
-    return this.kind === 'object';
-  }
-  isInterface(): boolean {
-    return this.kind === 'interface';
-  }
-  getProperties(): Symbol[] {
-    return this.properties ?? [];
-  }
-
-  isNull(): boolean {
-    return this.kind === 'null';
-  }
-  isBigInt(): boolean {
-    return this.kind === 'bigint';
-  }
-  isUndefined(): boolean {
-    return this.kind === 'undefined';
-  }
-  isNumber(): boolean {
-    return this.kind === 'number';
-  }
-  isString(): boolean {
-    return this.kind === 'string';
-  }
-
-  getAliasSymbol(): Symbol | undefined {
-    return this.aliasSymbol;
-  }
+export function getName(t: Type): string | undefined {
+  if (t.kind === 'others') return t.name;
+  return undefined;
 }
 
+export function getTypeArguments(t: Type): Symbol[] {
+  return t.kind === 'class' ? t.properties : [];
+}
+
+export function getTupleElements(t: Type): Type[] {
+  return t.kind === 'tuple' ? t.elements : [];
+}
+
+export function getArrayElementType(t: Type): Type | undefined {
+  return t.kind === 'array' ? t.element : undefined;
+}
+
+export function getUnionTypes(t: Type): Type[] {
+  return t.kind === 'union' ? t.unionTypes : [];
+}
+
+export function getProperties(t: Type): Symbol[] {
+  return t.kind === 'object' || t.kind === 'interface' ? t.properties : [];
+}
+
+export function getPromiseElementType(t: Type): Type | undefined {
+  return t.kind === 'promise' ? t.element : undefined;
+}
+
+export function getAliasSymbol(t: Type): Symbol | undefined {
+  return t.kind === 'alias' ? t.aliasSymbol : undefined;
+}
+
+// Get human-readable type name (exhaustive)
 export function getTypeName(t: Type): string {
-  if (t.getName) return t.getName()!;
-  if (t.isArray()) return 'Array';
-  if (t.isTuple()) return 'Tuple';
-  if (t.isUnion()) return 'Union';
-  if (t.isObject()) return 'Object';
-  if (t.isInterface()) return 'Interface';
-  if (t.isBoolean()) return 'boolean';
-  if (t.isNumber()) return 'number';
-  if (t.isString()) return 'string';
-  if (t.isNull()) return 'null';
-  if (t.isUndefined()) return 'undefined';
-  if (t.isBigInt()) return 'bigint';
-  if (t.isMap()) return 'Map';
-  if (t.isPromise()) return 'Promise';
-  return 'unknown';
+  switch (t.kind) {
+    case 'boolean':
+    case 'number':
+    case 'string':
+    case 'bigint':
+    case 'null':
+    case 'undefined':
+    case 'array':
+    case 'tuple':
+    case 'union':
+    case 'object':
+    case 'interface':
+    case 'promise':
+    case 'map':
+    case 'literal':
+    case 'class':
+    case 'alias':
+    case 'others':
+      return t.name ?? t.kind;
+  }
 }
 
 export function unwrapAlias(t: Type): Type {
   let current = t;
   const seen = new Set<Type>();
   while (true) {
-    const alias = current.getAliasSymbol();
+    const alias = getAliasSymbol(current);
     if (!alias || seen.has(current)) break;
     seen.add(current);
 

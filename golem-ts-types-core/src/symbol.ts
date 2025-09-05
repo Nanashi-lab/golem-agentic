@@ -32,8 +32,10 @@ export class Symbol {
     this.name = args.name;
     this.decls = args.declarations;
     this.valueDecl = args.valueDeclaration ?? args.declarations[0];
-    this._typeAtLocation =
-      args.typeAtLocation ?? new Type({ kind: 'undefined', name: 'undefined' });
+    this._typeAtLocation = args.typeAtLocation ?? {
+      kind: 'undefined',
+      name: 'undefined',
+    };
     this._aliasTarget = args.aliasTarget;
   }
 
@@ -54,7 +56,7 @@ export class Symbol {
     return this._typeAtLocation;
   }
 
-  _getAliasTarget(): Type | undefined {
+  getAliasTarget(): Type | undefined {
     return this._aliasTarget;
   }
 }
