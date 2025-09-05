@@ -161,6 +161,16 @@ jobs:
           node-version: "20.x"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Extract version from tag
+        id: get_version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG##*-v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Set package.json version
+        run: npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version
+
       - name: Install dependencies
         working-directory: ./golem-ts-types-core
         run: |
@@ -192,6 +202,16 @@ jobs:
         with:
           node-version: "20.x"
           registry-url: "https://registry.npmjs.org"
+
+      - name: Extract version from tag
+        id: get_version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG##*-v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Set package.json version
+        run: npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version     
 
       - name: Install dependencies
         working-directory: ./golem-ts-typegen
@@ -230,6 +250,16 @@ jobs:
 
       - name: Install wasm-rquickjs
         run: cargo install wasm-rquickjs-cli
+
+      - name: Extract version from tag
+        id: get_version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG##*-v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Set package.json version
+        run: npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version   
 
       - name: Install dependencies
         working-directory: ./golem-ts-sdk
