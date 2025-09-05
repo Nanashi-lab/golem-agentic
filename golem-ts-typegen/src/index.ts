@@ -26,6 +26,7 @@ import {
   Type,
   TypeMetadata,
 } from "@golemcloud/golem-ts-types-core";
+
 import * as fs from "node:fs";
 import path from "path";
 
