@@ -12,14 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Type as TsMorphType, Node as TsMorphNode, SourceFile } from "ts-morph";
 import {
-  Type,
-  Symbol,
-  Node,
-  TypeMetadata,
-  LiteTypeJSON,
+  Node as TsMorphNode,
+  Scope,
+  SourceFile,
+  Type as TsMorphType,
+} from "ts-morph";
+import {
   buildJSONFromType,
+  LiteTypeJSON,
+  Node,
+  Symbol,
+  Type,
+  TypeMetadata,
 } from "@golemcloud/golem-ts-types-core";
 import * as fs from "node:fs";
 import path from "path";
@@ -308,7 +313,12 @@ export function getFromTsMorph(tsMorphType: TsMorphType): Type {
     return new Type({ kind: "string", name: "string" });
   }
 
-  throw new Error("Unknown type: " + type.getText() + " with name: " + name);
+  // TODO; have custom types in types-core and pipe those types into custom
+  throw new Error(
+    "Type " +
+      `"${type.getText()}"` +
+      " not supported. This is a limitation of the type-gen module.",
+  );
 }
 
 export function getTypeName(type: TsMorphType): string | undefined {
@@ -362,17 +372,25 @@ export function updateMetadataFromSourceFiles(sourceFiles: SourceFile[]) {
       const className = classDecl.getName();
       if (!className) continue;
 
+      const publicConstructors = classDecl
+        .getConstructors()
+        .filter((ctor) => ctor.getScope() === Scope.Public);
+
       const constructorArgs =
-        classDecl
-          .getConstructors()[0]
-          ?.getParameters()
-          .map((p) => ({
-            name: p.getName(),
-            type: getFromTsMorph(p.getType()),
-          })) ?? [];
+        publicConstructors.length === 0
+          ? []
+          : publicConstructors[0].getParameters().map((p) => ({
+              name: p.getName(),
+              type: getFromTsMorph(p.getType()),
+            }));
 
       const methods = new Map();
-      for (const method of classDecl.getMethods()) {
+
+      const publicMethods = classDecl
+        .getMethods()
+        .filter((m) => m.getScope() === Scope.Public);
+
+      for (const method of publicMethods) {
         const methodParams = new Map(
           method.getParameters().map((p) => {
             return [p.getName(), getFromTsMorph(p.getType())];
