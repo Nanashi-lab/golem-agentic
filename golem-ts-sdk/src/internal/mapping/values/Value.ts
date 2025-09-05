@@ -701,65 +701,75 @@ function findTypeOfAny(
 }
 
 function matchesType(value: any, type: Type.Type): boolean {
-  const name = type.name;
+  switch (type.kind) {
+    case 'boolean':
+      return typeof value === 'boolean';
 
-  if (type.kind === 'number') {
-    return typeof value === 'number';
-  }
+    case 'number':
+      return typeof value === 'number';
 
-  if (type.kind === 'boolean' || name === 'true' || name === 'false') {
-    return typeof value === 'boolean';
-  }
+    case 'string':
+      return typeof value === 'string';
 
-  if (type.kind === 'string') {
-    return typeof value === 'string';
-  }
+    case 'bigint':
+      return typeof value === 'bigint' || typeof value === 'number';
 
-  if (type.kind === 'null') {
-    return value === null;
-  }
+    case 'null':
+      return value === null;
 
-  if (type.kind === 'undefined') {
-    return value === undefined;
-  }
+    case 'undefined':
+      return value === undefined;
 
-  if (type.kind === 'array') {
-    const elemType = type.element;
+    case 'array':
+      const elemType = type.element;
 
-    return matchesArray(value, elemType);
-  }
+      return matchesArray(value, elemType);
 
-  if (type.kind === 'tuple') {
-    return matchesTuple(value, type.elements);
-  }
+    case 'tuple':
+      return matchesTuple(value, type.elements);
 
-  if (type.kind === 'map') {
-    const keyType = type.key;
-    const valType = type.value;
+    case 'union':
+      return type.unionTypes.some((t) => matchesType(value, t));
 
-    if (!keyType || !valType) {
+    case 'object':
+      return handleObjectMatch(value, type, type.properties);
+
+    case 'class':
       return false;
-    }
-    if (!(value instanceof Map)) return false;
 
-    return Array.from(value.entries()).every(
-      ([k, v]) => matchesType(k, keyType) && matchesType(v, valType),
-    );
+    case 'interface':
+      return handleObjectMatch(value, type, type.properties);
+
+    case 'promise':
+      return matchesType(value, type.element);
+
+    case 'map':
+      const keyType = type.key;
+      const valType = type.value;
+
+      if (!keyType || !valType) {
+        return false;
+      }
+      if (!(value instanceof Map)) return false;
+
+      return Array.from(value.entries()).every(
+        ([k, v]) => matchesType(k, keyType) && matchesType(v, valType),
+      );
+
+    case 'literal':
+      const name = type.name;
+      if (name === 'true' || name === 'false') {
+        return typeof value === 'boolean';
+      } else {
+        return value === type.name;
+      }
+
+    case 'alias':
+      return false;
+
+    case 'others':
+      return false;
   }
-
-  if (type.kind === 'object') {
-    return handleObjectMatch(value, type, type.properties);
-  }
-
-  if (type.kind === 'interface') {
-    return handleObjectMatch(value, type, type.properties);
-  }
-
-  if (type.kind === 'union') {
-    return type.unionTypes.some((t) => matchesType(value, t));
-  }
-
-  return false;
 }
 
 function matchesTuple(
