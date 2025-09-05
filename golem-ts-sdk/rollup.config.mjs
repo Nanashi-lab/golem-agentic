@@ -3,7 +3,9 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from 'rollup-plugin-typescript2';
 import dts from 'rollup-plugin-dts';
-import { defineConfig } from 'rollup';
+import {defineConfig} from 'rollup';
+import * as fs from "node:fs";
+import path from "path";
 
 const external = [
     'agent-guest',
@@ -47,6 +49,25 @@ export default defineConfig([
             format: 'esm',
         },
         external,
-        plugins: [dts()],
+        plugins: [
+            dts(),
+            {
+                name: "prepend-virtual-types",
+                writeBundle() {
+                    const typesDir = path.resolve("types");
+
+                    const files = fs.readdirSync(typesDir)
+                        .filter(f => f.endsWith(".d.ts"));
+
+                    const refLines = files
+                        .map(f => `/// <reference path="../types/${f}" />`)
+                        .join("\n") + "\n";
+
+                    const mainDtsPath = path.resolve("dist/index.d.mts");
+                    const mainContent = fs.readFileSync(mainDtsPath, "utf-8");
+                    fs.writeFileSync(mainDtsPath, refLines + mainContent, "utf-8");
+                }
+            }
+        ],
     }
 ]);
