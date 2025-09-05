@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export * from './type-lite';
+export * as Type from './type-lite';
 export * from './node';
 export * from './symbol';
 export * from './type-json';

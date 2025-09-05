@@ -28,60 +28,62 @@ import {
   getClassType,
 } from "./util.js";
 
+import { Type } from "@golemcloud/golem-ts-types-core";
+
 describe("golem-ts-typegen can work correctly read types from .metadata directory", () => {
   it("track interface type", () => {
     const stringType = getStringType();
-    expect(stringType.isString()).toEqual(true);
+    expect(stringType.kind).toEqual("string");
   });
 
   it("track number type", () => {
     const numberType = getNumberType();
-    expect(numberType.isNumber()).toEqual(true);
+    expect(numberType.kind).toEqual("number");
   });
 
   it("track boolean type", () => {
     const booleanType = getBooleanType();
-    expect(booleanType.isBoolean()).toEqual(true);
+    expect(booleanType.kind).toEqual("boolean");
   });
 
   it("track map type", () => {
     const mapType = getTestMapType();
-    expect(mapType.isMap()).toEqual(true);
+    expect(mapType.kind).toEqual("map");
   });
 
   it("track tuple type", () => {
     const tupleType = getTupleType();
-    expect(tupleType.isTuple()).toEqual(true);
+    expect(tupleType.kind).toEqual("tuple");
   });
 
   it("track array type", () => {
-    const tupleType = getTestListOfObjectType();
-    expect(tupleType.isArray()).toEqual(true);
+    const arrayType = getTestListOfObjectType();
+    expect(arrayType.kind).toEqual("array");
   });
 
   it("track object type", () => {
     const objectType1 = getObjectType();
-    expect(objectType1.isObject()).toEqual(true);
+    expect(objectType1.kind).toEqual("object");
 
     const objectType2 = getComplexObjectType();
-    expect(objectType2.isObject()).toEqual(true);
+    expect(objectType2.kind).toEqual("object");
   });
 
   it("track union type", () => {
     const unionType1 = getUnionComplexType();
-    expect(unionType1.isUnion()).toEqual(true);
+    expect(unionType1.kind).toEqual("union");
 
     const unionType2 = getUnionType();
-    expect(unionType2.isUnion()).toEqual(true);
+    expect(unionType2.kind).toEqual("union");
   });
 
   it("track interface type", () => {
     const tupleType = getInterfaceType();
-    expect(tupleType.isInterface()).toEqual(true);
+    expect(tupleType.kind).toEqual("interface");
   });
 
   it("track class type", () => {
     const classType = getClassType();
-    expect(classType.isClass()).toEqual(true);
+    expect(classType.kind).toEqual("class");
   });
 });
