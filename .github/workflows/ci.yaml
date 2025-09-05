@@ -169,6 +169,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Set package.json version
+        working-directory: ./golem-ts-types-core
         run: npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version
 
       - name: Install dependencies
@@ -211,6 +212,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Set package.json version
+        working-directory: ./golem-ts-typegen
         run: npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version     
 
       - name: Install dependencies
@@ -259,6 +261,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Set package.json version
+        working-directory: ./golem-ts-sdk
         run: npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version   
 
       - name: Install dependencies
