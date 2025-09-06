@@ -7,6 +7,7 @@
         "lint": "pnpm -r run lint",
         "test": "pnpm -r run test",
         "format": "pnpm -r run format",
+        "format:check": "pnpm -r run format:check",
         "clean": "pnpm -r exec rm -rf dist node_modules .turbo packages/*/dist packages/*/node_modules packages/*/.metadata"
     },
     "devDependencies": {
