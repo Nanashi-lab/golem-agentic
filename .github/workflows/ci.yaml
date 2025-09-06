@@ -134,10 +134,11 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Set versions in all packages
+        working-directory: ./golem-ts-introspect
         run: |
           VERSION=${{ steps.get_version.outputs.version }}
           for pkg in packages/golem-ts-types-core packages/golem-ts-typegen; do
-            cd golem-ts-introspect/$pkg
+            cd $pkg
             npm version $VERSION --no-git-tag-version
             cd ../../
           done
