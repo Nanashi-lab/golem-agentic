@@ -43,7 +43,7 @@ jobs:
       - name: Build the package
         working-directory: ./golem-ts-introspect
         run: |
-          npm run build
+          pnpm run build
          
   build-ts-sdk:
     runs-on: blacksmith
