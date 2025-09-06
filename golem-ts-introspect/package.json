@@ -1,13 +1,11 @@
 {
     "name": "golem-ts-introspect",
+    "type": "module",
     "private": true,
-    "workspaces": [
-        "packages/*"
-    ],
     "scripts": {
-        "build": "npm run build -ws",
-        "lint": "npm run lint -ws",
-        "test": "npm run test -ws",
-        "clean": "rm -rf node_modules package-lock.json packages/*/package-lock.json packages/*/node_modules packages/*/dist packages/*/.metadata"
+        "build": "pnpm -r run build",
+        "lint": "pnpm -r run lint",
+        "test": "pnpm -r run test",
+        "clean": "pnpm -r exec rm -rf dist node_modules .turbo packages/*/dist packages/*/node_modules packages/*/.metadata"
     }
 }
