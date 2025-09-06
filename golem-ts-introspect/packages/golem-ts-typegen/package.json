@@ -1,7 +1,7 @@
 {
   "name": "@golemcloud/golem-ts-typegen",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.1.2",
   "publishConfig": {
     "access": "public",
     "tag": "test"
