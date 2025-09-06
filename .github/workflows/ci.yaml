@@ -2,15 +2,13 @@ name: CI
 on:
   push:
     tags:
-      - "golem-ts-sdk-v*.*.*"
-      - "golem-ts-typegen-v*.*.*"
-      - "golem-ts-types-core-v*.*.*"
+      - "golem-ts-agentic-v*.*.*"
     branches:
       - main
   pull_request:
 
 jobs:
-  build-ts-types-core:
+  build-ts-agentic:
     runs-on: blacksmith
     steps:
       - uses: actions/checkout@v4
@@ -19,80 +17,9 @@ jobs:
         with:
           node-version: "20.x"
 
-      - name: Install dependencies
-        working-directory: ./golem-ts-types-core
-        run: |
-          npm install
-
-      - name: Check code quality    
-        working-directory: ./golem-ts-types-core
-        run: |
-          npm run lint || (
-            echo "Linting issues found. Please fix them before proceeding. `npm run lint:fix` may help"
-            exit 1
-          )
-
-      - name: Check code formatting
-        working-directory: ./golem-ts-types-core
-        run: |
-          npm run format:check || (
-            echo "Code formatting issues found. Please run 'npm run format' to fix them."
-            exit 1
-          )    
-
-      - name: Build the package
-        working-directory: ./golem-ts-types-core
-        run: |
-          npm run build
-
-  build-ts-typegen:
-    runs-on: blacksmith
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v2
         with:
-          node-version: "20.x"
-
-      - name: Install dependencies
-        working-directory: ./golem-ts-typegen
-        run: |
-          npm install
-
-      - name: Check code quality    
-        working-directory: ./golem-ts-typegen
-        run: |
-          npm run lint || (
-            echo "Linting issues found. Please fix them before proceeding. `npm run lint:fix` may help"
-            exit 1
-          )
-
-      - name: Check code formatting
-        working-directory: ./golem-ts-typegen
-        run: |
-          npm run format:check || (
-            echo "Code formatting issues found. Please run 'npm run format' to fix them."
-            exit 1
-          )    
-
-      - name: Build the package
-        working-directory: ./golem-ts-typegen
-        run: |
-          npm run build
-
-      - name: Run tests
-        working-directory: ./golem-ts-typegen
-        run: |
-          npm run test            
-
-  build-ts-sdk:
-    runs-on: blacksmith
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20.x"
+          version: latest
 
       - name: Setup Rust
         run: rustup update stable --no-self-update && rustup default stable
@@ -101,101 +28,43 @@ jobs:
         run: cargo install wit-deps-cli
      
       - name: Install wasm-rquickjs
-        run: cargo install wasm-rquickjs-cli   
-        
-      - name: Install dependencies for golem-ts-sdk
-        working-directory: ./golem-ts-sdk
-        run: |
-          npm install
+        run: cargo install wasm-rquickjs-cli     
 
-      - name: Run WIT deps update for golem-ts-sdk
+      - name: Install dependencies
+        working-directory: ./golem-ts-agentic
         run: |
-          wit-deps update || (
-            echo "Failed to update WIT dependencies"
-            exit 1
-          )
-          # Check if wit/deps changed
-          if ! git diff --exit-code -- wit/deps; then
-            echo "WIT dependencies are outdated. Please run 'wit-deps update' and commit changes."
-            exit 1
-          fi
+          pnpm install
 
-      - name: Check code quality for golem-ts-sdk
-        working-directory: ./golem-ts-sdk
+      - name: Check code quality    
+        working-directory: ./golem-ts-agentic
         run: |
-          npm run lint || (
+          pnpm run lint || (
             echo "Linting issues found. Please fix them before proceeding. `npm run lint:fix` may help"
             exit 1
-          )     
+          )
 
-      - name: Check code formatting for golem-ts-sdk
-        working-directory: ./golem-ts-sdk
+      - name: Check code formatting
+        working-directory: ./golem-ts-agentic
         run: |
-          npm run format:check || (
+          pnpm run format:check || (
             echo "Code formatting issues found. Please run 'npm run format' to fix them."
             exit 1
-          )      
-
-      - name: Build golem-ts-sdk package
-        working-directory: ./golem-ts-sdk
-        run: |
-          npm run build
-
-      - name: Run tests in golem-ts-sdk
-        working-directory: ./golem-ts-sdk
-        run: |
-          npm run test    
-
-  publish-ts-types-core:
-    needs: build-ts-types-core
-    runs-on: blacksmith
-    if: startsWith(github.ref, 'refs/tags/golem-ts-types-core-v')
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20.x"
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Extract version from tag
-        id: get_version
-        run: |
-          TAG=${GITHUB_REF#refs/tags/}
-          VERSION=${TAG##*-v}
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Set package.json version
-        working-directory: ./golem-ts-types-core
-        run: npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version
-
-      - name: Install dependencies
-        working-directory: ./golem-ts-types-core
-        run: |
-          npm install
+          )    
 
       - name: Build the package
-        working-directory: ./golem-ts-types-core
+        working-directory: ./golem-ts-agentic
         run: |
-          npm run build     
+          pnpm run build
 
-      - name: Publish ts types core to npm
-        working-directory: ./golem-ts-types-core
+      - name: Run tests
+        working-directory: ./golem-ts-agentic
         run: |
-          npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}    
-
-  publish-ts-typegen:
-    needs: build-ts-typegen
+          pnpm run test    
+         
+  publish-ts-agentic:
+    needs: build-ts-agentic
     runs-on: blacksmith
-    if: startsWith(github.ref, 'refs/tags/golem-ts-typegen-v')
-    permissions:
-      contents: read
-      id-token: write
+    if: startsWith(github.ref, 'refs/tags/golem-ts-agentic-v')
     steps:
       - uses: actions/checkout@v4
 
@@ -203,55 +72,19 @@ jobs:
         with:
           node-version: "20.x"
           registry-url: "https://registry.npmjs.org"
-
-      - name: Extract version from tag
-        id: get_version
-        run: |
-          TAG=${GITHUB_REF#refs/tags/}
-          VERSION=${TAG##*-v}
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Set package.json version
-        working-directory: ./golem-ts-typegen
-        run: npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version     
-
-      - name: Install dependencies
-        working-directory: ./golem-ts-typegen
-        run: |
-          npm install
-
-      - name: Build the package
-        working-directory: ./golem-ts-typegen
-        run: |
-          npm run build     
-
-      - name: Publish ts typegen to npm
-        working-directory: ./golem-ts-typegen
-        run: |
-          npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}            
-
-  publish-ts-sdk:
-    needs: [build-ts-types-core, build-ts-sdk]
-    runs-on: blacksmith
-    if: startsWith(github.ref, 'refs/tags/golem-ts-sdk-v')
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      
+      - uses: pnpm/action-setup@v2
         with:
-          node-version: "20.x"
-          registry-url: "https://registry.npmjs.org"
+          version: latest
 
       - name: Setup Rust
         run: rustup update stable --no-self-update && rustup default stable
 
+      - name: Install wit-deps-cli for WIT deps management
+        run: cargo install wit-deps-cli
+     
       - name: Install wasm-rquickjs
-        run: cargo install wasm-rquickjs-cli
+        run: cargo install wasm-rquickjs-cli       
 
       - name: Extract version from tag
         id: get_version
@@ -260,23 +93,26 @@ jobs:
           VERSION=${TAG##*-v}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Set package.json version
-        working-directory: ./golem-ts-sdk
-        run: npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version   
+      - name: Set versions in all packages
+        working-directory: ./golem-ts-agentic
+        run: |
+          VERSION=${{ steps.get_version.outputs.version }}
+          for pkg in packages/golem-ts-types-core packages/golem-ts-typegen packages/golem-ts-sdk; do
+            cd $pkg
+            npm version $VERSION --no-git-tag-version
+            cd ../../
+          done
 
       - name: Install dependencies
-        working-directory: ./golem-ts-sdk
-        run: |
-          npm install
+        working-directory: ./golem-ts-agentic
+        run: pnpm install
 
-      - name: Build the SDK package
-        working-directory: ./golem-ts-sdk
-        run: |
-          npm run build
+      - name: Build all packages
+        working-directory: ./golem-ts-agentic
+        run: pnpm -r run build
 
-      - name: Publish ts SDK to npm
-        working-directory: ./golem-ts-sdk
-        run: |
-          npm publish --access public
+      - name: Publish all packages
+        working-directory: ./golem-ts-agentic
+        run: pnpm -r publish --access public --no-git-checks
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}      
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
