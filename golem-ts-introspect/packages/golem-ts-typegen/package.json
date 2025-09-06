@@ -1,7 +1,7 @@
 {
   "name": "@golemcloud/golem-ts-typegen",
   "type": "module",
-  "version": "0.1.2",
+  "version": "0.0.0",
   "publishConfig": {
     "access": "public",
     "tag": "test"
@@ -36,7 +36,7 @@
     "format": "prettier --write \"src/**/*\" \"tests/**/*\"",
     "format:check": "prettier --check \"src/**/*\" \"tests/**/*\"",
     "test": "tsc --noEmit && vitest run",
-    "build": "npm run build:lib && npm run build:cli",
+    "build": "pnpm run build:lib && pnpm run build:cli",
     "build:lib": "tsc --noEmit && rollup -c",
     "build:cli": "tsc src/bin/golem-typegen.ts --outDir dist --module node16 --target ES2020 --esModuleInterop",
     "dev": "rollup -c -w"
