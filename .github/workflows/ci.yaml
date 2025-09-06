@@ -19,6 +19,9 @@ jobs:
           node-version: "20.x"
           cache: 'npm'
 
+      - name: Setup pnpm
+        run: corepack enable && corepack prepare pnpm@latest --activate     
+
       - name: Install dependencies
         working-directory: ./golem-ts-introspect
         run: |
@@ -168,6 +171,9 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           cache: 'npm'
 
+      - name: Setup pnpm
+        run: corepack enable && corepack prepare pnpm@latest --activate     
+     
       - name: Setup Rust
         run: rustup update stable --no-self-update && rustup default stable
 
