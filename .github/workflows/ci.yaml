@@ -17,7 +17,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20.x"
-          cache: 'npm'
 
       - name: Setup pnpm
         run: corepack enable && corepack prepare pnpm@latest --activate     
@@ -56,7 +55,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20.x"
-          cache: 'npm'
 
       - name: Setup Rust
         run: rustup update stable --no-self-update && rustup default stable
@@ -122,7 +120,6 @@ jobs:
         with:
           node-version: "20.x"
           registry-url: "https://registry.npmjs.org"
-          cache: 'npm'
 
       - name: Extract version from tag
         id: get_version
@@ -169,7 +166,6 @@ jobs:
         with:
           node-version: "20.x"
           registry-url: "https://registry.npmjs.org"
-          cache: 'npm'
 
       - name: Setup pnpm
         run: corepack enable && corepack prepare pnpm@latest --activate     
