@@ -36,6 +36,7 @@
     "format": "prettier --write \"src/**/*\"",
     "format:check": "prettier --check \"src/**/*\"",
     "build": "tsc --noEmit && rollup -c",
+    "test": "tsc --noEmit",
     "dev": "rollup -c -w"
   },
   "keywords": [],
@@ -61,7 +62,6 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.39.0",
     "vitest": "^3.2.4"
-
   },
   "private": false
 }
