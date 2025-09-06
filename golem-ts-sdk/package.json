@@ -40,6 +40,7 @@
     "generate-test-types-metadata": "npx golem-typegen ./tsconfig.json --files tests/**/*.ts",
     "prebuild": "npm run clean-test-data && npm run generate-dts && npm run generate-test-types-metadata",
     "build": "tsc --noEmit && rollup -c",
+    "clean": "rm -rf .metadata dist node_modules package-lock.json && printf '\\nRun `npm install` before building again.\\n\\n'",
     "test": "npm run clean-test-data && npm run generate-test-types-metadata && tsc --noEmit && vitest run",
     "dev": "rollup -c -w"
   },
@@ -52,7 +53,7 @@
   "description": "",
   "devDependencies": {
     "@eslint/js": "^9.33.0",
-    "@golemcloud/golem-ts-typegen": "^0.0.1",
+    "@golemcloud/golem-ts-typegen": "^0.0.2",
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@types/node": "^24.3.0",
@@ -72,7 +73,7 @@
   },
   "private": false,
   "dependencies": {
-    "@golemcloud/golem-ts-types-core": "^0.0.1",
+    "@golemcloud/golem-ts-types-core": "^0.0.2",
     "effect": "^3.17.6"
   }
 }
