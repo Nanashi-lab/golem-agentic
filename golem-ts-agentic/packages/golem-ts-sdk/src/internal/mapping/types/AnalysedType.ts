@@ -229,6 +229,9 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
     case "undefined":
       return Either.right(tuple([]))
 
+    case "void":
+      return Either.right(tuple([]))
+
     case "tuple":
       const tupleElems = Either.all(type.elements.map(el => fromTsTypeInternal(el)));
       return Either.map(tupleElems, (items) => tuple(items));
@@ -402,7 +405,7 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
       }
 
 
-      return Either.left(`Type "${customTypeName}" is not supported`)
+      return Either.left(`Unsupported type \`${customTypeName}\``)
 
     case 'array':
       const name = type.name;
