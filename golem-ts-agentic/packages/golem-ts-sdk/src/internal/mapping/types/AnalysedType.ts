@@ -398,14 +398,35 @@ export function fromTsTypeInternal(type: TsType): Either.Either<AnalysedType, st
       return Either.left(`Type aliases are not supported. Found alias: ${type.name ?? "<anonymous>"}`);
 
     case "others":
+
+
       const customTypeName = type.name
+
 
       if (!customTypeName) {
         return Either.left("Unsupported type (anonymous) found.");
       }
 
+      if (customTypeName === 'Date') {
+        return Either.left("Unsupported type `Date`. Use a string in ISO 8601 format instead");
+      }
 
-      return Either.left(`Unsupported type \`${customTypeName}\``)
+
+      if (customTypeName === 'next') {
+        return Either.left("Unsupported type `Iterator`. Use `Array` type instead");
+      }
+
+      if (customTypeName.includes('iterator')) {
+        return Either.left(`Unsupported type \`Iterable\`. Use \`Array\` type instead`);
+      }
+
+
+      if (customTypeName === 'Record') {
+        return Either.left(`Unsupported type \`${customTypeName}\`. Use a plain object or a \`Map\` type instead`);
+      }
+
+
+      return Either.left(`Unsupported type \`${customTypeName}\``);
 
     case 'array':
       const name = type.name;

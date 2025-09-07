@@ -97,7 +97,7 @@ export function getAgentMethodSchema(
 
       if (Either.isLeft(outputSchemaEither)) {
         return Either.left(
-          `Failed to construct output schema for method ${methodName}: ${outputSchemaEither.val}`,
+          `Failed to construct output schema for method ${methodName}: ${outputSchemaEither.val}.`,
         );
       }
 
@@ -126,7 +126,7 @@ export function buildInputSchema(
           return [parameterInfo[0], result] as [string, ElementSchema];
         },
         (err) =>
-          `${err}, found in method \`${methodName}\`, parameter \`${parameterInfo[0]}\`. Please replace this parameter type with a simpler, supported type."`,
+          `Method: \`${methodName}\`, Parameter: \`${parameterInfo[0]}\`. Error: ${err}`,
       ),
     ),
   );
