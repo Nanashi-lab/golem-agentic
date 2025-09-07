@@ -109,7 +109,7 @@ jobs:
 
       - name: Build all packages
         working-directory: ./golem-ts-agentic
-        run: pnpm -r run build
+        run: pnpm run build
 
       - name: Publish all packages
         working-directory: ./golem-ts-agentic
