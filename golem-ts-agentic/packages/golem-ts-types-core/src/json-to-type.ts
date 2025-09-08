@@ -56,7 +56,7 @@ export function buildTypeFromJSON(json: LiteTypeJSON): Type {
       const elems = json.elements.map(buildTypeFromJSON);
       return {
         kind: 'tuple',
-        name: json.name ?? 'Tuple',
+        name: json.name,
         elements: elems,
       };
     }
@@ -65,7 +65,7 @@ export function buildTypeFromJSON(json: LiteTypeJSON): Type {
       const types = json.types.map(buildTypeFromJSON);
       return {
         kind: 'union',
-        name: json.name ?? 'Union',
+        name: json.name,
         unionTypes: types,
       };
     }
@@ -119,7 +119,11 @@ export function buildTypeFromJSON(json: LiteTypeJSON): Type {
     }
 
     case 'literal':
-      return { kind: 'literal', name: json.name };
+      return {
+        kind: 'literal',
+        name: json.name,
+        literalValue: json.literalValue,
+      };
 
     case 'alias': {
       const target = buildTypeFromJSON(json.target);
@@ -155,7 +159,7 @@ export function buildTypeFromJSON(json: LiteTypeJSON): Type {
 
       return {
         kind: 'map',
-        name: json.name ?? 'Map',
+        name: json.name,
         key: typeArgs[0],
         value: typeArgs[1],
       };
